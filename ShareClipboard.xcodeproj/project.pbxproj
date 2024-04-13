@@ -14,6 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DA76DEA02BCB178700A64957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* ShareClipboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShareClipboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareClipboardApp.swift; sourceTree = "<group>"; };
 		DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,6 +53,7 @@
 		DAAB33BD2BCAFDCB00C82DF4 /* ShareClipboard */ = {
 			isa = PBXGroup;
 			children = (
+				DA76DEA02BCB178700A64957 /* Info.plist */,
 				DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */,
 				DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */,
 				DAAB33C22BCAFDCD00C82DF4 /* Assets.xcassets */,
@@ -279,6 +281,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareClipboard/Info.plist;
+				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -306,6 +310,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareClipboard/Info.plist;
+				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
