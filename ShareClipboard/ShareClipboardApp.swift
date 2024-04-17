@@ -7,7 +7,7 @@ protocol ClipboardContentReceiver {
     func receiveClipboardContent(content: String)
 }
 
-class GameCenterManager: NSObject, ObservableObject, GKMatchmakerViewControllerDelegate, GKMatchDelegate {
+class GameCenterManager: NSObject, ObservableObject, GKMatchmakerViewControllerDelegate, GKMatchDelegate, GKLocalPlayerListener {
     @Published var isSignedIn: Bool = false
     @Published var matchedWithPlayers: Bool = false
     var gkViewControllerForSignIn: NSViewController?
@@ -32,6 +32,7 @@ class GameCenterManager: NSObject, ObservableObject, GKMatchmakerViewControllerD
                     self.isSignedIn = true
                 }
                 print("Player is authenticated")
+                GKLocalPlayer.local.register(self)
             } else {
                 DispatchQueue.main.async {
                     self.isSignedIn = false
@@ -108,6 +109,21 @@ class GameCenterManager: NSObject, ObservableObject, GKMatchmakerViewControllerD
             try match.sendData(toAllPlayers: messageData, with: .reliable)
         } catch {
             print("Failed to send data: \(error.localizedDescription)")
+        }
+    }
+    
+    // Handle incoming invitations
+    func player(_ player: GKPlayer, didAccept invite: GKInvite) {
+        print("Received invite!")
+        // Handle the accepted invite, by showing a matchmaker view controller
+        DispatchQueue.main.async {
+            if let matchmakerVC = GKMatchmakerViewController(invite: invite) {
+                matchmakerVC.matchmakerDelegate = self
+                // Present this from your main view controller
+                if let window = NSApplication.shared.mainWindow, let rootViewController = window.contentViewController {
+                    rootViewController.presentAsModalWindow(matchmakerVC)
+                }
+            }
         }
     }
 }
