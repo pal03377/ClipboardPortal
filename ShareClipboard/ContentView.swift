@@ -1,85 +1,70 @@
 import SwiftUI
-import AppKit
-import GameKit
+import UserNotifications
 
-struct ContentView: View, ClipboardContentReceiver {
-    @EnvironmentObject var gameCenterManager: GameCenterManager
-    @State var lastSharedClipboardEntry: String = ""
-    @State private var commandVListener: Any?
-    
+struct ContentView: View {
+    @EnvironmentObject var deviceTokenStore: DeviceTokenStore
+    @State private var isNotificationAllowed: Bool = false
+
     var body: some View {
-        if !gameCenterManager.isSignedIn {
-            Button(action: {
-                // Show Sign In sheet
-                if let window = NSApplication.shared.windows.first, let rootViewController = window.contentViewController, let gkViewControllerForSignIn = gameCenterManager.gkViewControllerForSignIn {
-                    rootViewController.presentAsModalWindow(gkViewControllerForSignIn)
-                }
-            }) {
-                Text("Sign in")
-            }
-            .buttonStyle(.plain)
-        } else if !gameCenterManager.matchedWithPlayers {
-            VStack {
-                Text("Signed in! 🎉")
-                Button(action: {
-                    do {
-                        try GKLocalPlayer.local.presentFriendRequestCreator(from: NSApplication.shared.mainWindow)
-                    } catch {
-                        print("Error: \(error.localizedDescription).")
+        VStack {
+            Text("Send your clipboard")
+                .font(.largeTitle)
+            Text("Press ⌘+V to send")
+            Spacer()
+                .frame(height: 32)
+            Text("Receive other clipboard")
+                .font(.largeTitle)
+            if isNotificationAllowed {
+                Text("You can receive clipboard contents. Send your friend the token to connect.")
+                if let token = deviceTokenStore.deviceToken {
+                    HStack {
+                        Text("Token: \(token)")
+                        ShareLink("Send to friend", item: token)
                     }
-                }) {
-                    Image(systemName: "person.crop.circle.badge.plus")
+                } else if let error = deviceTokenStore.registrationError {
+                    Text("Error: \(error.localizedDescription)")
+                    Button {
+                        registerForPushNotifications()
+                    } label: { Text("Retry") }
                 }
-                Button(action: {
-                    if let window = NSApplication.shared.mainWindow, let rootViewController = window.contentViewController {
-                            gameCenterManager.presentMatchmaker(from: rootViewController)
-                        }
-                }) {
-                    Text("Start clipboard sharing")
+            } else {
+                Button("Enable receiving clipboard") {
+                    registerForPushNotifications()
                 }
-                .padding()
             }
-        } else { // Matched with players?
-            VStack {
-                Text("Press Cmd+V to paste from clipboard")
-                Text("Last shared clipboard entry: \(lastSharedClipboardEntry)")
-            }
-            .padding()
-            .onAppear() {
-                // Receive clipboard content
-                self.gameCenterManager.addReceiver(self)
-                // Setup Cmd+V keyboard shortcut to send clipboard content
-                self.commandVListener = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { (event) -> NSEvent? in
-                    if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command && event.characters == "v" {
-                        // Read clipboard
-                        let pasteboard = NSPasteboard.general
-                        if let string = pasteboard.string(forType: .string) {
-                            print("Paste string: \(string)")
-                            self.lastSharedClipboardEntry = string
-                            gameCenterManager.sendDataToAllPlayers(message: string)
-                            return nil
-                        }
+        }
+        .padding()
+        .onAppear {
+            checkNotificationAuthorization()
+        }
+    }
+    
+    func checkNotificationAuthorization() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                self.isNotificationAllowed = (settings.authorizationStatus == .authorized)
+                if self.isNotificationAllowed && deviceTokenStore.deviceToken == nil {
+                    DispatchQueue.main.async {
+                        print("Registering...")
+                        NSApplication.shared.registerForRemoteNotifications()
                     }
-                    return event
                 }
-            }
-            .onDisappear() {
-                // Clean up Command V listener
-                if let commandVListener = self.commandVListener { NSEvent.removeMonitor(commandVListener) }
-                self.commandVListener = nil
             }
         }
     }
     
-    func receiveClipboardContent(content: String) {
-        self.lastSharedClipboardEntry = content // Store received content to show it in the UI
-        // Put new content in clipboard
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents() // Clear clipboard to avoid still having an image in it if a text is pasted
-        pasteboard.setString(content, forType: .string)
+    func registerForPushNotifications() {
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                DispatchQueue.main.async {
+                    self.isNotificationAllowed = granted
+                }
+                print("Permission granted: \(granted)")
+            }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(DeviceTokenStore())
 }
