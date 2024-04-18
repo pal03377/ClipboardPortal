@@ -146,20 +146,23 @@ struct ContentView: View {
                 
                 Text("History")
                     .font(.largeTitle)
-                List(clipboardManager.clipboardHistory, id: \.self) { content in
-                    Text(content)
-                    Button { // Copy button
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(content, forType: .string)
-                    } label: {
-                        Image(systemName: "doc.on.doc")
-                    }
-                    if let _ = receiverStore.receiverId {
-                        Button { // Resend button
-                            Task {
-                                await clipboardManager.sendClipboardContent(content: content)
-                            }
-                        } label: { Image(systemName: "paperplane") }
+                List(clipboardManager.clipboardHistory.reversed(), id: \.self) { content in
+                    HStack {
+                        Text(content)
+                        Spacer()
+                        Button { // Copy button
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(content, forType: .string)
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                        }
+                        if let _ = receiverStore.receiverId {
+                            Button { // Resend button
+                                Task {
+                                    await clipboardManager.sendClipboardContent(content: content)
+                                }
+                            } label: { Image(systemName: "paperplane") }
+                        }
                     }
                 }
                 .frame(maxHeight: 200)

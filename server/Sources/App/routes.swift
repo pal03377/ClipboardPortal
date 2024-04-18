@@ -37,6 +37,9 @@ func routes(_ app: Application) throws {
     struct ClipboardPayload: Codable {
         var clipboardContent: String
     }
+    struct ClipboardSendResponse: Content {
+        var status: String
+    }
     app.post("send") { req async throws in
         print("Body: " + (req.body.string ?? "No body")) // Print incoming data for debugging
         let notification = try req.content.decode(ClipboardContentSendDTO.self)
@@ -60,6 +63,6 @@ func routes(_ app: Application) throws {
             print("Error sending notification: \(error)") // Print error for debugging
             throw Abort(.internalServerError) // 500 if error sending notification
         }
-        return "ACK" // Acknowledge successful notification
+        return ClipboardSendResponse(status: "success") // e.g. {"status":"success"}
     }
 }

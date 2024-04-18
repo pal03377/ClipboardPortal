@@ -24,6 +24,9 @@ class ClipboardManager: ObservableObject {
         var receiverId: String // User ID for notification
         var clipboardContent: String // Clipboard contents to send
     }
+    struct ClipboardSendResponse: Codable {
+        var status: String
+    }
     func sendClipboardContent(content: String) async {
         guard let receiverId = self.receiverId else {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured." } // Show error if there is no receiver yet. Update UI in main thread.
@@ -32,7 +35,7 @@ class ClipboardManager: ObservableObject {
         DispatchQueue.main.async { self.sending = true } // Show loading spinner in UI. Update UI in main thread.
         defer { DispatchQueue.main.async { self.sending = false } } // Hide loading spinner when done. Update UI in main thread.
         do {
-            let _: String = try await ServerRequest.post(path: "/send", body: ClipboardContentSendDTO(receiverId: receiverId, clipboardContent: content)) // Send clipboard content to server to trigger notification to receipient
+            let _: ClipboardSendResponse = try await ServerRequest.post(path: "/send", body: ClipboardContentSendDTO(receiverId: receiverId, clipboardContent: content)) // Send clipboard content to server to trigger notification to receipient
             DispatchQueue.main.async { self.clipboardHistory.append(content) } // Record send in history. Update UI in main thread.
         } catch {
             DispatchQueue.main.async { self.sendErrorMessage = error.localizedDescription } // Show error. Update UI in main thread.
