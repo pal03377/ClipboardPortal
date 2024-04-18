@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "static ServerRequest.post&lt;&#x3c4;_0_0&gt;(path:body:):ServerRequest.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Bundle.main.object(forInfoDictionaryKey: &quot;ServerURL&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static ServerRequest.sendRequest&lt;&#x3c4;_0_0&gt;(_:):ServerRequest.swift">
+      </ContextState>
+      <ContextState
+         contextName = "serverUrl.unsafeMutableAddressor:Config.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Bundle.main.object(forInfoDictionaryKey: &quot;ServerURL&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

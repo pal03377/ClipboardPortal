@@ -9,7 +9,9 @@ class DeviceTokenStore: ObservableObject {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var deviceTokenStore = DeviceTokenStore()
+    var clipboardManager = ClipboardManager()
     
+    // Handle APNs notification service registration event
     func application(
       _ application: NSApplication,
       didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
@@ -20,12 +22,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.deviceTokenStore.deviceToken = token
     }
     
+    // Handle APNs notification service registration error
     func application(
         _ application: NSApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
         print("Failed to register: \(error)")
         deviceTokenStore.registrationError = error
+    }
+    
+    // Handle incoming APNs notifications to write the new clipboard contents
+    struct ClipboardPayload: Codable {
+        var clipboardContent: String
+    }
+    func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
+        print("Received remote notification: \(userInfo)")
+        if let clipboardData = userInfo["clipboard"] as? String {
+            clipboardManager.receiveClipboardContent(clipboardData)
+        } else {
+            print("No clipboard data found in the notification payload \(userInfo)")
+        }
     }
 }
 
@@ -38,6 +54,18 @@ struct ShareClipboardApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(appDelegate.deviceTokenStore)
+                .environmentObject(appDelegate.clipboardManager)
+        }
+        .commands {
+            SidebarCommands()
+            CommandGroup(replacing: .pasteboard) {
+                Button {
+                    Task {
+                        await appDelegate.clipboardManager.sendClipboardContent()
+                    }
+                } label: { Text("Paste") }
+                    .keyboardShortcut("v", modifiers: [.command])
+            }
         }
     }
 }

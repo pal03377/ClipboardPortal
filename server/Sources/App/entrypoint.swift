@@ -20,6 +20,9 @@ enum Entrypoint {
             app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
             // Set up database
             app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
+            // Create tables
+            app.migrations.add(CreateUser())
+            try await app.autoMigrate() // Run migrations
             // Register routes
             try routes(app)
             // Set up APNS for notifications

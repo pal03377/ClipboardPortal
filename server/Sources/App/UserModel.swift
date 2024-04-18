@@ -25,3 +25,17 @@ final class UserModel: Model {
         return UUID().uuidString // Generate a random UUID as a secret e.g. "1a2b3c..."
     }
 }
+
+// Create the user table migration
+struct CreateUser: Migration {
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UserModel.schema)
+            .field("id", .string, .identifier(auto: false)) // Allow ID to be a string -> no .id()
+            .field("apns_token", .string, .required)
+            .field("update_secret", .string)
+            .create()
+    }
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+        database.schema(UserModel.schema).delete()
+    }
+}

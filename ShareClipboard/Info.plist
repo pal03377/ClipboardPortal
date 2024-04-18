@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSGKFriendListUsageDescription</key>
-	<string>Share your clipboard with a friend.</string>
+	<key>ServerURL</key>
+	<string>$(SERVER_URL)</string>
 </dict>
 </plist>

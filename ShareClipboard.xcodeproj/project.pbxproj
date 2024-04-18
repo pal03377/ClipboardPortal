@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA8DF0D62BD16DE500AC13B0 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8DF0D52BD16DE500AC13B0 /* UserStore.swift */; };
+		DA8DF0D82BD16DFE00AC13B0 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8DF0D72BD16DFE00AC13B0 /* User.swift */; };
+		DA8DF0DE2BD17DAC00AC13B0 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8DF0DD2BD17DAC00AC13B0 /* ServerRequest.swift */; };
+		DA8DF0E02BD1866F00AC13B0 /* ReceiverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8DF0DF2BD1866F00AC13B0 /* ReceiverStore.swift */; };
+		DA8DF0E22BD1A3BB00AC13B0 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8DF0E12BD1A3BB00AC13B0 /* ClipboardManager.swift */; };
+		DA8DF0E42BD1AC5C00AC13B0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DA8DF0E32BD1AC5C00AC13B0 /* MainMenu.xib */; };
 		DAAB33BF2BCAFDCB00C82DF4 /* ShareClipboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */; };
 		DAAB33C12BCAFDCB00C82DF4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */; };
 		DAAB33C32BCAFDCD00C82DF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAAB33C22BCAFDCD00C82DF4 /* Assets.xcassets */; };
@@ -15,6 +21,14 @@
 
 /* Begin PBXFileReference section */
 		DA76DEA02BCB178700A64957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DA8DF0D52BD16DE500AC13B0 /* UserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStore.swift; sourceTree = "<group>"; };
+		DA8DF0D72BD16DFE00AC13B0 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		DA8DF0D92BD17AA400AC13B0 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
+		DA8DF0DC2BD17C8D00AC13B0 /* ConfigProduction.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigProduction.xcconfig; sourceTree = "<group>"; };
+		DA8DF0DD2BD17DAC00AC13B0 /* ServerRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerRequest.swift; sourceTree = "<group>"; };
+		DA8DF0DF2BD1866F00AC13B0 /* ReceiverStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiverStore.swift; sourceTree = "<group>"; };
+		DA8DF0E12BD1A3BB00AC13B0 /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
+		DA8DF0E32BD1AC5C00AC13B0 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* ShareClipboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShareClipboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareClipboardApp.swift; sourceTree = "<group>"; };
 		DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -56,9 +70,17 @@
 				DA76DEA02BCB178700A64957 /* Info.plist */,
 				DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */,
 				DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */,
+				DA8DF0E32BD1AC5C00AC13B0 /* MainMenu.xib */,
+				DA8DF0E12BD1A3BB00AC13B0 /* ClipboardManager.swift */,
+				DA8DF0DF2BD1866F00AC13B0 /* ReceiverStore.swift */,
+				DA8DF0D72BD16DFE00AC13B0 /* User.swift */,
 				DAAB33C22BCAFDCD00C82DF4 /* Assets.xcassets */,
 				DAAB33C72BCAFDCD00C82DF4 /* ShareClipboard.entitlements */,
 				DAAB33C42BCAFDCD00C82DF4 /* Preview Content */,
+				DA8DF0D52BD16DE500AC13B0 /* UserStore.swift */,
+				DA8DF0DD2BD17DAC00AC13B0 /* ServerRequest.swift */,
+				DA8DF0D92BD17AA400AC13B0 /* ConfigDevelopment.xcconfig */,
+				DA8DF0DC2BD17C8D00AC13B0 /* ConfigProduction.xcconfig */,
 			);
 			path = ShareClipboard;
 			sourceTree = "<group>";
@@ -131,6 +153,7 @@
 			files = (
 				DAAB33C62BCAFDCD00C82DF4 /* Preview Assets.xcassets in Resources */,
 				DAAB33C32BCAFDCD00C82DF4 /* Assets.xcassets in Resources */,
+				DA8DF0E42BD1AC5C00AC13B0 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,8 +164,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA8DF0DE2BD17DAC00AC13B0 /* ServerRequest.swift in Sources */,
+				DA8DF0D82BD16DFE00AC13B0 /* User.swift in Sources */,
+				DA8DF0D62BD16DE500AC13B0 /* UserStore.swift in Sources */,
 				DAAB33C12BCAFDCB00C82DF4 /* ContentView.swift in Sources */,
+				DA8DF0E02BD1866F00AC13B0 /* ReceiverStore.swift in Sources */,
 				DAAB33BF2BCAFDCB00C82DF4 /* ShareClipboardApp.swift in Sources */,
+				DA8DF0E22BD1A3BB00AC13B0 /* ClipboardManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +297,7 @@
 		};
 		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DA8DF0D92BD17AA400AC13B0 /* ConfigDevelopment.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -302,6 +331,7 @@
 		};
 		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DA8DF0DC2BD17C8D00AC13B0 /* ConfigProduction.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

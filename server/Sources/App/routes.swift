@@ -30,28 +30,36 @@ func routes(_ app: Application) throws {
         return existingUser // e.g. {"id":"12345678","apnsToken":"1a2b3c...","updateSecret":"1a2b3c..."}
     }
     // Send notification
-    struct NotificationDTO: Content {
-        var id: String // User ID for notification
-        var clipboard: String // Clipboard contents to send
+    struct ClipboardContentSendDTO: Content {
+        var receiverId: String // User ID for notification
+        var clipboardContent: String // Clipboard contents to send
     }
     struct ClipboardPayload: Codable {
-        var clipboard: String
+        var clipboardContent: String
     }
     app.post("send") { req async throws in
-        let notification = try req.content.decode(NotificationDTO.self)
-        let user = try await UserModel.find(notification.id, on: req.db) // Find user in DB
+        print("Body: " + (req.body.string ?? "No body")) // Print incoming data for debugging
+        let notification = try req.content.decode(ClipboardContentSendDTO.self)
+        let user = try await UserModel.find(notification.receiverId, on: req.db) // Find user in DB
         guard let user = user else { throw Abort(.notFound) } // 404 if user not found
         let alert = APNSAlertNotification( // Create notification to send clipboard content to other user
             alert: .init(
                 title: .raw("Received Clipboard!"),
-                body: .raw(notification.clipboard)
+                body: .raw(notification.clipboardContent)
             ),
             expiration: .immediately,
             priority: .immediately,
             topic: Environment.get("APNS_TOPIC")!, // APNs topic = bundle ID as required by Apple e.g. "com.example.app"
-            payload: ClipboardPayload(clipboard: notification.clipboard) // Send clipboard contents in payload to receive them in the app and write them to the clipboard
+            payload: ClipboardPayload(clipboardContent: notification.clipboardContent) // Send clipboard contents in payload to receive them in the app and write them to the clipboard
         )
-        try await req.apns.client.sendAlertNotification(alert, deviceToken: user.apnsToken) // Send notification
+        do {
+            print("Sending to device token \(user.apnsToken)")
+            let resp = try await req.apns.client.sendAlertNotification(alert, deviceToken: user.apnsToken) // Send notification
+            print("APNs response: \(resp)") // Print response for debugging
+        } catch {
+            print("Error sending notification: \(error)") // Print error for debugging
+            throw Abort(.internalServerError) // 500 if error sending notification
+        }
         return "ACK" // Acknowledge successful notification
     }
 }
