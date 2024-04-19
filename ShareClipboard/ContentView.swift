@@ -22,7 +22,6 @@ struct ContentView: View {
                 if let receiverId = receiverStore.receiverId, !isChangeReceiverIdShown {
                     // Receiver ID exists and is not in change mode
                     HStack {
-                        if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
                         Text("Press")
                         Button {
                             Task {
@@ -137,13 +136,11 @@ struct ContentView: View {
                 List(clipboardManager.clipboardHistory.reversed(), id: \.self) { content in
                     HStack {
                         Text(content)
+                            .lineLimit(4)
+                            .truncationMode(.tail)
                         Spacer()
-                        Button { // Copy button
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(content, forType: .string)
-                        } label: {
-                            Image(systemName: "doc.on.doc")
-                        }
+                        Button {} label: { Image(systemName: "doc.on.doc") }
+                            .copyContent(content)
                         if let _ = receiverStore.receiverId {
                             Button { // Resend button
                                 Task {
@@ -158,6 +155,16 @@ struct ContentView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay {
+            // Dark loading overlay while sending clipboard contents
+            if clipboardManager.sending {
+                Color.black.opacity(0.5).edgesIgnoringSafeArea(.all)
+                    .overlay {
+                        ProgressView()
+                    }
+            } // Show loading spinner while sending clipboard contents
+        }
         .onAppear {
             checkNotificationAuthorization()
         }
