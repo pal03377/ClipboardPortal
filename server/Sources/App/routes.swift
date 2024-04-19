@@ -54,7 +54,8 @@ func routes(_ app: Application) throws {
             expiration: .timeIntervalSince1970InSeconds(Int(Date().timeIntervalSince1970 + 30)), // Expire in X seconds
             priority: .immediately,
             topic: Environment.get("APNS_TOPIC")!, // APNs topic = bundle ID as required by Apple e.g. "com.example.app"
-            payload: ClipboardPayload(clipboardContent: notification.clipboardContent) // Send clipboard contents in payload to receive them in the app and write them to the clipboard
+            payload: ClipboardPayload(clipboardContent: notification.clipboardContent), // Send clipboard contents in payload to receive them in the app and write them to the clipboard
+            sound: .default
         )
         print(alert) // Print alert for debugging
         do {

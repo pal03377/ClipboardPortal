@@ -32,7 +32,7 @@ class ClipboardManager: ObservableObject {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured." } // Show error if there is no receiver yet. Update UI in main thread.
             return
         }
-        DispatchQueue.main.async { self.sending = true } // Show loading spinner in UI. Update UI in main thread.
+        DispatchQueue.main.async { self.sending = true; self.sendErrorMessage = nil } // Show loading spinner in UI. Update UI in main thread.
         defer { DispatchQueue.main.async { self.sending = false } } // Hide loading spinner when done. Update UI in main thread.
         do {
             let _: ClipboardSendResponse = try await ServerRequest.post(path: "/send", body: ClipboardContentSendDTO(receiverId: receiverId, clipboardContent: content)) // Send clipboard content to server to trigger notification to receipient
