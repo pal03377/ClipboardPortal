@@ -2,7 +2,7 @@ x-shared_environment: &shared_environment
   LOG_LEVEL: ${LOG_LEVEL:-debug}
   
 services:
-  app:
+  share-clipboard-server:
     container_name: share-clipboard-server
     image: server:latest
     build:
