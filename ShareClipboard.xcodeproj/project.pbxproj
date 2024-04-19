@@ -17,6 +17,7 @@
 		DAAB33C12BCAFDCB00C82DF4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */; };
 		DAAB33C32BCAFDCD00C82DF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAAB33C22BCAFDCD00C82DF4 /* Assets.xcassets */; };
 		DAAB33C62BCAFDCD00C82DF4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAAB33C52BCAFDCD00C82DF4 /* Preview Assets.xcassets */; };
+		DAF57DBA2BD2B05B0054D26B /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF57DB92BD2B05B0054D26B /* CopyContentModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		DAAB33C22BCAFDCD00C82DF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DAAB33C52BCAFDCD00C82DF4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DAAB33C72BCAFDCD00C82DF4 /* ShareClipboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareClipboard.entitlements; sourceTree = "<group>"; };
+		DAF57DB92BD2B05B0054D26B /* CopyContentModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				DA76DEA02BCB178700A64957 /* Info.plist */,
 				DAAB33BE2BCAFDCB00C82DF4 /* ShareClipboardApp.swift */,
 				DAAB33C02BCAFDCB00C82DF4 /* ContentView.swift */,
+				DAF57DB92BD2B05B0054D26B /* CopyContentModifier.swift */,
 				DA8DF0E32BD1AC5C00AC13B0 /* MainMenu.xib */,
 				DA8DF0E12BD1A3BB00AC13B0 /* ClipboardManager.swift */,
 				DA8DF0DF2BD1866F00AC13B0 /* ReceiverStore.swift */,
@@ -165,6 +168,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA8DF0DE2BD17DAC00AC13B0 /* ServerRequest.swift in Sources */,
+				DAF57DBA2BD2B05B0054D26B /* CopyContentModifier.swift in Sources */,
 				DA8DF0D82BD16DFE00AC13B0 /* User.swift in Sources */,
 				DA8DF0D62BD16DE500AC13B0 /* UserStore.swift in Sources */,
 				DAAB33C12BCAFDCB00C82DF4 /* ContentView.swift in Sources */,

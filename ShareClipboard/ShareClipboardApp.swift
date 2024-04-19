@@ -9,6 +9,7 @@ class DeviceTokenStore: ObservableObject {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var deviceTokenStore = DeviceTokenStore()
+    var userStore = UserStore()
     var clipboardManager = ClipboardManager()
     
     // Handle APNs notification service registration event
@@ -49,22 +50,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct ShareClipboardApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(pasteShortcutDisabledTemporarily: $pasteShortcutDisabledTemporarily)
                 .environmentObject(appDelegate.deviceTokenStore)
+                .environmentObject(appDelegate.userStore)
                 .environmentObject(appDelegate.clipboardManager)
+                .frame(minWidth: 400) // Min window width to now squeeze text
         }
         .commands {
             SidebarCommands()
-            CommandGroup(replacing: .pasteboard) {
+            if !pasteShortcutDisabledTemporarily {
+                CommandGroup(replacing: .pasteboard) {
+                    Button {
+                        Task {
+                            await appDelegate.clipboardManager.sendClipboardContent()
+                        }
+                    } label: { Text("Paste") }
+                        .keyboardShortcut("v", modifiers: [.command])
+                }
+            }
+            CommandGroup(after: .newItem) {
                 Button {
                     Task {
-                        await appDelegate.clipboardManager.sendClipboardContent()
+                        try await appDelegate.userStore.delete()
                     }
-                } label: { Text("Paste") }
-                    .keyboardShortcut("v", modifiers: [.command])
+                } label: { Text("Reset user") }
             }
         }
     }

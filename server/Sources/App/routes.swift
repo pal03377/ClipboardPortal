@@ -63,6 +63,7 @@ func routes(_ app: Application) throws {
             print("Sending to device token \(user.apnsToken)")
             let resp = try await req.apns.client.sendAlertNotification(alert, deviceToken: user.apnsToken) // Send notification
             print("Response: \(resp) (cannot use apns-id to check status because it is not the apns-unique-id :( )")
+            print("Unique ID: \(resp.apnsUniqueID?.description.lowercased() ?? "nil")") // Print unique ID for debugging
         } catch {
             print("Error sending notification: \(error)") // Print error for debugging
             throw Abort(.internalServerError) // 500 if error sending notification

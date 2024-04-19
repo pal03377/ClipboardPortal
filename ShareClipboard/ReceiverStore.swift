@@ -42,8 +42,9 @@ class ReceiverStore: ObservableObject {
     }
 
     // Validate the receiver ID to be an 8-digit number
-    func validate(receiverId: String) async throws {
-        guard receiverId.count == 8 else { throw NSError(domain: "ReceiverStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "Receiver ID must be an 8-digit number"]) }
-        guard Int(receiverId) != nil else { throw NSError(domain: "ReceiverStore", code: 2, userInfo: [NSLocalizedDescriptionKey: "Receiver ID must be an 8-digit number"]) }
+    func validate(receiverId: String) -> String? { // Returns string for error or nil if everything is fine
+        guard receiverId.count == 8 else { return "Receiver ID must be an 8-digit number" }
+        guard Int(receiverId) != nil else { return "Receiver ID must be an 8-digit number" }
+        return nil // Everything is fine
     }
 }

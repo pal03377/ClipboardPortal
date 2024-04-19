@@ -8,9 +8,11 @@ struct ContentView: View {
     @State private var receiverIdInputError: String? = nil // Error message for invalid receiver ID e.g. "Receiver ID must be a 8-digit number"
     @EnvironmentObject private var deviceTokenStore: DeviceTokenStore
     @State private var isNotificationAllowed: Bool = false
-    @StateObject private var userStore = UserStore()
+    @EnvironmentObject private var userStore: UserStore
     @State private var userLoadErrorMessage: String?
     @EnvironmentObject private var clipboardManager: ClipboardManager
+    @Binding var pasteShortcutDisabledTemporarily: Bool // Disable clipboard-send shortcut to be able to paste a receiver ID temporarily
+    @FocusState private var receiverIdInputFocused
 
     var body: some View {
         VStack {
@@ -42,12 +44,20 @@ struct ContentView: View {
                         Text("Receiver ID:")
                         TextField("12345678", text: $receiverIdInputValue)
                             .frame(width: 100)
+                            .focusable()
+                            .focused($receiverIdInputFocused)
+                            .onAppear { receiverIdInputFocused = true } // Focus when TextField appears
                             // Allow only numbers
                             .onReceive(receiverIdInputValue.publisher.collect()) { newValue in
                                 let filtered = newValue.filter { "0123456789".contains($0) }
                                 if filtered != newValue {
                                     receiverIdInputValue = String(filtered)
                                 }
+                            }
+                            // Save when pressing Enter
+                            .onKeyPress(.return) {
+                                Task { try await saveReceiverId() }
+                                return .handled
                             }
                         Button { // Button to delete receiver ID
                             Task {
@@ -56,21 +66,7 @@ struct ContentView: View {
                             }
                         } label: { Image(systemName: "trash") }
                         Button { // Button to save receiver ID
-                            Task {
-                                do {
-                                    try await receiverStore.validate(receiverId: receiverIdInputValue)
-                                    receiverIdInputError = nil
-                                } catch {
-                                    receiverIdInputError = error.localizedDescription
-                                }
-                                do {
-                                    try await receiverStore.save(receiverId: receiverIdInputValue)
-                                } catch {
-                                    print("Error! \(error.localizedDescription)")
-                                    fatalError(error.localizedDescription)
-                                }
-                                isChangeReceiverIdShown = false
-                            }
+                            Task { try await saveReceiverId() }
                         } label: { Text("Save") }
                     }
                     .onAppear {
@@ -78,9 +74,8 @@ struct ContentView: View {
                     }
                 }
             }
-            .task {
-                await receiverStore.load()
-            }
+            .frame(height: 0) // Prevent jumping when the "Edit" button is pressed
+            .task { await receiverStore.load() } // Load the receiver ID from local storage
             
             Spacer()
                 .frame(height: 32)
@@ -97,22 +92,11 @@ struct ContentView: View {
                                 Text("You can receive clipboard contents.")
                             }
                             HStack {
-                                Text("Connection code for your friend:")
-                                Text(user.id).monospaced()
-                                Button { // Copy button
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(user.id, forType: .string)
-                                } label: {
-                                    Image(systemName: "doc.on.doc")
-                                }
+                                Text("Connection code:")
+                                Text(user.id).monospaced().copyContent(user.id)
+                                Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(user.id) // Copy button
                                 ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
                             }
-                            Button {
-                                Task {
-                                    try await userStore.delete()
-                                    await loadUser()
-                                }
-                            } label: { Text("Reset user") }
                         } else {
                             if let errorMsg = userLoadErrorMessage {
                                 Text("Error while creating the user: \(errorMsg)")
@@ -126,8 +110,11 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .task {
-                        await loadUser()
+                    .onChange(of: userStore.user, initial: true) {
+                        // Load user on init and after it was deleted (using the "Reset user" menu entry
+                        if userStore.user == nil {
+                            Task { await loadUser() }
+                        }
                     }
                 } else if let error = deviceTokenStore.registrationError {
                     Text("Error: \(error.localizedDescription)")
@@ -174,9 +161,12 @@ struct ContentView: View {
         .onAppear {
             checkNotificationAuthorization()
         }
+        .onChange(of: isChangeReceiverIdShown) {
+            self.pasteShortcutDisabledTemporarily = self.isChangeReceiverIdShown // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
+        }
         .onChange(of: receiverStore.receiverId) {
             // Update clipboardManager so that the ShareClipboardApp does not need to know the receiver ID itself
-            clipboardManager.receiverId = receiverStore.receiverId
+            self.clipboardManager.receiverId = self.receiverStore.receiverId
         }
     }
     
@@ -204,6 +194,13 @@ struct ContentView: View {
             }
     }
     
+    private func saveReceiverId() async throws {
+        self.receiverIdInputError = receiverStore.validate(receiverId: receiverIdInputValue)
+        if self.receiverIdInputError != nil { return } // Stop on validation error
+        try await receiverStore.save(receiverId: receiverIdInputValue)
+        isChangeReceiverIdShown = false
+    }
+    
     private func loadUser() async {
         guard let apnToken = deviceTokenStore.deviceToken else {
             DispatchQueue.main.async { self.userLoadErrorMessage = "There is no APN device token yet." } // Update UI in main thread
@@ -218,7 +215,9 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    @State var pasteShortcutDisabledTemporarily = false
+    return ContentView(pasteShortcutDisabledTemporarily: $pasteShortcutDisabledTemporarily)
         .environmentObject(DeviceTokenStore())
+        .environmentObject(UserStore())
         .environmentObject(ClipboardManager())
 }
