@@ -110,6 +110,7 @@ struct ContentView: View {
                             Button {
                                 Task {
                                     try await userStore.delete()
+                                    await loadUser()
                                 }
                             } label: { Text("Reset user") }
                         } else {
