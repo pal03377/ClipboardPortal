@@ -1,0 +1,4 @@
+$DOMAIN {
+	log $PROJECT_NAME # Enable Caddy access logs (for goaccess)
+	reverse_proxy :$PORT
+}
