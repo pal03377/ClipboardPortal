@@ -45,16 +45,18 @@ func routes(_ app: Application) throws {
         let notification = try req.content.decode(ClipboardContentSendDTO.self)
         let user = try await UserModel.find(notification.receiverId, on: req.db) // Find user in DB
         guard let user = user else { throw Abort(.notFound) } // 404 if user not found
+        print("Topic: " + Environment.get("APNS_TOPIC")!) // Print APNs topic for debugging
         let alert = APNSAlertNotification( // Create notification to send clipboard content to other user
             alert: .init(
                 title: .raw("Received Clipboard!"),
                 body: .raw(notification.clipboardContent)
             ),
-            expiration: .immediately,
+            expiration: .timeIntervalSince1970InSeconds(Int(Date().timeIntervalSince1970 + 30)), // Expire in X seconds
             priority: .immediately,
             topic: Environment.get("APNS_TOPIC")!, // APNs topic = bundle ID as required by Apple e.g. "com.example.app"
             payload: ClipboardPayload(clipboardContent: notification.clipboardContent) // Send clipboard contents in payload to receive them in the app and write them to the clipboard
         )
+        print(alert) // Print alert for debugging
         do {
             print("Sending to device token \(user.apnsToken)")
             let resp = try await req.apns.client.sendAlertNotification(alert, deviceToken: user.apnsToken) // Send notification
