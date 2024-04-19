@@ -10,6 +10,7 @@ struct ServerRequest {
     // Send a POST request to the server
     static func post<T: Decodable>(path: String, body: Encodable) async throws -> T { // Send POST data to server at e.g. "/path"
         let url = serverUrl.appendingPathComponent(path) // Create URL from path e.g. "/path" -> URL("https://example.com/path")
+        print("url \(url)")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type") // Send JSON header to server
