@@ -6,8 +6,8 @@ class ReceiverStore: ObservableObject {
     @Published var receiverId: String?
 
     // Helper function to get the file path for the user data
-    private static func fileURL() throws -> URL { // e.g. ~/Library/Application Support/receiver.data
-        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in ~/Library/Application Support
+    private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/receiver.data
+        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support
                                     in: .userDomainMask,
                                     appropriateFor: nil,
                                     create: false)
@@ -30,14 +30,14 @@ class ReceiverStore: ObservableObject {
     func save(receiverId: String) async throws {
         DispatchQueue.main.async { self.receiverId = receiverId } // Update UI on main thread
         let data = try JSONEncoder().encode(receiverId) // JSON-encode user data
-        let outfile = try Self.fileURL() // Get filepath e.g. ~/Library/Application Support/receiver.data
+        let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/receiver.data
         try data.write(to: outfile) // Write user data to file
     }
 
     // Delete the user data file to reset the user
     func delete() async throws {
         DispatchQueue.main.async { self.receiverId = nil } // Update UI on main thread
-        let fileURL = try Self.fileURL() // Get filepath e.g. ~/Library/Application Support/receiver.data
+        let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/receiver.data
         try FileManager.default.removeItem(at: fileURL) // Delete user data file
     }
 
