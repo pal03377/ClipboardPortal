@@ -9,7 +9,6 @@ struct ContentView: View {
     @EnvironmentObject private var deviceTokenStore: DeviceTokenStore
     @State private var isNotificationAllowed: Bool = false
     @EnvironmentObject private var userStore: UserStore
-    @State private var userLoadErrorMessage: String?
     @EnvironmentObject private var clipboardManager: ClipboardManager
     @Binding var pasteShortcutDisabledTemporarily: Bool // Disable clipboard-send shortcut to be able to paste a receiver ID temporarily
     @FocusState private var receiverIdInputFocused
@@ -102,10 +101,9 @@ struct ContentView: View {
                                     .foregroundStyle(.red)
                             }
                         } else {
-                            if let errorMsg = userLoadErrorMessage {
-                                Text("Error while creating the user: \(errorMsg)")
+                            if let errorMsg = userStore.userLoadErrorMessage {
+                                Text(errorMsg).foregroundStyle(.red) // Show error message
                                 Button {
-                                    userLoadErrorMessage = nil
                                     Task { await loadUser() }
                                 } label: { Text("Retry") }
                             } else {
@@ -215,14 +213,10 @@ struct ContentView: View {
     
     private func loadUser() async {
         guard let apnToken = deviceTokenStore.deviceToken else {
-            DispatchQueue.main.async { self.userLoadErrorMessage = "There is no APN device token yet." } // Update UI in main thread
+            DispatchQueue.main.async { self.userStore.userLoadErrorMessage = "There is no APN device token yet." } // Update UI in main thread
             return
         }
-        do {
-            try await userStore.load(apnToken: apnToken)
-        } catch {
-            DispatchQueue.main.async { self.userLoadErrorMessage = error.localizedDescription } // Show the error to the user. Update UI in main thread.
-        }
+        await userStore.load(apnToken: apnToken)
     }
 }
 

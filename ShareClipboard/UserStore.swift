@@ -3,6 +3,7 @@ import SwiftUI
 // Create user on server, update the APN token and store it locally
 class UserStore: ObservableObject {
     @Published var user: User? = nil
+    @Published var userLoadErrorMessage: String? = nil
 
     // Helper function to get the file path for the user data
     private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
@@ -14,35 +15,72 @@ class UserStore: ObservableObject {
     }
 
     // Load user from storage and send APN updates to the server if the user exists - or create a new user on the server if it does not.
-    func load(apnToken: String) async throws {
-        let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
+    func load(apnToken: String) async {
+        DispatchQueue.main.async { self.userLoadErrorMessage = nil } // Clear previous error message
+        let fileURL = try? Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
+        guard let fileURL else {
+            DispatchQueue.main.async { self.userLoadErrorMessage = "Could not get file URL" }
+            return
+        }
         print(fileURL)
         // Ensure the file exists before trying to read it
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             // If no file exists, create a new user on the server
-            let newUser = try await createUserOnServer(apnToken: apnToken)
-            DispatchQueue.main.async { self.user = newUser } // Update UI on main thread
-            try await save(user: newUser) // Store user data locally
+            do {
+                let newUser = try await createUserOnServer(apnToken: apnToken)
+                DispatchQueue.main.async { self.user = newUser } // Update UI on main thread
+                await save(user: newUser) // Store user data locally
+            } catch {
+                DispatchQueue.main.async { self.userLoadErrorMessage = "User creation failed: \(error.localizedDescription)" }
+            }
             return
         }
-        let data = try Data(contentsOf: fileURL) // Read user data from file
-        let storedUser = try JSONDecoder().decode(User?.self, from: data) // Decode user from JSON
-        DispatchQueue.main.async { self.user = storedUser } // Update UI on main thread
-        try await self.updateApnToken(apnToken) // Update APN token on server
+        do {
+            let data = try Data(contentsOf: fileURL) // Read user data from file
+            let storedUser = try JSONDecoder().decode(User?.self, from: data) // Decode user from JSON
+            DispatchQueue.main.async { self.user = storedUser } // Update UI on main thread
+            try await self.updateApnToken(apnToken) // Update APN token on server
+        } catch let DecodingError.dataCorrupted(context) {
+            print(context)
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data corrupted" }
+        } catch let DecodingError.keyNotFound(key, context) {
+            print("Key '\(key)' not found:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data key missing: \(key.stringValue)" }
+        } catch let DecodingError.valueNotFound(value, context) {
+            print("Value '\(value)' not found:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data value missing: \(value)" }
+        } catch let DecodingError.typeMismatch(type, context)  {
+            print("Type '\(type)' mismatch:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data type mismatch: \(type)" }
+        } catch {
+            print("error: ", error)
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data decoding failed: \(error.localizedDescription)" }
+        }
     }
 
     // Helper function to save the user data locally
-    private func save(user: User) async throws {
-        let data = try JSONEncoder().encode(user) // JSON-encode user data
-        let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
-        try data.write(to: outfile) // Write user data to file
+    private func save(user: User) async {
+        do {
+            let data = try JSONEncoder().encode(user) // JSON-encode user data
+            let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
+            try data.write(to: outfile) // Write user data to file
+        } catch {
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data saving failed: \(error.localizedDescription)" }
+        }
     }
 
     // Delete the user data file to reset the user
-    func delete() async throws {
-        DispatchQueue.main.async { self.user = nil } // Update UI on main thread
-        let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
-        try FileManager.default.removeItem(at: fileURL) // Delete user data file
+    func delete() async {
+        DispatchQueue.main.async { self.user = nil; self.userLoadErrorMessage = nil } // Update UI on main thread
+        do {
+            let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
+            try FileManager.default.removeItem(at: fileURL) // Delete user data file
+        } catch {
+            DispatchQueue.main.async { self.userLoadErrorMessage = "User data deletion failed: \(error.localizedDescription)" }
+        }
     }
     
     // Helper function to create a new user on the server if no user is stored
