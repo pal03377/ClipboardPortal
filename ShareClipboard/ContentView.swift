@@ -96,6 +96,11 @@ struct ContentView: View {
                                 Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(user.id) // Copy button
                                 ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
                             }
+                            // Show clipboard receiving errors
+                            if let receiveErrorMessage = clipboardManager.receiveErrorMessage {
+                                Text(receiveErrorMessage)
+                                    .foregroundStyle(.red)
+                            }
                         } else {
                             if let errorMsg = userLoadErrorMessage {
                                 Text("Error while creating the user: \(errorMsg)")

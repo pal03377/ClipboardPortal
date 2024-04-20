@@ -17,7 +17,7 @@ class UserStore: ObservableObject {
     func load(apnToken: String) async throws {
         let fileURL = try Self.fileURL() // Get filepath e.g. ~/Library/Application Support/user.data
         let data = try? Data(contentsOf: fileURL) // Read user data from file
-        let storedUser = if let data { try JSONDecoder().decode(User?.self, from: data) } else { nil as User? } // Decode user from JSON
+        let storedUser = if let data { try? JSONDecoder().decode(User?.self, from: data) } else { nil as User? } // Decode user from JSON
         if let user = storedUser { // User exists in local storage?
             DispatchQueue.main.async { self.user = user } // Update UI on main thread
             try await self.updateApnToken(apnToken) // Update APN token on server
@@ -54,10 +54,10 @@ class UserStore: ObservableObject {
     struct UserUpdateDTO: Codable {
         var id: String
         var apnsToken: String
-        var updateSecret: String
+        var secret: String
     }
     private func updateApnToken(_ token: String) async throws {
         guard let user, token != user.apnsToken else { return; } // No need to update if there is no user yet or the token did not change
-        let _: User = try await ServerRequest.put(path: "/", body: UserUpdateDTO(id: user.id, apnsToken: user.apnsToken, updateSecret: user.updateSecret)) // Update user on server. Ignore response because it's just the same user again.
+        let _: User = try await ServerRequest.put(path: "/", body: UserUpdateDTO(id: user.id, apnsToken: user.apnsToken, secret: user.secret)) // Update user on server. Ignore response because it's just the same user again.
     }
 }

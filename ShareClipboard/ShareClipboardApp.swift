@@ -39,7 +39,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String : Any]) {
         print("Received remote notification: \(userInfo)")
         if let clipboardContent = userInfo["clipboardContent"] as? String {
-            clipboardManager.receiveClipboardContent(clipboardContent)
+            Task {
+                await clipboardManager.receiveClipboardContent(clipboardContent, isTruncated: userInfo["isTruncated"] as? Bool ?? false, user: userStore.user)
+            }
         } else {
             print("No clipboard data found in the notification payload \(userInfo)")
         }

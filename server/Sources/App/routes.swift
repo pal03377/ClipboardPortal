@@ -12,22 +12,22 @@ func routes(_ app: Application) throws {
         let user = try req.content.decode(UserCreateDTO.self)
         let newUser = UserModel(apnsToken: user.apnsToken) // Create new user
         try await newUser.save(on: req.db) // Save new user to DB
-        return newUser // e.g. {"id":"12345678","apnsToken":"1a2b3c...","updateSecret":"1a2b3c..."}
+        return newUser // e.g. {"id":"12345678","apnsToken":"1a2b3c...","secret":"1a2b3c..."}
     }
     // Update APNs token
     struct UserUpdateDTO: Content {
         var id: String
         var apnsToken: String
-        var updateSecret: String
+        var secret: String
     }
     app.put { req async throws in
         let user = try req.content.decode(UserUpdateDTO.self)
         let existingUser = try await UserModel.find(user.id, on: req.db) // Find user in DB
         guard let existingUser = existingUser else { throw Abort(.notFound) } // 404 if user not found
-        guard existingUser.updateSecret == user.updateSecret else { throw Abort(.unauthorized) } // 403 if update secret is incorrect
+        guard existingUser.secret == user.secret else { throw Abort(.unauthorized) } // 403 if update secret is incorrect
         existingUser.apnsToken = user.apnsToken // Update APNs token
         try await existingUser.save(on: req.db) // Save update to DB
-        return existingUser // e.g. {"id":"12345678","apnsToken":"1a2b3c...","updateSecret":"1a2b3c..."}
+        return existingUser // e.g. {"id":"12345678","apnsToken":"1a2b3c...","secret":"1a2b3c..."}
     }
     // Send notification
     struct ClipboardContentSendDTO: Content {
@@ -36,6 +36,7 @@ func routes(_ app: Application) throws {
     }
     struct ClipboardPayload: Codable {
         var clipboardContent: String
+        var isTruncated: Bool // Whether the clipboard content was truncated because of APNs payload size limit
     }
     struct ClipboardSendResponse: Content {
         var status: String
@@ -46,15 +47,21 @@ func routes(_ app: Application) throws {
         let user = try await UserModel.find(notification.receiverId, on: req.db) // Find user in DB
         guard let user = user else { throw Abort(.notFound) } // 404 if user not found
         print("Topic: " + Environment.get("APNS_TOPIC")!) // Print APNs topic for debugging
+        // Truncate clipboard content because of APNs payload size limit (4KB - https://stackoverflow.com/a/26994198/4306257)
+        let clipboardContentTruncated = String(notification.clipboardContent.prefix(200)) // Truncate clipboard content because of APNs payload size limit (4KB - https://stackoverflow.com/a/26994198/4306257)
+        // Store original clipboard content in DB to be able to retrieve it later
+        user.lastReceivedClipboardContent = notification.clipboardContent
+        try await user.save(on: req.db)
+        // Send notification to user
         let alert: APNSAlertNotification<ClipboardPayload> = APNSAlertNotification( // Create notification to send clipboard content to other user
             alert: .init(
                 title: .raw("Received Clipboard!"),
-                body: .raw(notification.clipboardContent)
+                body: .raw(clipboardContentTruncated)
             ),
             expiration: .timeIntervalSince1970InSeconds(Int(Date().timeIntervalSince1970 + 30)), // Expire in X seconds
             priority: .immediately,
             topic: Environment.get("APNS_TOPIC")!, // APNs topic = bundle ID as required by Apple e.g. "com.example.app"
-            payload: ClipboardPayload(clipboardContent: notification.clipboardContent), // Send clipboard contents in payload to receive them in the app and write them to the clipboard
+            payload: ClipboardPayload(clipboardContent: clipboardContentTruncated, isTruncated: notification.clipboardContent != clipboardContentTruncated), // Send clipboard contents in payload to receive them in the app and write them to the clipboard
             sound: .default,
             interruptionLevel: .timeSensitive
         )
@@ -69,5 +76,20 @@ func routes(_ app: Application) throws {
             throw Abort(.internalServerError) // 500 if error sending notification
         }
         return ClipboardSendResponse(status: "success") // e.g. {"status":"success"}
+    }
+    // Receive full clipboard content
+    struct ClipboardContentReceiveDTO: Content {
+        var id: String
+        var secret: String
+    }
+    struct ClipboardContentReceiveResponse: Content {
+        var clipboardContent: String?
+    }
+    app.post("receive") { req async throws in
+        let receivedData = try req.content.decode(ClipboardContentReceiveDTO.self)
+        let user = try await UserModel.find(receivedData.id, on: req.db) // Find user in DB
+        guard let user = user else { throw Abort(.notFound) } // 404 if user not found
+        guard user.secret == receivedData.secret else { throw Abort(.unauthorized) } // 403 if secret is incorrect
+        return ClipboardContentReceiveResponse(clipboardContent: user.lastReceivedClipboardContent) // e.g. {"clipboardContent":"Hello, World!"} or {"clipboardContent":nil}
     }
 }
