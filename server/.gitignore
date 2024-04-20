@@ -4,7 +4,7 @@ xcuserdata
 *.xcodeproj
 DerivedData/
 .DS_Store
-db.sqlite
+data
 .swiftpm
 .env
 .env.*
