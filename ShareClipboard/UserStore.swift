@@ -14,8 +14,8 @@ class UserStore: ObservableObject {
             .appendingPathComponent("user.data")
     }
 
-    // Load user from storage and send APN updates to the server if the user exists - or create a new user on the server if it does not.
-    func load(apnToken: String) async {
+    // Load user from storage - or create a new user on the server if it does not exist yet.
+    func load() async {
         DispatchQueue.main.async { self.userLoadErrorMessage = nil } // Clear previous error message
         let fileURL = try? Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ShareClipboard/Data/Library/Application%20Support/user.data
         guard let fileURL else {
@@ -27,7 +27,7 @@ class UserStore: ObservableObject {
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             // If no file exists, create a new user on the server
             do {
-                let newUser = try await createUserOnServer(apnToken: apnToken)
+                let newUser = try await createUserOnServer()
                 DispatchQueue.main.async { self.user = newUser } // Update UI on main thread
                 await save(user: newUser) // Store user data locally
             } catch {
@@ -39,7 +39,6 @@ class UserStore: ObservableObject {
             let data = try Data(contentsOf: fileURL) // Read user data from file
             let storedUser = try JSONDecoder().decode(User?.self, from: data) // Decode user from JSON
             DispatchQueue.main.async { self.user = storedUser } // Update UI on main thread
-            try await self.updateApnToken(apnToken) // Update APN token on server
         } catch let DecodingError.dataCorrupted(context) {
             print(context)
             DispatchQueue.main.async { self.userLoadErrorMessage = "User data corrupted" }
@@ -84,21 +83,14 @@ class UserStore: ObservableObject {
     }
     
     // Helper function to create a new user on the server if no user is stored
-    struct UserCreateDTO: Codable {
-        var apnsToken: String
-    }
-    private func createUserOnServer(apnToken: String) async throws -> User {
-        try await ServerRequest.post(path: "/", body: UserCreateDTO(apnsToken: apnToken)) // Send create request to server and get back User
+    struct UserCreateDTO: Codable {}
+    private func createUserOnServer() async throws -> User {
+        try await ServerRequest.post(path: "/", body: UserCreateDTO()) // Send create request to server and get back User
     }
     
     // Update the APN push notification token on the server if it changed
     struct UserUpdateDTO: Codable {
         var id: String
-        var apnsToken: String
         var secret: String
-    }
-    private func updateApnToken(_ token: String) async throws {
-        guard let user, token != user.apnsToken else { return; } // No need to update if there is no user yet or the token did not change
-        let _: User = try await ServerRequest.put(path: "/", body: UserUpdateDTO(id: user.id, apnsToken: user.apnsToken, secret: user.secret)) // Update user on server. Ignore response because it's just the same user again.
     }
 }

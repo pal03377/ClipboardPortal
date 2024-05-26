@@ -6,12 +6,13 @@ struct ContentView: View {
     @State private var isChangeReceiverIdShown: Bool = false // Whether the input to change the receiver is shown
     @State private var receiverIdInputValue: String = ""
     @State private var receiverIdInputError: String? = nil // Error message for invalid receiver ID e.g. "Receiver ID must be a 8-digit number"
-    @EnvironmentObject private var deviceTokenStore: DeviceTokenStore
     @State private var isNotificationAllowed: Bool = false
     @EnvironmentObject private var userStore: UserStore
     @EnvironmentObject private var clipboardManager: ClipboardManager
     @Binding var pasteShortcutDisabledTemporarily: Bool // Disable clipboard-send shortcut to be able to paste a receiver ID temporarily
     @FocusState private var receiverIdInputFocused
+    let updateTimer = Timer.publish(every: 4, tolerance: 2, on: .main, in: .common).autoconnect() // Timer to fetch new clipboard contents every Xs
+
 
     var body: some View {
         VStack {
@@ -61,6 +62,7 @@ struct ContentView: View {
                             Task {
                                 try? await receiverStore.delete()
                                 isChangeReceiverIdShown = false
+                                clipboardManager.sendErrorMessage = nil // Invalidate sending error message because it doesn't make much sense now
                             }
                         } label: { Image(systemName: "trash") }
                         Button { // Button to save receiver ID
@@ -81,48 +83,41 @@ struct ContentView: View {
             Text("Receive other clipboard")
                 .font(.largeTitle)
             if isNotificationAllowed {
-                if let _ = deviceTokenStore.deviceToken {
-                    VStack {
-                        if let user = userStore.user {
-                            // User loaded
-                            HStack {
-                                Image(systemName: "checkmark.circle")
-                                Text("You can receive clipboard contents.")
-                            }
-                            HStack {
-                                Text("Connection code:")
-                                Text(user.id).monospaced().copyContent(ClipboardContent(type: .text, content: user.id))
-                                Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(ClipboardContent(type: .text, content: user.id)) // Copy button
-                                ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
-                            }
-                            // Show clipboard receiving errors
-                            if let receiveErrorMessage = clipboardManager.receiveErrorMessage {
-                                Text(receiveErrorMessage)
-                                    .foregroundStyle(.red)
-                            }
+                VStack {
+                    if let user = userStore.user {
+                        // User loaded
+                        HStack {
+                            Image(systemName: "checkmark.circle")
+                            Text("You can receive clipboard contents.")
+                        }
+                        HStack {
+                            Text("Connection code:")
+                            Text(user.id).monospaced().copyContent(ClipboardContent(type: .text, content: user.id))
+                            Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(ClipboardContent(type: .text, content: user.id)) // Copy button
+                            ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
+                        }
+                        // Show clipboard receiving errors
+                        if let receiveErrorMessage = clipboardManager.receiveErrorMessage {
+                            Text(receiveErrorMessage)
+                                .foregroundStyle(.red)
+                        }
+                    } else {
+                        if let errorMsg = userStore.userLoadErrorMessage {
+                            Text(errorMsg).foregroundStyle(.red) // Show error message
+                            Button {
+                                Task { await userStore.load() }
+                            } label: { Text("Retry") }
                         } else {
-                            if let errorMsg = userStore.userLoadErrorMessage {
-                                Text(errorMsg).foregroundStyle(.red) // Show error message
-                                Button {
-                                    Task { await loadUser() }
-                                } label: { Text("Retry") }
-                            } else {
-                                // User still loading
-                                ProgressView()
-                            }
+                            // User still loading
+                            ProgressView()
                         }
                     }
-                    .task(id: userStore.user) { // Load user on change
-                        // Load user on init and after it was deleted (using the "Reset user" menu entry
-                        if userStore.user == nil {
-                            Task { await loadUser() }
-                        }
+                }
+                .task(id: userStore.user) { // Load user on change
+                    // Load user on init and after it was deleted (using the "Reset user" menu entry
+                    if userStore.user == nil {
+                        Task { await userStore.load() }
                     }
-                } else if let error = deviceTokenStore.registrationError {
-                    Text("Error: \(error.localizedDescription)")
-                    Button {
-                        registerForPushNotifications()
-                    } label: { Text("Retry") }
                 }
             } else {
                 Button("Enable receiving clipboard") {
@@ -178,18 +173,15 @@ struct ContentView: View {
             // Update clipboardManager so that the ShareClipboardApp does not need to know the receiver ID itself
             self.clipboardManager.receiverId = self.receiverStore.receiverId
         }
+        .onReceive(updateTimer) { _ in
+            Task { await checkForNewClipboardContents() }
+        }
     }
     
     func checkNotificationAuthorization() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { // Update UI in main thread
                 self.isNotificationAllowed = (settings.authorizationStatus == .authorized)
-                if self.isNotificationAllowed && deviceTokenStore.deviceToken == nil {
-                    DispatchQueue.main.async {
-                        print("Registering...")
-                        NSApplication.shared.registerForRemoteNotifications()
-                    }
-                }
             }
         }
     }
@@ -209,21 +201,31 @@ struct ContentView: View {
         if self.receiverIdInputError != nil { return } // Stop on validation error
         try await receiverStore.save(receiverId: receiverIdInputValue)
         isChangeReceiverIdShown = false
+        clipboardManager.sendErrorMessage = nil // Invalidate sending error message because it doesn't make much sense now
     }
     
-    private func loadUser() async {
-        guard let apnToken = deviceTokenStore.deviceToken else {
-            DispatchQueue.main.async { self.userStore.userLoadErrorMessage = "There is no APN device token yet." } // Update UI in main thread
-            return
+    // Check for new clipboard contents on the server
+    func checkForNewClipboardContents() async {
+        if let user = userStore.user {
+            let isNewClipboardContent = await clipboardManager.checkForUpdates(user: user)
+            if isNewClipboardContent { // New notification was found?
+                // Create local notification to show it
+                let content = UNMutableNotificationContent()
+                content.title = "Received Clipboard!"
+                content.body = clipboardManager.clipboardHistory.last?.clipboardContent.content ?? ""
+                content.sound = UNNotificationSound.default
+                // Trigger notification after 5 seconds (for example)
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                try? await UNUserNotificationCenter.current().add(request)
+            }
         }
-        await userStore.load(apnToken: apnToken)
     }
 }
 
 #Preview {
     @State var pasteShortcutDisabledTemporarily = false
     return ContentView(pasteShortcutDisabledTemporarily: $pasteShortcutDisabledTemporarily)
-        .environmentObject(DeviceTokenStore())
         .environmentObject(UserStore())
         .environmentObject(ClipboardManager())
 }

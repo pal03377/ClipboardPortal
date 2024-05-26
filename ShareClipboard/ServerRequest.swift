@@ -1,5 +1,31 @@
 import Foundation
 
+enum ServerRequestError: Error {
+    case networkError
+    case badRequest
+    case forbidden
+    case notFound
+    case serverError
+    case unknown(Int)
+    
+    var errorDescription: String? {
+        switch self {
+        case .networkError:
+            return "A network error occurred. Please check your connection and try again."
+        case .badRequest:
+            return "Bad request. Please check the request and try again."
+        case .forbidden:
+            return "Forbidden. You don't have permission to access this resource."
+        case .notFound:
+            return "Resource not found. Please check the URL and try again."
+        case .serverError:
+            return "A server error occurred. Please try again later."
+        case .unknown(let code):
+            return "An unknown error occurred. (Error code: \(code))"
+        }
+    }
+}
+
 struct ServerRequest {
     // Configure these values by editing ConfigDevelopment.xcconfig and ConfigProduction.xcconfig
     static var serverUrl: URL {
@@ -36,8 +62,24 @@ struct ServerRequest {
     }
     // Helper function to send, check and decode a request
     private static func sendRequest<T: Decodable>(_ request: URLRequest) async throws -> T {
-        let (responseData, response) = try await URLSession.shared.data(for: request) // Send request
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else { throw URLError(.badServerResponse) } // Throw if server responded with non-ok status code
+        var responseData: Data, response: URLResponse
+        do {
+            (responseData, response) = try await URLSession.shared.data(for: request) // Send request
+        } catch {
+            print(error)
+            throw ServerRequestError.networkError
+        }
+        guard let response = response as? HTTPURLResponse else { throw ServerRequestError.unknown(-1) }
+        guard (200...299).contains(response.statusCode) else {
+            // Throw if server responded with non-ok status code
+            switch response.statusCode {
+            case 400: throw ServerRequestError.badRequest
+            case 403: throw ServerRequestError.forbidden
+            case 404: throw ServerRequestError.notFound
+            case 500: throw ServerRequestError.serverError
+            default: throw ServerRequestError.unknown(response.statusCode)
+            }
+        }
         return try JSONDecoder().decode(T.self, from: responseData) // Decode and return response
     }
 }

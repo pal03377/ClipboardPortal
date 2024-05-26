@@ -1,9 +1,6 @@
 import Vapor
 import Fluent
 import FluentSQLiteDriver
-import APNS
-import VaporAPNS
-import APNSCore
 import Logging
 
 @main
@@ -30,22 +27,6 @@ enum Entrypoint {
             try await app.autoMigrate() // Run migrations
             // Register routes
             try routes(app)
-            // Set up APNS for notifications
-            let apnsConfig = APNSClientConfiguration(
-                authenticationMethod: .jwt(
-                    privateKey: try .loadFrom(string: Environment.get("APNS_P8_CONTENT")!.replacingOccurrences(of: "\\n", with: "\n")),
-                    keyIdentifier: Environment.get("APNS_KEY_ID")!,
-                    teamIdentifier: Environment.get("APNS_TEAM_ID")!
-                ),
-                environment: Environment.get("APNS_ENVIRONMENT") == "production" ? .production : .sandbox
-            )
-            app.apns.containers.use(
-                apnsConfig,
-                eventLoopGroupProvider: .shared(app.eventLoopGroup),
-                responseDecoder: JSONDecoder(),
-                requestEncoder: JSONEncoder(),
-                as: .default
-            )
         } catch {
             app.logger.report(error: error)
             throw error
