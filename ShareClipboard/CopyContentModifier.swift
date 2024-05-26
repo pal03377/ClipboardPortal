@@ -10,9 +10,10 @@ extension AnyTransition {
     }
 }
 
+@available(macOS 14.0, *)
 struct CopyContentModifier: ViewModifier {
     var isButton: Bool
-    var copyContent: String
+    var copyContent: ClipboardContent
     @State var copyAnimationPlaying: Bool = false
     
     func body(content: Content) -> some View {
@@ -62,10 +63,11 @@ struct CopyContentModifier: ViewModifier {
             self.copyAnimationPlaying = false
         }
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(copyContent, forType: .string)
+        NSPasteboard.general.setString(copyContent.content, forType: .string)
     }
 }
 
+@available(macOS 14.0, *)
 struct AdditionalActionButtonStyle: ButtonStyle {
     var additionalAction: () -> ()
     public static func applyStyles(_ label: ButtonStyleConfiguration.Label) -> some View {
@@ -93,13 +95,21 @@ extension View {
 }
 
 extension View {
-    func copyContent(_ copyContent: String) -> some View {
-        self.modifier(CopyContentModifier(isButton: false, copyContent: copyContent))
+    func copyContent(_ copyContent: ClipboardContent) -> some View {
+        if #available(macOS 14, *) {
+            return self.modifier(CopyContentModifier(isButton: false, copyContent: copyContent))
+        } else {
+            return self
+        }
     }
 }
 extension Button {
-    func copyContent(_ copyContent: String) -> some View {
-        self.modifier(CopyContentModifier(isButton: true, copyContent: copyContent))
+    func copyContent(_ copyContent: ClipboardContent) -> some View {
+        if #available(macOS 14, *) {
+            return self.modifier(CopyContentModifier(isButton: true, copyContent: copyContent))
+        } else {
+            return self
+        }
     }
 }
 
@@ -107,13 +117,13 @@ extension Button {
     VStack {
         // Text button
         Button {} label: { Text("Copy") }
-            .copyContent("Text to copy")
+            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
         // Image button
         Button {} label: { Image(systemName: "doc.on.doc") }
-            .copyContent("Text to copy")
+            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
         // Pure text
         Text("Copyme")
-            .copyContent("Text to copy")
+            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
     }
     .padding()
 }

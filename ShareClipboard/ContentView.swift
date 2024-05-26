@@ -53,9 +53,9 @@ struct ContentView: View {
                                 }
                             }
                             // Save when pressing Enter
-                            .onKeyPress(.return) {
+                            .keyPressMacOS14(.return) {
                                 Task { try await saveReceiverId() }
-                                return .handled
+                                return true // Return if handled
                             }
                         Button { // Button to delete receiver ID
                             Task {
@@ -91,8 +91,8 @@ struct ContentView: View {
                             }
                             HStack {
                                 Text("Connection code:")
-                                Text(user.id).monospaced().copyContent(user.id)
-                                Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(user.id) // Copy button
+                                Text(user.id).monospaced().copyContent(ClipboardContent(type: .text, content: user.id))
+                                Button {} label: { Image(systemName: "doc.on.doc") }.copyContent(ClipboardContent(type: .text, content: user.id)) // Copy button
                                 ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
                             }
                             // Show clipboard receiving errors
@@ -112,7 +112,7 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .onChange(of: userStore.user, initial: true) {
+                    .task(id: userStore.user) { // Load user on change
                         // Load user on init and after it was deleted (using the "Reset user" menu entry
                         if userStore.user == nil {
                             Task { await loadUser() }
@@ -136,18 +136,18 @@ struct ContentView: View {
                 
                 Text("History")
                     .font(.largeTitle)
-                List(clipboardManager.clipboardHistory.reversed(), id: \.self) { content in
+                List(clipboardManager.clipboardHistory.reversed(), id: \.self) { historyEntry in
                     HStack {
-                        Text(content)
+                        Text(historyEntry.clipboardContent.content)
                             .lineLimit(4)
                             .truncationMode(.tail)
                         Spacer()
                         Button {} label: { Image(systemName: "doc.on.doc") }
-                            .copyContent(content)
+                            .copyContent(historyEntry.clipboardContent)
                         if let _ = receiverStore.receiverId {
                             Button { // Resend button
                                 Task {
-                                    await clipboardManager.sendClipboardContent(content: content)
+                                    await clipboardManager.sendClipboardContent(content: historyEntry.clipboardContent)
                                 }
                             } label: { Image(systemName: "paperplane") }
                         }
@@ -171,10 +171,10 @@ struct ContentView: View {
         .onAppear {
             checkNotificationAuthorization()
         }
-        .onChange(of: isChangeReceiverIdShown) {
+        .task(id: isChangeReceiverIdShown) {
             self.pasteShortcutDisabledTemporarily = self.isChangeReceiverIdShown // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
         }
-        .onChange(of: receiverStore.receiverId) {
+        .task(id: receiverStore.receiverId) {
             // Update clipboardManager so that the ShareClipboardApp does not need to know the receiver ID itself
             self.clipboardManager.receiverId = self.receiverStore.receiverId
         }

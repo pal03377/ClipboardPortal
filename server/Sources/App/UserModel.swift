@@ -5,10 +5,10 @@ final class UserModel: Model {
     @ID(custom: "id", generatedBy: .user) var id: String? // User ID to choose who to send clipboard contents to. 8 digits. e.g. "12345678"
     @Field(key: "apns_token") var apnsToken: String // APNs token to send clipboard contents with push notifications. e.g. "1a2b3c..."
     @Field(key: "secret") var secret: String? // Secret to allow updating the APNs token and fetching the last clipboard content. Using the ID would be insecure because the ID is public. e.g. "1a2b3c..."
-    @Field(key: "last_received_clipboard_content") var lastReceivedClipboardContent: String? // Last clipboard content received from another user. Needed because of the small payload size limit of APNs. e.g. "Hello, world!
+    @Field(key: "last_received_clipboard_content") var lastReceivedClipboardContent: ClipboardContent? // Last clipboard content received from another user. Needed because of the small payload size limit of APNs. e.g. "Hello, world!
 
     init() {}
-    init(id: String?, apnsToken: String, secret: String? = nil, lastReceivedClipboardContent: String? = nil) {
+    init(id: String?, apnsToken: String, secret: String? = nil, lastReceivedClipboardContent: ClipboardContent? = nil) {
         self.id = id ?? Self.generateRandomID()
         self.apnsToken = apnsToken
         self.secret = secret ?? Self.generateRandomSecret()
@@ -35,7 +35,7 @@ struct CreateUser: Migration {
             .field("id", .string, .identifier(auto: false)) // Allow ID to be a string -> no .id()
             .field("apns_token", .string, .required)
             .field("secret", .string)
-            .field("last_received_clipboard_content", .string)
+            .field("last_received_clipboard_content", .json)
             .create()
     }
     func revert(on database: Database) -> EventLoopFuture<Void> {

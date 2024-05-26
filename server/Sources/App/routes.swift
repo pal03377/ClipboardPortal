@@ -32,23 +32,25 @@ func routes(_ app: Application) throws {
     // Send notification
     struct ClipboardContentSendDTO: Content {
         var receiverId: String // User ID for notification
-        var clipboardContent: String // Clipboard contents to send
+        var clipboardContent: ClipboardContent // Clipboard contents to send
     }
     struct ClipboardPayload: Codable {
-        var clipboardContent: String
-        var isTruncated: Bool // Whether the clipboard content was truncated because of APNs payload size limit
+        var clipboardContent: ClipboardContent
+        var date: Date
     }
     struct ClipboardSendResponse: Content {
-        var status: String
+        var id: UUID // ID of the clipboard content
     }
     app.post("send") { req async throws in
         print("Body: " + (req.body.string ?? "No body")) // Print incoming data for debugging
-        let notification = try req.content.decode(ClipboardContentSendDTO.self)
+        var notification = try req.content.decode(ClipboardContentSendDTO.self)
         let user = try await UserModel.find(notification.receiverId, on: req.db) // Find user in DB
         guard let user = user else { throw Abort(.notFound) } // 404 if user not found
         print("Topic: " + Environment.get("APNS_TOPIC")!) // Print APNs topic for debugging
+        // Set ID from server
+        notification.clipboardContent.id = UUID() // Set ID from server
         // Truncate clipboard content because of APNs payload size limit (4KB - https://stackoverflow.com/a/26994198/4306257)
-        let clipboardContentTruncated = String(notification.clipboardContent.prefix(200)) // Truncate clipboard content because of APNs payload size limit (4KB - https://stackoverflow.com/a/26994198/4306257)
+        let clipboardContentTruncated = notification.clipboardContent.truncated() // Truncate clipboard content because of APNs payload size limit (4KB - https://stackoverflow.com/a/26994198/4306257)
         // Store original clipboard content in DB to be able to retrieve it later
         user.lastReceivedClipboardContent = notification.clipboardContent
         try await user.save(on: req.db)
@@ -56,12 +58,12 @@ func routes(_ app: Application) throws {
         let alert: APNSAlertNotification<ClipboardPayload> = APNSAlertNotification( // Create notification to send clipboard content to other user
             alert: .init(
                 title: .raw("Received Clipboard!"),
-                body: .raw(clipboardContentTruncated)
+                body: .raw(clipboardContentTruncated.content)
             ),
             expiration: .timeIntervalSince1970InSeconds(Int(Date().timeIntervalSince1970 + 30)), // Expire in X seconds
             priority: .immediately,
             topic: Environment.get("APNS_TOPIC")!, // APNs topic = bundle ID as required by Apple e.g. "com.example.app"
-            payload: ClipboardPayload(clipboardContent: clipboardContentTruncated, isTruncated: notification.clipboardContent != clipboardContentTruncated), // Send clipboard contents in payload to receive them in the app and write them to the clipboard
+            payload: ClipboardPayload(clipboardContent: clipboardContentTruncated, date: Date()), // Send clipboard contents in payload to receive them in the app and write them to the clipboard
             sound: .default,
             interruptionLevel: .timeSensitive
         )
@@ -75,21 +77,25 @@ func routes(_ app: Application) throws {
             print("Error sending notification: \(error)") // Print error for debugging
             throw Abort(.internalServerError) // 500 if error sending notification
         }
-        return ClipboardSendResponse(status: "success") // e.g. {"status":"success"}
+        return ClipboardSendResponse(id: notification.clipboardContent.id!) // e.g. {"id":"123e4567-e89b-12d3-a456-426614174000"}
     }
     // Receive full clipboard content
     struct ClipboardContentReceiveDTO: Content {
         var id: String
         var secret: String
+        var skipForId: UUID? // Skip sending for clipboard content ID to avoid too much traffic
     }
     struct ClipboardContentReceiveResponse: Content {
-        var clipboardContent: String?
+        var clipboardContent: ClipboardContent?
     }
     app.post("receive") { req async throws in
         let receivedData = try req.content.decode(ClipboardContentReceiveDTO.self)
         let user = try await UserModel.find(receivedData.id, on: req.db) // Find user in DB
         guard let user = user else { throw Abort(.notFound) } // 404 if user not found
         guard user.secret == receivedData.secret else { throw Abort(.unauthorized) } // 403 if secret is incorrect
+        if user.lastReceivedClipboardContent?.id == receivedData.skipForId { // Skip sending clipboard content that the client already has
+            return ClipboardContentReceiveResponse(clipboardContent: nil) // e.g. {"clipboardContent":nil}
+        }
         return ClipboardContentReceiveResponse(clipboardContent: user.lastReceivedClipboardContent) // e.g. {"clipboardContent":"Hello, World!"} or {"clipboardContent":nil}
     }
 }
