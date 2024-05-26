@@ -110,7 +110,7 @@ class ClipboardManager: ObservableObject {
             let errorMessage = if let error = error as? ServerRequestError {
                 switch error {
                 case .notFound: "This receiver ID does not exist."
-                default: error.errorDescription
+                default: error.localizedDescription
                 }
             } else { error.localizedDescription }
             // Show error
@@ -120,7 +120,7 @@ class ClipboardManager: ObservableObject {
     func sendClipboardContent() async {
         let pasteboard = NSPasteboard.general
         if let content = pasteboard.string(forType: .string) {
-            if let _ = URL(string: content) { // Content looks like URL?
+            if (content.starts(with: "http:") || content.starts(with: "https:")) && !content.contains(" "), let _ = URL(string: content) { // Content looks like URL?
                 await self.sendClipboardContent(content: ClipboardContent(type: .url, content: content)) // Send as URL
             } else { // Content is normal string?
                 await self.sendClipboardContent(content: ClipboardContent(type: .text, content: content))

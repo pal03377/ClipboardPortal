@@ -7,8 +7,9 @@ enum ServerRequestError: Error {
     case notFound
     case serverError
     case unknown(Int)
-    
-    var errorDescription: String? {
+}
+extension ServerRequestError: LocalizedError { // Nice error messages
+    public var errorDescription: String? {
         switch self {
         case .networkError:
             return "A network error occurred. Please check your connection and try again."

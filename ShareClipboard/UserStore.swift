@@ -84,9 +84,10 @@ class UserStore: ObservableObject {
     
     // Update local storage for last received clipboard contents to not re-fetch when restarting the app
     func updateLastReceivedClipboardContent(_ newContent: ClipboardContent) async {
-        if var user {
-            user.lastReceivedClipboardContent = newContent
-            await save(user: user)
+        guard let _ = self.user else { return; }
+        DispatchQueue.main.async { // Update UI in main thread
+            self.user!.lastReceivedClipboardContent = newContent
+            Task { await self.save(user: self.user!) }
         }
     }
     
