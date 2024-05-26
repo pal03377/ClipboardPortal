@@ -1,6 +1,12 @@
 import SwiftUI
 import UserNotifications
 
+// TODO:
+// - Setting to allow opening URLs
+// - In-App-URL for Live Share (send URL directly to app)
+// - Design better interface in Affinity Designer
+// - Send images and files
+
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
 // - APNs was very hard to debug locally with a sandbox

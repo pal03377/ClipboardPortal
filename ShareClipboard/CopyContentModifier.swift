@@ -62,8 +62,7 @@ struct CopyContentModifier: ViewModifier {
         withAnimation {
             self.copyAnimationPlaying = false
         }
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(copyContent.content, forType: .string)
+        copyContent.copyToClipboard()
     }
 }
 

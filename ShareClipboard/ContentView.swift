@@ -173,6 +173,13 @@ struct ContentView: View {
             // Update clipboardManager so that the ShareClipboardApp does not need to know the receiver ID itself
             self.clipboardManager.receiverId = self.receiverStore.receiverId
         }
+        .task(id: clipboardManager.clipboardHistory) {
+            Task {
+                if let lastClipboardContent = clipboardManager.lastReceivedContent {
+                    await userStore.updateLastReceivedClipboardContent(lastClipboardContent)
+                }
+            }
+        }
         .onReceive(updateTimer) { _ in
             Task { await checkForNewClipboardContents() }
         }

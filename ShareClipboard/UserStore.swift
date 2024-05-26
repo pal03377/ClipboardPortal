@@ -82,6 +82,14 @@ class UserStore: ObservableObject {
         }
     }
     
+    // Update local storage for last received clipboard contents to not re-fetch when restarting the app
+    func updateLastReceivedClipboardContent(_ newContent: ClipboardContent) async {
+        if var user {
+            user.lastReceivedClipboardContent = newContent
+            await save(user: user)
+        }
+    }
+    
     // Helper function to create a new user on the server if no user is stored
     struct UserCreateDTO: Codable {}
     private func createUserOnServer() async throws -> User {

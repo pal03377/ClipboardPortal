@@ -2,6 +2,7 @@ import Foundation
 
 enum ClipboardContentTypes: String, Codable {
     case text = "text"
+    case url = "url"
 }
 
 struct ClipboardContent: Codable {
