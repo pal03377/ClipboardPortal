@@ -40,7 +40,7 @@ class ClipboardManager: ObservableObject {
     @Published var sendErrorMessage: String? = nil // Error message when sending the clipboard fails
     @Published var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
     @Published var clipboardHistory: [ClipboardHistoryEntry] = []
-    var receiverId: String? = nil // Needs to be set from outside because the ShareClipboardApp does not know it, so the ContentView has to update it
+    var receiverId: String? = nil // Needs to be set from outside because the ClipboardFriendApp does not know it, so the ContentView has to update it
     
     var lastReceivedContent: ClipboardContent? {
         get { clipboardHistory.filter(\.received).last?.clipboardContent }

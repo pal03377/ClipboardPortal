@@ -1,2 +1,0 @@
-SERVER_URL = http:/$()/127.0.0.1:8080 // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257
-//SERVER_URL = https:/$()/shareclipboard.pschwind.de // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257

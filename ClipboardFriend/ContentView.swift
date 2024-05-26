@@ -170,7 +170,7 @@ struct ContentView: View {
             self.pasteShortcutDisabledTemporarily = self.isChangeReceiverIdShown // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
         }
         .task(id: receiverStore.receiverId) {
-            // Update clipboardManager so that the ShareClipboardApp does not need to know the receiver ID itself
+            // Update clipboardManager so that the ClipboardFriendApp does not need to know the receiver ID itself
             self.clipboardManager.receiverId = self.receiverStore.receiverId
         }
         .task(id: clipboardManager.clipboardHistory) {

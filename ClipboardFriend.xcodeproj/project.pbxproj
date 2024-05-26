@@ -1,0 +1,411 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A732C03FD3400E46661 /* Assets.xcassets */; };
+		DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A742C03FD3400E46661 /* ClipboardManager.swift */; };
+		DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */; };
+		DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */; };
+		DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A782C03FD3400E46661 /* ContentView.swift */; };
+		DAB35A8B2C03FD3400E46661 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A792C03FD3400E46661 /* Info.plist */; };
+		DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */; };
+		DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */; };
+		DAB35A8E2C03FD3400E46661 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7C2C03FD3400E46661 /* User.swift */; };
+		DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */; };
+		DAB35A902C03FD3400E46661 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7E2C03FD3400E46661 /* Config.swift */; };
+		DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7F2C03FD3400E46661 /* UserStore.swift */; };
+		DAB35A922C03FD3400E46661 /* ReceiverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A802C03FD3400E46661 /* ReceiverStore.swift */; };
+		DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A812C03FD3400E46661 /* ServerRequest.swift */; };
+		DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */; };
+		DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A832C03FD3400E46661 /* MainMenu.xib */; };
+		DAB35A962C03FD3400E46661 /* ClipboardFriend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipboardFriend.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAB35A732C03FD3400E46661 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardFriend/Assets.xcassets; sourceTree = "<group>"; };
+		DAB35A742C03FD3400E46661 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardFriend/ClipboardManager.swift; sourceTree = "<group>"; };
+		DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewIfModifier.swift; path = ClipboardFriend/ViewIfModifier.swift; sourceTree = "<group>"; };
+		DAB35A782C03FD3400E46661 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ClipboardFriend/ContentView.swift; sourceTree = "<group>"; };
+		DAB35A792C03FD3400E46661 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipboardFriend/Info.plist; sourceTree = "<group>"; };
+		DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigProduction.xcconfig; path = ClipboardFriend/ConfigProduction.xcconfig; sourceTree = "<group>"; };
+		DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CopyContentModifier.swift; path = ClipboardFriend/CopyContentModifier.swift; sourceTree = "<group>"; };
+		DAB35A7C2C03FD3400E46661 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ClipboardFriend/User.swift; sourceTree = "<group>"; };
+		DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyPressModifierMacOS14.swift; path = ClipboardFriend/KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
+		DAB35A7E2C03FD3400E46661 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Config.swift; path = ClipboardFriend/Config.swift; sourceTree = "<group>"; };
+		DAB35A7F2C03FD3400E46661 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardFriend/UserStore.swift; sourceTree = "<group>"; };
+		DAB35A802C03FD3400E46661 /* ReceiverStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReceiverStore.swift; path = ClipboardFriend/ReceiverStore.swift; sourceTree = "<group>"; };
+		DAB35A812C03FD3400E46661 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardFriend/ServerRequest.swift; sourceTree = "<group>"; };
+		DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigDevelopment.xcconfig; path = ClipboardFriend/ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
+		DAB35A832C03FD3400E46661 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = ClipboardFriend/MainMenu.xib; sourceTree = "<group>"; };
+		DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardFriend.swift; path = ClipboardFriend/ClipboardFriend.swift; sourceTree = "<group>"; };
+		DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardFriend.entitlements; path = ClipboardFriend/ClipboardFriend.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DAAB33B82BCAFDCB00C82DF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DAAB33B22BCAFDCB00C82DF4 = {
+			isa = PBXGroup;
+			children = (
+				DAB35A732C03FD3400E46661 /* Assets.xcassets */,
+				DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */,
+				DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */,
+				DAB35A742C03FD3400E46661 /* ClipboardManager.swift */,
+				DAB35A7E2C03FD3400E46661 /* Config.swift */,
+				DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */,
+				DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */,
+				DAB35A782C03FD3400E46661 /* ContentView.swift */,
+				DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */,
+				DAB35A792C03FD3400E46661 /* Info.plist */,
+				DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */,
+				DAB35A832C03FD3400E46661 /* MainMenu.xib */,
+				DAB35A752C03FD3400E46661 /* Preview Content */,
+				DAB35A802C03FD3400E46661 /* ReceiverStore.swift */,
+				DAB35A812C03FD3400E46661 /* ServerRequest.swift */,
+				DAB35A7C2C03FD3400E46661 /* User.swift */,
+				DAB35A7F2C03FD3400E46661 /* UserStore.swift */,
+				DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */,
+				DAAB33BC2BCAFDCB00C82DF4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DAAB33BC2BCAFDCB00C82DF4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DAB35A752C03FD3400E46661 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */,
+			);
+			name = "Preview Content";
+			path = "ClipboardFriend/Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DAAB33BA2BCAFDCB00C82DF4 /* ClipboardFriend */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "ClipboardFriend" */;
+			buildPhases = (
+				DAAB33B72BCAFDCB00C82DF4 /* Sources */,
+				DAAB33B82BCAFDCB00C82DF4 /* Frameworks */,
+				DAAB33B92BCAFDCB00C82DF4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClipboardFriend;
+			productName = ClipboardFriend;
+			productReference = DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DAAB33B32BCAFDCB00C82DF4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1510;
+				LastUpgradeCheck = 1510;
+				TargetAttributes = {
+					DAAB33BA2BCAFDCB00C82DF4 = {
+						CreatedOnToolsVersion = 15.1;
+						LastSwiftMigration = 1510;
+					};
+				};
+			};
+			buildConfigurationList = DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardFriend" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DAAB33B22BCAFDCB00C82DF4;
+			productRefGroup = DAAB33BC2BCAFDCB00C82DF4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DAAB33BA2BCAFDCB00C82DF4 /* ClipboardFriend */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DAAB33B92BCAFDCB00C82DF4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */,
+				DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */,
+				DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */,
+				DAB35A8B2C03FD3400E46661 /* Info.plist in Resources */,
+				DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */,
+				DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DAAB33B72BCAFDCB00C82DF4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */,
+				DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */,
+				DAB35A962C03FD3400E46661 /* ClipboardFriend.swift in Sources */,
+				DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */,
+				DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */,
+				DAB35A902C03FD3400E46661 /* Config.swift in Sources */,
+				DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */,
+				DAB35A8E2C03FD3400E46661 /* User.swift in Sources */,
+				DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */,
+				DAB35A922C03FD3400E46661 /* ReceiverStore.swift in Sources */,
+				DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		DAAB33C82BCAFDCD00C82DF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DAAB33C92BCAFDCD00C82DF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ClipboardFriend/ClipboardFriend.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
+				DEVELOPMENT_TEAM = 5D4FR5T9QN;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ClipboardFriend/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Friend";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardFriend;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = ClipboardFriend/ClipboardFriend.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
+				DEVELOPMENT_TEAM = 5D4FR5T9QN;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ClipboardFriend/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Friend";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardFriend;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardFriend" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAAB33C82BCAFDCD00C82DF4 /* Debug */,
+				DAAB33C92BCAFDCD00C82DF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "ClipboardFriend" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAAB33CB2BCAFDCD00C82DF4 /* Debug */,
+				DAAB33CC2BCAFDCD00C82DF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DAAB33B32BCAFDCB00C82DF4 /* Project object */;
+}

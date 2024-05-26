@@ -2,7 +2,6 @@ import SwiftUI
 import UserNotifications
 
 // TODO:
-// - Setting to allow opening URLs
 // - In-App-URL for Live Share (send URL directly to app)
 // - Design better interface in Affinity Designer
 // - Send images and files
@@ -15,7 +14,7 @@ import UserNotifications
 // APNs has a content size limit of around 1000 characters, which is way too low for general clipboard contents
 
 @main
-struct ShareClipboardApp: App {
+struct ClipboardFriendApp: App {
     @State var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
     @StateObject var userStore = UserStore()
     @StateObject var clipboardManager = ClipboardManager()
