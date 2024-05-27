@@ -2,9 +2,9 @@ import SwiftUI
 import UserNotifications
 
 // TODO:
-// - Design better interface in Affinity Designer
 // - Send images and files
-// - In-App-URL for Live Share (send URL directly to app)
+// - URL Schema for receiving friend code
+// - URL Schema for Live Share (send URL directly to app)
 
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
@@ -35,24 +35,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     //}
 }
 
+class AppGlobals: ObservableObject {
+    @Published var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
+}
+
 @main
 struct ClipboardFriendApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
+    @State var appGlobals = AppGlobals()
     @StateObject var userStore = UserStore()
+    @StateObject var settingsStore = SettingsStore()
     @StateObject var clipboardManager = ClipboardManager()
     private var updateTimer: Timer?
     
     var body: some Scene {
         WindowGroup {
-            ContentView(pasteShortcutDisabledTemporarily: $pasteShortcutDisabledTemporarily)
+            ContentView()
+                .environmentObject(appGlobals)
                 .environmentObject(userStore)
+                .environmentObject(settingsStore)
                 .environmentObject(clipboardManager)
                 .frame(minWidth: 400) // Min window width to now squeeze text
+                .task { await userStore.load() } // Load user data
+                .task { await settingsStore.load() } // Load settings
         }
+        .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
-            if !pasteShortcutDisabledTemporarily {
+            if !appGlobals.pasteShortcutDisabledTemporarily {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
                         Task {
@@ -66,6 +76,7 @@ struct ClipboardFriendApp: App {
                 Button {
                     Task {
                         await userStore.delete()
+                        await userStore.load() // Reload user data
                     }
                 } label: { Text("Reset user") }
             }

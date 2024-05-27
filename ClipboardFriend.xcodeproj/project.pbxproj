@@ -7,19 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA76F31B2C04144F0064E8EC /* CommandV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31A2C04144F0064E8EC /* CommandV.swift */; };
+		DA76F31D2C041C450064E8EC /* ClipboardHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */; };
+		DA76F31F2C0426030064E8EC /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31E2C0426030064E8EC /* StatusView.swift */; };
+		DA76F3212C04307C0064E8EC /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3202C04307C0064E8EC /* Settings.swift */; };
+		DA76F3232C0433D40064E8EC /* NotificationsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */; };
+		DA76F3252C0434420064E8EC /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3242C0434420064E8EC /* LocalNotification.swift */; };
+		DA76F3272C0444210064E8EC /* FocusEffectDisabledMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */; };
 		DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A732C03FD3400E46661 /* Assets.xcassets */; };
 		DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A742C03FD3400E46661 /* ClipboardManager.swift */; };
 		DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */; };
 		DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */; };
 		DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A782C03FD3400E46661 /* ContentView.swift */; };
-		DAB35A8B2C03FD3400E46661 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A792C03FD3400E46661 /* Info.plist */; };
 		DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */; };
 		DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */; };
 		DAB35A8E2C03FD3400E46661 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7C2C03FD3400E46661 /* User.swift */; };
 		DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */; };
 		DAB35A902C03FD3400E46661 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7E2C03FD3400E46661 /* Config.swift */; };
 		DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7F2C03FD3400E46661 /* UserStore.swift */; };
-		DAB35A922C03FD3400E46661 /* ReceiverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A802C03FD3400E46661 /* ReceiverStore.swift */; };
+		DAB35A922C03FD3400E46661 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A802C03FD3400E46661 /* SettingsStore.swift */; };
 		DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A812C03FD3400E46661 /* ServerRequest.swift */; };
 		DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */; };
 		DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A832C03FD3400E46661 /* MainMenu.xib */; };
@@ -27,6 +33,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DA76F31A2C04144F0064E8EC /* CommandV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandV.swift; sourceTree = "<group>"; };
+		DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryList.swift; sourceTree = "<group>"; };
+		DA76F31E2C0426030064E8EC /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		DA76F3202C04307C0064E8EC /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsToggle.swift; sourceTree = "<group>"; };
+		DA76F3242C0434420064E8EC /* LocalNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotification.swift; sourceTree = "<group>"; };
+		DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledMacOS14.swift; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Friend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAB35A732C03FD3400E46661 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardFriend/Assets.xcassets; sourceTree = "<group>"; };
 		DAB35A742C03FD3400E46661 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardFriend/ClipboardManager.swift; sourceTree = "<group>"; };
@@ -40,7 +53,7 @@
 		DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyPressModifierMacOS14.swift; path = ClipboardFriend/KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
 		DAB35A7E2C03FD3400E46661 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Config.swift; path = ClipboardFriend/Config.swift; sourceTree = "<group>"; };
 		DAB35A7F2C03FD3400E46661 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardFriend/UserStore.swift; sourceTree = "<group>"; };
-		DAB35A802C03FD3400E46661 /* ReceiverStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReceiverStore.swift; path = ClipboardFriend/ReceiverStore.swift; sourceTree = "<group>"; };
+		DAB35A802C03FD3400E46661 /* SettingsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsStore.swift; path = ClipboardFriend/SettingsStore.swift; sourceTree = "<group>"; };
 		DAB35A812C03FD3400E46661 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardFriend/ServerRequest.swift; sourceTree = "<group>"; };
 		DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigDevelopment.xcconfig; path = ClipboardFriend/ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
 		DAB35A832C03FD3400E46661 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = ClipboardFriend/MainMenu.xib; sourceTree = "<group>"; };
@@ -59,9 +72,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DA76F3192C0414430064E8EC /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				DA76F31A2C04144F0064E8EC /* CommandV.swift */,
+				DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */,
+				DA76F31E2C0426030064E8EC /* StatusView.swift */,
+				DA76F3202C04307C0064E8EC /* Settings.swift */,
+				DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
 		DAAB33B22BCAFDCB00C82DF4 = {
 			isa = PBXGroup;
 			children = (
+				DA76F3192C0414430064E8EC /* ui */,
 				DAB35A732C03FD3400E46661 /* Assets.xcassets */,
 				DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */,
 				DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */,
@@ -70,12 +96,14 @@
 				DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */,
 				DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */,
 				DAB35A782C03FD3400E46661 /* ContentView.swift */,
+				DA76F3242C0434420064E8EC /* LocalNotification.swift */,
 				DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */,
 				DAB35A792C03FD3400E46661 /* Info.plist */,
 				DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */,
+				DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */,
 				DAB35A832C03FD3400E46661 /* MainMenu.xib */,
 				DAB35A752C03FD3400E46661 /* Preview Content */,
-				DAB35A802C03FD3400E46661 /* ReceiverStore.swift */,
+				DAB35A802C03FD3400E46661 /* SettingsStore.swift */,
 				DAB35A812C03FD3400E46661 /* ServerRequest.swift */,
 				DAB35A7C2C03FD3400E46661 /* User.swift */,
 				DAB35A7F2C03FD3400E46661 /* UserStore.swift */,
@@ -163,7 +191,6 @@
 				DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */,
 				DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */,
 				DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */,
-				DAB35A8B2C03FD3400E46661 /* Info.plist in Resources */,
 				DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */,
 				DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */,
 			);
@@ -176,17 +203,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA76F3232C0433D40064E8EC /* NotificationsToggle.swift in Sources */,
 				DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */,
 				DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */,
 				DAB35A962C03FD3400E46661 /* ClipboardFriendApp.swift in Sources */,
 				DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */,
+				DA76F31F2C0426030064E8EC /* StatusView.swift in Sources */,
 				DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */,
 				DAB35A902C03FD3400E46661 /* Config.swift in Sources */,
 				DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */,
 				DAB35A8E2C03FD3400E46661 /* User.swift in Sources */,
+				DA76F3272C0444210064E8EC /* FocusEffectDisabledMacOS14.swift in Sources */,
+				DA76F3212C04307C0064E8EC /* Settings.swift in Sources */,
 				DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */,
-				DAB35A922C03FD3400E46661 /* ReceiverStore.swift in Sources */,
+				DA76F31D2C041C450064E8EC /* ClipboardHistoryList.swift in Sources */,
+				DAB35A922C03FD3400E46661 /* SettingsStore.swift in Sources */,
+				DA76F31B2C04144F0064E8EC /* CommandV.swift in Sources */,
 				DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */,
+				DA76F3252C0434420064E8EC /* LocalNotification.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,7 +357,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -361,7 +395,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
