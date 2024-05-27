@@ -21,7 +21,9 @@ enum Entrypoint {
                 try FileManager.default.createDirectory(atPath: dataDir, withIntermediateDirectories: true, attributes: nil)
             }
             // Set up database
-            app.databases.use(.sqlite(.file("data/db.sqlite")), as: .sqlite)
+            let dbPath = "data/db.sqlite"
+            if !FileManager.default.fileExists(atPath: dbPath) { FileManager.default.createFile(atPath: dbPath, contents: nil, attributes: nil) }
+            app.databases.use(.sqlite(.file(dbPath)), as: .sqlite)
             // Create tables
             app.migrations.add(CreateUser())
             try await app.autoMigrate() // Run migrations
