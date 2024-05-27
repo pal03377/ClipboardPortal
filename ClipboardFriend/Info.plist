@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>ServerURL</key>
+	<string>$(SERVER_URL)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>None</string>
-			<key>CFBundleURLIconFile</key>
-			<string></string>
 			<key>CFBundleURLName</key>
 			<string>de.pschwind.clipboardfriend</string>
 			<key>CFBundleURLSchemes</key>
@@ -17,7 +17,12 @@
 			</array>
 		</dict>
 	</array>
-	<key>ServerURL</key>
-	<string>$(SERVER_URL)</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+		<key>UIApplicationSupportsTabbedSceneCollection</key>
+		<false/>
+	</dict>
 </dict>
 </plist>

@@ -23,11 +23,11 @@
 		DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A812C03FD3400E46661 /* ServerRequest.swift */; };
 		DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */; };
 		DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A832C03FD3400E46661 /* MainMenu.xib */; };
-		DAB35A962C03FD3400E46661 /* ClipboardFriend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */; };
+		DAB35A962C03FD3400E46661 /* ClipboardFriendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipboardFriend.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Friend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAB35A732C03FD3400E46661 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardFriend/Assets.xcassets; sourceTree = "<group>"; };
 		DAB35A742C03FD3400E46661 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardFriend/ClipboardManager.swift; sourceTree = "<group>"; };
 		DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -44,7 +44,7 @@
 		DAB35A812C03FD3400E46661 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardFriend/ServerRequest.swift; sourceTree = "<group>"; };
 		DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigDevelopment.xcconfig; path = ClipboardFriend/ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
 		DAB35A832C03FD3400E46661 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = ClipboardFriend/MainMenu.xib; sourceTree = "<group>"; };
-		DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardFriend.swift; path = ClipboardFriend/ClipboardFriend.swift; sourceTree = "<group>"; };
+		DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardFriendApp.swift; path = ClipboardFriend/ClipboardFriendApp.swift; sourceTree = "<group>"; };
 		DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardFriend.entitlements; path = ClipboardFriend/ClipboardFriend.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,7 +64,7 @@
 			children = (
 				DAB35A732C03FD3400E46661 /* Assets.xcassets */,
 				DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */,
-				DAB35A842C03FD3400E46661 /* ClipboardFriend.swift */,
+				DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */,
 				DAB35A742C03FD3400E46661 /* ClipboardManager.swift */,
 				DAB35A7E2C03FD3400E46661 /* Config.swift */,
 				DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */,
@@ -87,7 +87,7 @@
 		DAAB33BC2BCAFDCB00C82DF4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */,
+				DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,9 +104,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DAAB33BA2BCAFDCB00C82DF4 /* ClipboardFriend */ = {
+		DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Friend */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "ClipboardFriend" */;
+			buildConfigurationList = DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Friend" */;
 			buildPhases = (
 				DAAB33B72BCAFDCB00C82DF4 /* Sources */,
 				DAAB33B82BCAFDCB00C82DF4 /* Frameworks */,
@@ -116,9 +116,9 @@
 			);
 			dependencies = (
 			);
-			name = ClipboardFriend;
+			name = "Clipboard Friend";
 			productName = ClipboardFriend;
-			productReference = DAAB33BB2BCAFDCB00C82DF4 /* ClipboardFriend.app */;
+			productReference = DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -150,7 +150,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DAAB33BA2BCAFDCB00C82DF4 /* ClipboardFriend */,
+				DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Friend */,
 			);
 		};
 /* End PBXProject section */
@@ -178,7 +178,7 @@
 			files = (
 				DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */,
 				DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */,
-				DAB35A962C03FD3400E46661 /* ClipboardFriend.swift in Sources */,
+				DAB35A962C03FD3400E46661 /* ClipboardFriendApp.swift in Sources */,
 				DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */,
 				DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */,
 				DAB35A902C03FD3400E46661 /* Config.swift in Sources */,
@@ -313,6 +313,7 @@
 		};
 		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -350,6 +351,7 @@
 		};
 		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -396,7 +398,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "ClipboardFriend" */ = {
+		DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Friend" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DAAB33CB2BCAFDCD00C82DF4 /* Debug */,

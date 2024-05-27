@@ -119,7 +119,8 @@ class ClipboardManager: ObservableObject {
     }
     func sendClipboardContent() async {
         let pasteboard = NSPasteboard.general
-        if let content = pasteboard.string(forType: .string) {
+        if var content = pasteboard.string(forType: .string) {
+            if content == "rick" { content = "https://www.youtube.com/watch?v=xvFZjo5PgG0" } // Easter egg
             if (content.starts(with: "http:") || content.starts(with: "https:")) && !content.contains(" "), let _ = URL(string: content) { // Content looks like URL?
                 await self.sendClipboardContent(content: ClipboardContent(type: .url, content: content)) // Send as URL
             } else { // Content is normal string?

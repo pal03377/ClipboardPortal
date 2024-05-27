@@ -20,7 +20,7 @@
             landmarkType = "0">
             <Locations>
                <Location
-                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - adbb29022bbdd3e0"
+                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - 3832e69835870efa"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -35,12 +35,42 @@
                   offsetFromSymbolStart = "168">
                </Location>
                <Location
-                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - 8ae25f0cc1235ad7"
+                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - b57f7f774ddbc10d"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "ClipboardFriend.serverUrl.unsafeMutableAddressor : Foundation.URL"
                   moduleName = "ClipboardFriend"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/paul/main/projects/ClipboardFriend/ClipboardFriend/Config.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "4"
+                  endingLineNumber = "4"
+                  offsetFromSymbolStart = "16">
+               </Location>
+               <Location
+                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - c9e19047a9c1e15"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "one-time initialization function for serverUrl"
+                  moduleName = "Clipboard Friend"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/paul/main/projects/ClipboardFriend/ClipboardFriend/Config.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "4"
+                  endingLineNumber = "4"
+                  offsetFromSymbolStart = "168">
+               </Location>
+               <Location
+                  uuid = "4BF3550A-1DA5-4D0C-88A6-A6D04BF168C1 - ed1e0b1b1ec7d69a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Clipboard_Friend.serverUrl.unsafeMutableAddressor : Foundation.URL"
+                  moduleName = "Clipboard Friend"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/paul/main/projects/ClipboardFriend/ClipboardFriend/Config.swift"
                   startingColumnNumber = "9223372036854775807"
