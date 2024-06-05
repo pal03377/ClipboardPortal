@@ -47,6 +47,10 @@ struct ContentView: View {
                 }
             }
         }
+        .task(id: settingsStore.settingsData.receiverId) {
+            // Update clipboardManager so that the ClipboardFriendApp does not need to know the receiver ID itself
+            self.clipboardManager.receiverId = self.settingsStore.settingsData.receiverId
+        }
         .onReceive(updateTimer) { _ in
             Task { await checkForNewClipboardContents() }
         }

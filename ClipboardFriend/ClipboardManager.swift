@@ -35,7 +35,7 @@ struct ClipboardHistoryEntry: Hashable {
 }
 
 // Send and receive clipboard contents
-class ClipboardManager: ObservableObject {
+class ClipboardManager: ObservableObject, Equatable {
     @Published var sending: Bool = false // Whether clipboard contents are being sent right now
     @Published var sendErrorMessage: String? = nil // Error message when sending the clipboard fails
     @Published var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
@@ -91,6 +91,7 @@ class ClipboardManager: ObservableObject {
         var id: UUID // ID of the clipboard content
     }
     func sendClipboardContent(content: ClipboardContent) async {
+        print("sending \(content)")
         guard let receiverId = self.receiverId else {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured. Go to settings." } // Show error if there is no receiver yet. Update UI in main thread.
             return
@@ -129,5 +130,9 @@ class ClipboardManager: ObservableObject {
         } else {
             DispatchQueue.main.async { self.sendErrorMessage = "No sendable clipboard content." } // Show error. Update UI in main thread.
         }
+    }
+    
+    static func == (lhs: ClipboardManager, rhs: ClipboardManager) -> Bool {
+        return lhs.sending == rhs.sending && lhs.clipboardHistory == rhs.clipboardHistory && lhs.receiverId == rhs.receiverId
     }
 }

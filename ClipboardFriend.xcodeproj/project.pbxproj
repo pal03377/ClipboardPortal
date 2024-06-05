@@ -357,7 +357,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -395,7 +395,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;

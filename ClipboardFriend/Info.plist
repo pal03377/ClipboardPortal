@@ -2,21 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>ServerURL</key>
-	<string>$(SERVER_URL)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>de.pschwind.clipboardfriend</string>
+			<string>de.pschwind.clipboardportal</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>clipboardfriend</string>
+				<string>clipboardportal</string>
 			</array>
 		</dict>
 	</array>
+	<key>ServerURL</key>
+	<string>$(SERVER_URL)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

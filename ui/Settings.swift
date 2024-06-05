@@ -4,7 +4,6 @@ struct Settings: View {
     @EnvironmentObject private var appGlobals: AppGlobals
     @EnvironmentObject private var settingsStore: SettingsStore
     @EnvironmentObject private var userStore: UserStore
-    @EnvironmentObject private var clipboardManager: ClipboardManager
     @State private var isFriendsCodePopupOpen = false
     @FocusState private var receiverIdInputFocused
 
@@ -67,10 +66,6 @@ struct Settings: View {
                     }
                 }
             }
-            .task(id: settingsStore.settingsData.receiverId) {
-                // Update clipboardManager so that the ClipboardFriendApp does not need to know the receiver ID itself
-                self.clipboardManager.receiverId = self.settingsStore.settingsData.receiverId
-            }
             Divider()
             NotificationsToggle()
         }
@@ -83,5 +78,4 @@ struct Settings: View {
         .environmentObject(AppGlobals())
         .environmentObject(SettingsStore())
         .environmentObject(UserStore())
-        .environmentObject(ClipboardManager())
 }

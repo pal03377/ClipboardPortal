@@ -2,9 +2,12 @@ import SwiftUI
 import UserNotifications
 
 // TODO:
+// - Rename to Clipboard Portal
 // - Send images and files
 // - URL Schema for receiving friend code
-// - URL Schema for Live Share (send URL directly to app)
+// - Global Shortcut for pasting
+// - Keep history list scrolled up/down
+// - Fix notification check
 
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
@@ -14,25 +17,43 @@ import UserNotifications
 // APNs has a content size limit of around 1000 characters, which is way too low for general clipboard contents
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    var clipboardManager = ClipboardManager()
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
-        //for url in urls {
-            //handleIncomingURL(url)
-        //}
+        for url in urls {
+            handleIncomingURL(url)
+        }
     }
 
-    //private func handleIncomingURL(_ url: URL) {
-    //    // Handle the URL here
-    //    if url.scheme == "clipboardfriend" {
-    //        if url.host == "test" {
-    //            print("Handling clipboardfriend://test")
-    //            // Insert your custom handling logic here
-    //        }
-    //    }
-    //}
+    private func handleIncomingURL(_ url: URL) {
+        print("Open URL \(url)")
+        // Handle the URL here
+        if url.scheme == "clipboardportal" {
+            if url.host == "paste" {
+                // Parse URL components to access query items
+                guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+                      let queryItems = components.queryItems else {
+                    print("Invalid URL or missing components")
+                    return
+                }
+                let type = queryItems.first(where: { $0.name == "type" })?.value ?? "text"
+                let content = queryItems.first(where: { $0.name == "content" })?.value
+                if let content = content {
+                    print("Type: \(type), Content: \(content)")
+                    Task {
+                        await clipboardManager.sendClipboardContent(content: ClipboardContent(type: ClipboardContentTypes(rawValue: type) ?? .text, content: content))
+                        print("Sent clipboard contents!")
+                    }
+                } else {
+                    print("Wrong URL: Missing content GET param")
+                }
+            }
+        }
+    }
 }
 
 class AppGlobals: ObservableObject {
@@ -45,7 +66,6 @@ struct ClipboardFriendApp: App {
     @State var appGlobals = AppGlobals()
     @StateObject var userStore = UserStore()
     @StateObject var settingsStore = SettingsStore()
-    @StateObject var clipboardManager = ClipboardManager()
     private var updateTimer: Timer?
     
     var body: some Scene {
@@ -54,11 +74,12 @@ struct ClipboardFriendApp: App {
                 .environmentObject(appGlobals)
                 .environmentObject(userStore)
                 .environmentObject(settingsStore)
-                .environmentObject(clipboardManager)
+                .environmentObject(appDelegate.clipboardManager)
                 .frame(minWidth: 400) // Min window width to now squeeze text
                 .task { await userStore.load() } // Load user data
                 .task { await settingsStore.load() } // Load settings
         }
+        .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
@@ -66,7 +87,7 @@ struct ClipboardFriendApp: App {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
                         Task {
-                            await clipboardManager.sendClipboardContent()
+                            await appDelegate.clipboardManager.sendClipboardContent()
                         }
                     } label: { Text("Paste") }
                         .keyboardShortcut("v", modifiers: [.command])
