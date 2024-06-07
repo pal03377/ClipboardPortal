@@ -2,7 +2,6 @@ import SwiftUI
 import UserNotifications
 
 // TODO:
-// - Increase server payload limit (to prevent 413 error) and show better error if 413 occurs
 // - Rename to Clipboard Portal (and show cool Portal icon and maybe some default sound)
 // - Global Shortcut for pasting
 // - Fix notification check
