@@ -2,12 +2,14 @@ import SwiftUI
 import UserNotifications
 
 // TODO:
-// - Rename to Clipboard Portal
+// - Increase server payload limit (to prevent 413 error) and show better error if 413 occurs
+// - Rename to Clipboard Portal (and show cool Portal icon and maybe some default sound)
+// - Global Shortcut for pasting
+// - Fix notification check
+// - Extend button click area to whole top
+// - Make history not scrollable and instead show X entries and make whole UI scrollable
 // - Send images and files
 // - URL Schema for receiving friend code
-// - Global Shortcut for pasting
-// - Keep history list scrolled up/down
-// - Fix notification check
 
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:

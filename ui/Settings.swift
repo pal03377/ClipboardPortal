@@ -6,9 +6,6 @@ struct Settings: View {
     @EnvironmentObject private var userStore: UserStore
     @State private var isFriendsCodePopupOpen = false
     @FocusState private var receiverIdInputFocused
-
-    
-    // TODO: Add registerForPushNotifications()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -39,19 +36,19 @@ struct Settings: View {
                         Task { try await settingsStore.save() }
                     }).monospaced()
                         .focused($receiverIdInputFocused)
-                    // Allow only numbers
+                        // Allow only numbers
                         .onReceive(settingsStore.settingsData.receiverId.publisher.collect()) { newValue in
                             let filtered = newValue.filter { "0123456789".contains($0) }
                             if filtered != newValue {
                                 settingsStore.settingsData.receiverId = String(filtered)
                             }
                         }
-                    // Save when pressing Enter
+                        // Save when pressing Enter
                         .keyPressMacOS14(.return) {
                             Task { try await settingsStore.save() }
                             return true // Return that event was handled
                         }
-                    // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
+                        // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
                         .task(id: receiverIdInputFocused) {
                             appGlobals.pasteShortcutDisabledTemporarily = self.receiverIdInputFocused
                         }

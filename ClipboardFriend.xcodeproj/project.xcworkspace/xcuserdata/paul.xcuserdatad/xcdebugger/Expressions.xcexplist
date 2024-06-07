@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "closure #2 in NotificationsToggle.body.getter:NotificationsToggle.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "settingsStore.settingsData.notificationsEnabled">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "static ServerRequest.post&lt;&#x3c4;_0_0&gt;(path:body:):ServerRequest.swift">
          <PersistentStrings>
             <PersistentString

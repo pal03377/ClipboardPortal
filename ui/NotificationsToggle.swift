@@ -11,7 +11,7 @@ struct NotificationsToggle: View {
         }
         .task(id: settingsStore.settingsData.notificationsEnabled) {
             if settingsStore.settingsData.notificationsEnabled {
-                checkNotificationAuthorization()
+                checkNotificationAuthorization() // Check if permission was already granted
             }
         }
     }
@@ -20,8 +20,10 @@ struct NotificationsToggle: View {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async { // Update UI in main thread
                 self.isNotificationsAllowed = (settings.authorizationStatus == .authorized)
-                self.settingsStore.settingsData.notificationsEnabled = self.isNotificationsAllowed
-                Task { try await self.settingsStore.save() }
+                // Request permission if needed
+                if !self.isNotificationsAllowed && self.settingsStore.settingsData.notificationsEnabled { // Not yet allowed but wanted?
+                    registerForPushNotifications() // Request notifications permission
+                }
             }
         }
     }
