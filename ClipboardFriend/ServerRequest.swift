@@ -5,6 +5,7 @@ enum ServerRequestError: Error {
     case badRequest
     case forbidden
     case notFound
+    case payloadTooLarge
     case serverError
     case unknown(Int)
 }
@@ -19,6 +20,8 @@ extension ServerRequestError: LocalizedError { // Nice error messages
             return "Forbidden. You don't have permission to access this resource."
         case .notFound:
             return "Resource not found. Please check the URL and try again."
+        case .payloadTooLarge:
+            return "Too much data."
         case .serverError:
             return "A server error occurred. Please try again later."
         case .unknown(let code):
@@ -77,6 +80,7 @@ struct ServerRequest {
             case 400: throw ServerRequestError.badRequest
             case 403: throw ServerRequestError.forbidden
             case 404: throw ServerRequestError.notFound
+            case 413: throw ServerRequestError.payloadTooLarge
             case 500: throw ServerRequestError.serverError
             default: throw ServerRequestError.unknown(response.statusCode)
             }
