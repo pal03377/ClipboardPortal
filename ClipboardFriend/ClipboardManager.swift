@@ -92,7 +92,7 @@ class ClipboardManager: ObservableObject, Equatable {
     }
     func sendClipboardContent(content: ClipboardContent) async {
         print("sending \(content)")
-        guard let receiverId = self.receiverId else {
+        guard let receiverId = self.receiverId, receiverId != "" else {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured. Go to settings." } // Show error if there is no receiver yet. Update UI in main thread.
             return
         }

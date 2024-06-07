@@ -65,7 +65,7 @@ class AppGlobals: ObservableObject {
 @main
 struct ClipboardFriendApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State var appGlobals = AppGlobals()
+    @StateObject var appGlobals = AppGlobals()
     @StateObject var userStore = UserStore()
     @StateObject var settingsStore = SettingsStore()
     private var updateTimer: Timer?
