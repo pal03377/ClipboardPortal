@@ -12,8 +12,8 @@ class SettingsStore: ObservableObject {
     @Published var settingsData = defaultSettingsData
 
     // Helper function to get the file path for the user data
-    private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/settings.data
-        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support
+    private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/settings.data
+        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support
                                     in: .userDomainMask,
                                     appropriateFor: nil,
                                     create: false)
@@ -32,7 +32,7 @@ class SettingsStore: ObservableObject {
     // Helper function to save the receiver ID locally
     func save() async throws {
         let data = try JSONEncoder().encode(settingsData) // JSON-encode user data
-        let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/settings.data
+        let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/settings.data
         try data.write(to: outfile) // Write user data to file
     }
 }

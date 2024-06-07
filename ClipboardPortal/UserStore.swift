@@ -6,8 +6,8 @@ class UserStore: ObservableObject {
     @Published var userLoadErrorMessage: String? = nil
 
     // Helper function to get the file path for the user data
-    private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/user.data
-        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support
+    private static func fileURL() throws -> URL { // e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
+        try FileManager.default.url(for: .applicationSupportDirectory, // Store data in file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support
                                     in: .userDomainMask,
                                     appropriateFor: nil,
                                     create: false)
@@ -17,7 +17,7 @@ class UserStore: ObservableObject {
     // Load user from storage - or create a new user on the server if it does not exist yet.
     func load() async {
         DispatchQueue.main.async { self.userLoadErrorMessage = nil } // Clear previous error message
-        let fileURL = try? Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/user.data
+        let fileURL = try? Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
         guard let fileURL else {
             DispatchQueue.main.async { self.userLoadErrorMessage = "Could not get file URL" }
             return
@@ -64,7 +64,7 @@ class UserStore: ObservableObject {
     private func save(user: User) async {
         do {
             let data = try JSONEncoder().encode(user) // JSON-encode user data
-            let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/user.data
+            let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
             try data.write(to: outfile) // Write user data to file
         } catch {
             DispatchQueue.main.async { self.userLoadErrorMessage = "User data saving failed: \(error.localizedDescription)" }
@@ -75,7 +75,7 @@ class UserStore: ObservableObject {
     func delete() async {
         DispatchQueue.main.async { self.user = nil; self.userLoadErrorMessage = nil } // Update UI on main thread
         do {
-            let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardFriend/Data/Library/Application%20Support/user.data
+            let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
             try FileManager.default.removeItem(at: fileURL) // Delete user data file
         } catch {
             DispatchQueue.main.async { self.userLoadErrorMessage = "User data deletion failed: \(error.localizedDescription)" }

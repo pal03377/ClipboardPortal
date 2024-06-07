@@ -2,8 +2,8 @@ x-shared_environment: &shared_environment
   LOG_LEVEL: ${LOG_LEVEL:-debug}
   
 services:
-  share-clipboard-server:
-    container_name: share-clipboard-server
+  clipboard-portal-server:
+    container_name: clipboard-portal-server
     image: server:latest
     build:
       context: .

@@ -62,7 +62,7 @@ class AppGlobals: ObservableObject {
 }
 
 @main
-struct ClipboardFriendApp: App {
+struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appGlobals = AppGlobals()
     @StateObject var userStore = UserStore()

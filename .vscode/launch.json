@@ -7,9 +7,9 @@
                 "swift"
             ],
             "args": [],
-            "cwd": "${workspaceFolder:ClipboardFriend}/server",
+            "cwd": "${workspaceFolder:ClipboardPortal}/server",
             "name": "Debug App (server)",
-            "program": "${workspaceFolder:ClipboardFriend}/server/.build/debug/App",
+            "program": "${workspaceFolder:ClipboardPortal}/server/.build/debug/App",
             "preLaunchTask": "swift: Build Debug App (server)"
         },
         {
@@ -19,9 +19,9 @@
                 "swift"
             ],
             "args": [],
-            "cwd": "${workspaceFolder:ClipboardFriend}/server",
+            "cwd": "${workspaceFolder:ClipboardPortal}/server",
             "name": "Release App (server)",
-            "program": "${workspaceFolder:ClipboardFriend}/server/.build/release/App",
+            "program": "${workspaceFolder:ClipboardPortal}/server/.build/release/App",
             "preLaunchTask": "swift: Build Release App (server)"
         }
     ]

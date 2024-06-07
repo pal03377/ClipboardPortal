@@ -1,5 +1,4 @@
 $DOMAIN {
 	log $PROJECT_NAME # Enable Caddy access logs (for goaccess)
 	reverse_proxy :$PORT
-	max_size 5MByte # Increase max clipboard send limit
 }

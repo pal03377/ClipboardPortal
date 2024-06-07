@@ -7,58 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA76F31B2C04144F0064E8EC /* CommandV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31A2C04144F0064E8EC /* CommandV.swift */; };
-		DA76F31D2C041C450064E8EC /* ClipboardHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */; };
-		DA76F31F2C0426030064E8EC /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F31E2C0426030064E8EC /* StatusView.swift */; };
-		DA76F3212C04307C0064E8EC /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3202C04307C0064E8EC /* Settings.swift */; };
-		DA76F3232C0433D40064E8EC /* NotificationsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */; };
-		DA76F3252C0434420064E8EC /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3242C0434420064E8EC /* LocalNotification.swift */; };
-		DA76F3272C0444210064E8EC /* FocusEffectDisabledMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */; };
-		DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A732C03FD3400E46661 /* Assets.xcassets */; };
-		DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A742C03FD3400E46661 /* ClipboardManager.swift */; };
-		DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */; };
-		DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */; };
-		DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A782C03FD3400E46661 /* ContentView.swift */; };
-		DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */; };
-		DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */; };
-		DAB35A8E2C03FD3400E46661 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7C2C03FD3400E46661 /* User.swift */; };
-		DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */; };
-		DAB35A902C03FD3400E46661 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7E2C03FD3400E46661 /* Config.swift */; };
-		DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A7F2C03FD3400E46661 /* UserStore.swift */; };
-		DAB35A922C03FD3400E46661 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A802C03FD3400E46661 /* SettingsStore.swift */; };
-		DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A812C03FD3400E46661 /* ServerRequest.swift */; };
-		DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */; };
-		DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DAB35A832C03FD3400E46661 /* MainMenu.xib */; };
-		DAB35A962C03FD3400E46661 /* ClipboardFriendApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */; };
+		DA18CDD92C1348510027608C /* NotificationsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD42C1348510027608C /* NotificationsToggle.swift */; };
+		DA18CDDA2C1348510027608C /* CommandV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD52C1348510027608C /* CommandV.swift */; };
+		DA18CDDB2C1348510027608C /* ClipboardHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD62C1348510027608C /* ClipboardHistoryList.swift */; };
+		DA18CDDC2C1348510027608C /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD72C1348510027608C /* StatusView.swift */; };
+		DA18CDDD2C1348510027608C /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD82C1348510027608C /* Settings.swift */; };
+		DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF572C13471200769146 /* LocalNotification.swift */; };
+		DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF582C13471200769146 /* SettingsStore.swift */; };
+		DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF592C13471200769146 /* ClipboardManager.swift */; };
+		DA99FF6F2C13471200769146 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5A2C13471200769146 /* CopyContentModifier.swift */; };
+		DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */; };
+		DA99FF722C13471200769146 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5D2C13471200769146 /* ContentView.swift */; };
+		DA99FF762C13471200769146 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF622C13471200769146 /* Config.swift */; };
+		DA99FF782C13471200769146 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF642C13471200769146 /* UserStore.swift */; };
+		DA99FF792C13471200769146 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF652C13471200769146 /* User.swift */; };
+		DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF662C13471200769146 /* ViewIfModifier.swift */; };
+		DA99FF7B2C13471200769146 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */; };
+		DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF682C13471200769146 /* ServerRequest.swift */; };
+		DA99FF7D2C13471200769146 /* FocusEffectDisabledMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF6A2C13471200769146 /* FocusEffectDisabledMacOS14.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DA76F31A2C04144F0064E8EC /* CommandV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandV.swift; sourceTree = "<group>"; };
-		DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryList.swift; sourceTree = "<group>"; };
-		DA76F31E2C0426030064E8EC /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
-		DA76F3202C04307C0064E8EC /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
-		DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsToggle.swift; sourceTree = "<group>"; };
-		DA76F3242C0434420064E8EC /* LocalNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotification.swift; sourceTree = "<group>"; };
-		DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledMacOS14.swift; sourceTree = "<group>"; };
-		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Friend.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAB35A732C03FD3400E46661 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardFriend/Assets.xcassets; sourceTree = "<group>"; };
-		DAB35A742C03FD3400E46661 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardFriend/ClipboardManager.swift; sourceTree = "<group>"; };
-		DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewIfModifier.swift; path = ClipboardFriend/ViewIfModifier.swift; sourceTree = "<group>"; };
-		DAB35A782C03FD3400E46661 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ClipboardFriend/ContentView.swift; sourceTree = "<group>"; };
-		DAB35A792C03FD3400E46661 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipboardFriend/Info.plist; sourceTree = "<group>"; };
-		DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigProduction.xcconfig; path = ClipboardFriend/ConfigProduction.xcconfig; sourceTree = "<group>"; };
-		DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CopyContentModifier.swift; path = ClipboardFriend/CopyContentModifier.swift; sourceTree = "<group>"; };
-		DAB35A7C2C03FD3400E46661 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ClipboardFriend/User.swift; sourceTree = "<group>"; };
-		DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyPressModifierMacOS14.swift; path = ClipboardFriend/KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
-		DAB35A7E2C03FD3400E46661 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Config.swift; path = ClipboardFriend/Config.swift; sourceTree = "<group>"; };
-		DAB35A7F2C03FD3400E46661 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardFriend/UserStore.swift; sourceTree = "<group>"; };
-		DAB35A802C03FD3400E46661 /* SettingsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsStore.swift; path = ClipboardFriend/SettingsStore.swift; sourceTree = "<group>"; };
-		DAB35A812C03FD3400E46661 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardFriend/ServerRequest.swift; sourceTree = "<group>"; };
-		DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigDevelopment.xcconfig; path = ClipboardFriend/ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
-		DAB35A832C03FD3400E46661 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = ClipboardFriend/MainMenu.xib; sourceTree = "<group>"; };
-		DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardFriendApp.swift; path = ClipboardFriend/ClipboardFriendApp.swift; sourceTree = "<group>"; };
-		DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardFriend.entitlements; path = ClipboardFriend/ClipboardFriend.entitlements; sourceTree = "<group>"; };
+		DA18CDD42C1348510027608C /* NotificationsToggle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationsToggle.swift; sourceTree = "<group>"; };
+		DA18CDD52C1348510027608C /* CommandV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandV.swift; sourceTree = "<group>"; };
+		DA18CDD62C1348510027608C /* ClipboardHistoryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryList.swift; sourceTree = "<group>"; };
+		DA18CDD72C1348510027608C /* StatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		DA18CDD82C1348510027608C /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		DA99FF562C13471200769146 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipboardPortal/Info.plist; sourceTree = "<group>"; };
+		DA99FF572C13471200769146 /* LocalNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalNotification.swift; path = ClipboardPortal/LocalNotification.swift; sourceTree = "<group>"; };
+		DA99FF582C13471200769146 /* SettingsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsStore.swift; path = ClipboardPortal/SettingsStore.swift; sourceTree = "<group>"; };
+		DA99FF592C13471200769146 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardPortal/ClipboardManager.swift; sourceTree = "<group>"; };
+		DA99FF5A2C13471200769146 /* CopyContentModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CopyContentModifier.swift; path = ClipboardPortal/CopyContentModifier.swift; sourceTree = "<group>"; };
+		DA99FF5B2C13471200769146 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardPortal/Assets.xcassets; sourceTree = "<group>"; };
+		DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardPortalApp.swift; path = ClipboardPortal/ClipboardPortalApp.swift; sourceTree = "<group>"; };
+		DA99FF5D2C13471200769146 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ClipboardPortal/ContentView.swift; sourceTree = "<group>"; };
+		DA99FF5E2C13471200769146 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = ClipboardPortal/MainMenu.xib; sourceTree = "<group>"; };
+		DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigDevelopment.xcconfig; path = ClipboardPortal/ConfigDevelopment.xcconfig; sourceTree = "<group>"; };
+		DA99FF622C13471200769146 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Config.swift; path = ClipboardPortal/Config.swift; sourceTree = "<group>"; };
+		DA99FF632C13471200769146 /* ConfigProduction.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigProduction.xcconfig; path = ClipboardPortal/ConfigProduction.xcconfig; sourceTree = "<group>"; };
+		DA99FF642C13471200769146 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardPortal/UserStore.swift; sourceTree = "<group>"; };
+		DA99FF652C13471200769146 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ClipboardPortal/User.swift; sourceTree = "<group>"; };
+		DA99FF662C13471200769146 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewIfModifier.swift; path = ClipboardPortal/ViewIfModifier.swift; sourceTree = "<group>"; };
+		DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyPressModifierMacOS14.swift; path = ClipboardPortal/KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
+		DA99FF682C13471200769146 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardPortal/ServerRequest.swift; sourceTree = "<group>"; };
+		DA99FF692C13471200769146 /* ClipboardPortal.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardPortal.entitlements; path = ClipboardPortal/ClipboardPortal.entitlements; sourceTree = "<group>"; };
+		DA99FF6A2C13471200769146 /* FocusEffectDisabledMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FocusEffectDisabledMacOS14.swift; path = ClipboardPortal/FocusEffectDisabledMacOS14.swift; sourceTree = "<group>"; };
+		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Portal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,42 +66,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		DA76F3192C0414430064E8EC /* ui */ = {
+		DA18CDD32C1348510027608C /* ui */ = {
 			isa = PBXGroup;
 			children = (
-				DA76F31A2C04144F0064E8EC /* CommandV.swift */,
-				DA76F31C2C041C450064E8EC /* ClipboardHistoryList.swift */,
-				DA76F31E2C0426030064E8EC /* StatusView.swift */,
-				DA76F3202C04307C0064E8EC /* Settings.swift */,
-				DA76F3222C0433D40064E8EC /* NotificationsToggle.swift */,
+				DA18CDD42C1348510027608C /* NotificationsToggle.swift */,
+				DA18CDD52C1348510027608C /* CommandV.swift */,
+				DA18CDD62C1348510027608C /* ClipboardHistoryList.swift */,
+				DA18CDD72C1348510027608C /* StatusView.swift */,
+				DA18CDD82C1348510027608C /* Settings.swift */,
 			);
-			path = ui;
+			name = ui;
+			path = ClipboardPortal/ui;
 			sourceTree = "<group>";
 		};
 		DAAB33B22BCAFDCB00C82DF4 = {
 			isa = PBXGroup;
 			children = (
-				DA76F3192C0414430064E8EC /* ui */,
-				DAB35A732C03FD3400E46661 /* Assets.xcassets */,
-				DAB35A852C03FD3400E46661 /* ClipboardFriend.entitlements */,
-				DAB35A842C03FD3400E46661 /* ClipboardFriendApp.swift */,
-				DAB35A742C03FD3400E46661 /* ClipboardManager.swift */,
-				DAB35A7E2C03FD3400E46661 /* Config.swift */,
-				DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */,
-				DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */,
-				DAB35A782C03FD3400E46661 /* ContentView.swift */,
-				DA76F3242C0434420064E8EC /* LocalNotification.swift */,
-				DAB35A7B2C03FD3400E46661 /* CopyContentModifier.swift */,
-				DAB35A792C03FD3400E46661 /* Info.plist */,
-				DAB35A7D2C03FD3400E46661 /* KeyPressModifierMacOS14.swift */,
-				DA76F3262C0444210064E8EC /* FocusEffectDisabledMacOS14.swift */,
-				DAB35A832C03FD3400E46661 /* MainMenu.xib */,
-				DAB35A752C03FD3400E46661 /* Preview Content */,
-				DAB35A802C03FD3400E46661 /* SettingsStore.swift */,
-				DAB35A812C03FD3400E46661 /* ServerRequest.swift */,
-				DAB35A7C2C03FD3400E46661 /* User.swift */,
-				DAB35A7F2C03FD3400E46661 /* UserStore.swift */,
-				DAB35A772C03FD3400E46661 /* ViewIfModifier.swift */,
+				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
+				DA99FF5D2C13471200769146 /* ContentView.swift */,
+				DA18CDD32C1348510027608C /* ui */,
+				DA99FF592C13471200769146 /* ClipboardManager.swift */,
+				DA99FF622C13471200769146 /* Config.swift */,
+				DA99FF5A2C13471200769146 /* CopyContentModifier.swift */,
+				DA99FF6A2C13471200769146 /* FocusEffectDisabledMacOS14.swift */,
+				DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */,
+				DA99FF572C13471200769146 /* LocalNotification.swift */,
+				DA99FF682C13471200769146 /* ServerRequest.swift */,
+				DA99FF582C13471200769146 /* SettingsStore.swift */,
+				DA99FF652C13471200769146 /* User.swift */,
+				DA99FF642C13471200769146 /* UserStore.swift */,
+				DA99FF662C13471200769146 /* ViewIfModifier.swift */,
+				DA99FF5B2C13471200769146 /* Assets.xcassets */,
+				DA99FF692C13471200769146 /* ClipboardPortal.entitlements */,
+				DA99FF5E2C13471200769146 /* MainMenu.xib */,
+				DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */,
+				DA99FF632C13471200769146 /* ConfigProduction.xcconfig */,
+				DA99FF562C13471200769146 /* Info.plist */,
 				DAAB33BC2BCAFDCB00C82DF4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,26 +109,17 @@
 		DAAB33BC2BCAFDCB00C82DF4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */,
+				DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		DAB35A752C03FD3400E46661 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				DAB35A762C03FD3400E46661 /* Preview Assets.xcassets */,
-			);
-			name = "Preview Content";
-			path = "ClipboardFriend/Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Friend */ = {
+		DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Portal */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Friend" */;
+			buildConfigurationList = DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Portal" */;
 			buildPhases = (
 				DAAB33B72BCAFDCB00C82DF4 /* Sources */,
 				DAAB33B82BCAFDCB00C82DF4 /* Frameworks */,
@@ -144,9 +129,9 @@
 			);
 			dependencies = (
 			);
-			name = "Clipboard Friend";
-			productName = ClipboardFriend;
-			productReference = DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Friend.app */;
+			name = "Clipboard Portal";
+			productName = ClipboardPortal;
+			productReference = DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -165,7 +150,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardFriend" */;
+			buildConfigurationList = DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardPortal" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -178,7 +163,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Friend */,
+				DAAB33BA2BCAFDCB00C82DF4 /* Clipboard Portal */,
 			);
 		};
 /* End PBXProject section */
@@ -188,11 +173,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAB35A882C03FD3400E46661 /* Preview Assets.xcassets in Resources */,
-				DAB35A8C2C03FD3400E46661 /* ConfigProduction.xcconfig in Resources */,
-				DAB35A862C03FD3400E46661 /* Assets.xcassets in Resources */,
-				DAB35A942C03FD3400E46661 /* ConfigDevelopment.xcconfig in Resources */,
-				DAB35A952C03FD3400E46661 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,24 +183,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA76F3232C0433D40064E8EC /* NotificationsToggle.swift in Sources */,
-				DAB35A892C03FD3400E46661 /* ViewIfModifier.swift in Sources */,
-				DAB35A8F2C03FD3400E46661 /* KeyPressModifierMacOS14.swift in Sources */,
-				DAB35A962C03FD3400E46661 /* ClipboardFriendApp.swift in Sources */,
-				DAB35A932C03FD3400E46661 /* ServerRequest.swift in Sources */,
-				DA76F31F2C0426030064E8EC /* StatusView.swift in Sources */,
-				DAB35A8D2C03FD3400E46661 /* CopyContentModifier.swift in Sources */,
-				DAB35A902C03FD3400E46661 /* Config.swift in Sources */,
-				DAB35A872C03FD3400E46661 /* ClipboardManager.swift in Sources */,
-				DAB35A8E2C03FD3400E46661 /* User.swift in Sources */,
-				DA76F3272C0444210064E8EC /* FocusEffectDisabledMacOS14.swift in Sources */,
-				DA76F3212C04307C0064E8EC /* Settings.swift in Sources */,
-				DAB35A912C03FD3400E46661 /* UserStore.swift in Sources */,
-				DA76F31D2C041C450064E8EC /* ClipboardHistoryList.swift in Sources */,
-				DAB35A922C03FD3400E46661 /* SettingsStore.swift in Sources */,
-				DA76F31B2C04144F0064E8EC /* CommandV.swift in Sources */,
-				DAB35A8A2C03FD3400E46661 /* ContentView.swift in Sources */,
-				DA76F3252C0434420064E8EC /* LocalNotification.swift in Sources */,
+				DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */,
+				DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */,
+				DA99FF6F2C13471200769146 /* CopyContentModifier.swift in Sources */,
+				DA18CDDB2C1348510027608C /* ClipboardHistoryList.swift in Sources */,
+				DA99FF7D2C13471200769146 /* FocusEffectDisabledMacOS14.swift in Sources */,
+				DA99FF722C13471200769146 /* ContentView.swift in Sources */,
+				DA18CDDD2C1348510027608C /* Settings.swift in Sources */,
+				DA99FF762C13471200769146 /* Config.swift in Sources */,
+				DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */,
+				DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */,
+				DA18CDD92C1348510027608C /* NotificationsToggle.swift in Sources */,
+				DA99FF792C13471200769146 /* User.swift in Sources */,
+				DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */,
+				DA18CDDC2C1348510027608C /* StatusView.swift in Sources */,
+				DA99FF7B2C13471200769146 /* KeyPressModifierMacOS14.swift in Sources */,
+				DA99FF782C13471200769146 /* UserStore.swift in Sources */,
+				DA18CDDA2C1348510027608C /* CommandV.swift in Sources */,
+				DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +209,7 @@
 /* Begin XCBuildConfiguration section */
 		DAAB33C82BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -292,6 +273,7 @@
 		};
 		DAAB33C92BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DA99FF632C13471200769146 /* ConfigProduction.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -347,24 +329,23 @@
 		};
 		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAB35A822C03FD3400E46661 /* ConfigDevelopment.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ClipboardFriend/ClipboardFriend.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ClipboardPortal/ClipboardPortal.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ClipboardFriend/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Friend";
+				INFOPLIST_FILE = ClipboardPortal/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Portal";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -374,7 +355,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardFriend;
+				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -385,24 +366,23 @@
 		};
 		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAB35A7A2C03FD3400E46661 /* ConfigProduction.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ClipboardFriend/ClipboardFriend.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ClipboardPortal/ClipboardPortal.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_ASSET_PATHS = "\"ClipboardFriend/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ClipboardFriend/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Friend";
+				INFOPLIST_FILE = ClipboardPortal/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Portal";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSGKFriendListUsageDescription = "Choose your friend to share the clipboard with.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -412,7 +392,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardFriend;
+				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -423,7 +403,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardFriend" */ = {
+		DAAB33B62BCAFDCB00C82DF4 /* Build configuration list for PBXProject "ClipboardPortal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DAAB33C82BCAFDCD00C82DF4 /* Debug */,
@@ -432,7 +412,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Friend" */ = {
+		DAAB33CA2BCAFDCD00C82DF4 /* Build configuration list for PBXNativeTarget "Clipboard Portal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DAAB33CB2BCAFDCD00C82DF4 /* Debug */,
