@@ -9,7 +9,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            CommandV() {
+            CommandVView() {
                 Task { await clipboardManager.sendClipboardContent() }
             }
                 .padding(32)
@@ -17,7 +17,7 @@ struct ContentView: View {
                 .overlay {
                     if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
                 }
-            ClipboardHistoryList(history: clipboardManager.clipboardHistory) { clipboardContent in
+            ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
                 // (Re-)Send entry content
                 Task {
                     await clipboardManager.sendClipboardContent(content: clipboardContent)
@@ -36,7 +36,7 @@ struct ContentView: View {
             .buttonStyle(PlainButtonStyle())
             .padding()
             .popover(isPresented: $isSettingsOpen, arrowEdge: .top) {
-                Settings().padding()
+                SettingsView().padding()
             }
             .focusEffectDisabledMacOS14()
         }
