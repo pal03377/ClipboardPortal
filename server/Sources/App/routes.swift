@@ -23,7 +23,7 @@ func routes(_ app: Application) throws {
     struct ClipboardSendResponse: Content {
         var id: UUID // ID of the clipboard content
     }
-    app.post("send", body: .collect(maxSize: "5mb")) { req async throws in // Increase max size to X MB for larger clipboard contents
+    app.on(.POST, "send", body: .collect(maxSize: "30mb")) { req async throws in // Increase max size to X MB for larger clipboard contents
         print("Body: " + (req.body.string ?? "No body")) // Print incoming data for debugging
         var notification = try req.content.decode(ClipboardContentSendDTO.self)
         let user = try await UserModel.find(notification.receiverId, on: req.db) // Find user in DB
