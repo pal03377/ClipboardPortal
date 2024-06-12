@@ -10,3 +10,4 @@ data
 .env.*
 !.env.template
 .vscode
+Caddyfile
