@@ -27,7 +27,7 @@
       "size" : "128x128"
     },
     {
-      "filename" : "256 1.png",
+      "filename" : "256.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
@@ -39,7 +39,7 @@
       "size" : "256x256"
     },
     {
-      "filename" : "512 1.png",
+      "filename" : "512.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
@@ -51,7 +51,7 @@
       "size" : "512x512"
     },
     {
-      "filename" : "ClipboardPortal.png",
+      "filename" : "1024.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"

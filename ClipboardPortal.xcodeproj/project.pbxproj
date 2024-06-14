@@ -12,19 +12,23 @@
 		DA18CDDB2C1348510027608C /* ClipboardHistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD62C1348510027608C /* ClipboardHistoryListView.swift */; };
 		DA18CDDC2C1348510027608C /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD72C1348510027608C /* StatusView.swift */; };
 		DA18CDDD2C1348510027608C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA18CDD82C1348510027608C /* SettingsView.swift */; };
+		DA82955D2C1CAEDA00ADFA1E /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */; };
+		DA8295602C1CAF5200ADFA1E /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA82955F2C1CAF5200ADFA1E /* GlobalShortcut.swift */; };
+		DA8295622C1CAF7700ADFA1E /* GlobalShortcutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8295612C1CAF7700ADFA1E /* GlobalShortcutView.swift */; };
 		DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF572C13471200769146 /* LocalNotification.swift */; };
 		DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF582C13471200769146 /* SettingsStore.swift */; };
 		DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF592C13471200769146 /* ClipboardManager.swift */; };
-		DA99FF6F2C13471200769146 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5A2C13471200769146 /* CopyContentModifier.swift */; };
 		DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */; };
 		DA99FF722C13471200769146 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5D2C13471200769146 /* ContentView.swift */; };
 		DA99FF762C13471200769146 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF622C13471200769146 /* Config.swift */; };
 		DA99FF782C13471200769146 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF642C13471200769146 /* UserStore.swift */; };
 		DA99FF792C13471200769146 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF652C13471200769146 /* User.swift */; };
 		DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF662C13471200769146 /* ViewIfModifier.swift */; };
-		DA99FF7B2C13471200769146 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */; };
 		DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF682C13471200769146 /* ServerRequest.swift */; };
-		DA99FF7D2C13471200769146 /* FocusEffectDisabledModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF6A2C13471200769146 /* FocusEffectDisabledModifierMacOS14.swift */; };
+		DAFE18762C178B8100360134 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFE18732C178B8100360134 /* KeyPressModifierMacOS14.swift */; };
+		DAFE18772C178B8100360134 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFE18742C178B8100360134 /* CopyContentModifier.swift */; };
+		DAFE18782C178B8100360134 /* FocusEffectDisabledModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAFE18752C178B8100360134 /* FocusEffectDisabledModifierMacOS14.swift */; };
+		DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA99FF5B2C13471200769146 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,11 +37,12 @@
 		DA18CDD62C1348510027608C /* ClipboardHistoryListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryListView.swift; sourceTree = "<group>"; };
 		DA18CDD72C1348510027608C /* StatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		DA18CDD82C1348510027608C /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DA82955F2C1CAF5200ADFA1E /* GlobalShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcut.swift; sourceTree = "<group>"; };
+		DA8295612C1CAF7700ADFA1E /* GlobalShortcutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcutView.swift; sourceTree = "<group>"; };
 		DA99FF562C13471200769146 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ClipboardPortal/Info.plist; sourceTree = "<group>"; };
 		DA99FF572C13471200769146 /* LocalNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalNotification.swift; path = ClipboardPortal/LocalNotification.swift; sourceTree = "<group>"; };
 		DA99FF582C13471200769146 /* SettingsStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsStore.swift; path = ClipboardPortal/SettingsStore.swift; sourceTree = "<group>"; };
 		DA99FF592C13471200769146 /* ClipboardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardManager.swift; path = ClipboardPortal/ClipboardManager.swift; sourceTree = "<group>"; };
-		DA99FF5A2C13471200769146 /* CopyContentModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
 		DA99FF5B2C13471200769146 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ClipboardPortal/Assets.xcassets; sourceTree = "<group>"; };
 		DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClipboardPortalApp.swift; path = ClipboardPortal/ClipboardPortalApp.swift; sourceTree = "<group>"; };
 		DA99FF5D2C13471200769146 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ClipboardPortal/ContentView.swift; sourceTree = "<group>"; };
@@ -48,11 +53,12 @@
 		DA99FF642C13471200769146 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardPortal/UserStore.swift; sourceTree = "<group>"; };
 		DA99FF652C13471200769146 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ClipboardPortal/User.swift; sourceTree = "<group>"; };
 		DA99FF662C13471200769146 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewIfModifier.swift; path = ClipboardPortal/ViewIfModifier.swift; sourceTree = "<group>"; };
-		DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
 		DA99FF682C13471200769146 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardPortal/ServerRequest.swift; sourceTree = "<group>"; };
 		DA99FF692C13471200769146 /* ClipboardPortal.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardPortal.entitlements; path = ClipboardPortal/ClipboardPortal.entitlements; sourceTree = "<group>"; };
-		DA99FF6A2C13471200769146 /* FocusEffectDisabledModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledModifierMacOS14.swift; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Portal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAFE18732C178B8100360134 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
+		DAFE18742C178B8100360134 /* CopyContentModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
+		DAFE18752C178B8100360134 /* FocusEffectDisabledModifierMacOS14.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledModifierMacOS14.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA82955D2C1CAEDA00ADFA1E /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,14 +86,13 @@
 			path = ClipboardPortal/ui;
 			sourceTree = "<group>";
 		};
-		DA18CDE02C134CAD0027608C /* modifiers */ = {
+		DA82955E2C1CAF1600ADFA1E /* shortcut */ = {
 			isa = PBXGroup;
 			children = (
-				DA99FF5A2C13471200769146 /* CopyContentModifier.swift */,
-				DA99FF6A2C13471200769146 /* FocusEffectDisabledModifierMacOS14.swift */,
-				DA99FF672C13471200769146 /* KeyPressModifierMacOS14.swift */,
+				DA82955F2C1CAF5200ADFA1E /* GlobalShortcut.swift */,
+				DA8295612C1CAF7700ADFA1E /* GlobalShortcutView.swift */,
 			);
-			path = modifiers;
+			path = shortcut;
 			sourceTree = "<group>";
 		};
 		DAAB33B22BCAFDCB00C82DF4 = {
@@ -95,7 +101,8 @@
 				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
 				DA99FF5D2C13471200769146 /* ContentView.swift */,
 				DA18CDD32C1348510027608C /* ui */,
-				DA18CDE02C134CAD0027608C /* modifiers */,
+				DAFE18722C178B8100360134 /* modifiers */,
+				DA82955E2C1CAF1600ADFA1E /* shortcut */,
 				DA99FF592C13471200769146 /* ClipboardManager.swift */,
 				DA99FF622C13471200769146 /* Config.swift */,
 				DA99FF572C13471200769146 /* LocalNotification.swift */,
@@ -122,6 +129,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		DAFE18722C178B8100360134 /* modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				DAFE18732C178B8100360134 /* KeyPressModifierMacOS14.swift */,
+				DAFE18742C178B8100360134 /* CopyContentModifier.swift */,
+				DAFE18752C178B8100360134 /* FocusEffectDisabledModifierMacOS14.swift */,
+			);
+			path = modifiers;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -138,6 +155,9 @@
 			dependencies = (
 			);
 			name = "Clipboard Portal";
+			packageProductDependencies = (
+				DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */,
+			);
 			productName = ClipboardPortal;
 			productReference = DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */;
 			productType = "com.apple.product-type.application";
@@ -167,6 +187,9 @@
 				Base,
 			);
 			mainGroup = DAAB33B22BCAFDCB00C82DF4;
+			packageReferences = (
+				DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			productRefGroup = DAAB33BC2BCAFDCB00C82DF4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -181,6 +204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,22 +217,24 @@
 			files = (
 				DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */,
 				DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */,
-				DA99FF6F2C13471200769146 /* CopyContentModifier.swift in Sources */,
 				DA18CDDB2C1348510027608C /* ClipboardHistoryListView.swift in Sources */,
-				DA99FF7D2C13471200769146 /* FocusEffectDisabledModifierMacOS14.swift in Sources */,
+				DAFE18782C178B8100360134 /* FocusEffectDisabledModifierMacOS14.swift in Sources */,
 				DA99FF722C13471200769146 /* ContentView.swift in Sources */,
 				DA18CDDD2C1348510027608C /* SettingsView.swift in Sources */,
+				DAFE18762C178B8100360134 /* KeyPressModifierMacOS14.swift in Sources */,
 				DA99FF762C13471200769146 /* Config.swift in Sources */,
 				DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */,
 				DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */,
 				DA18CDD92C1348510027608C /* NotificationsToggleView.swift in Sources */,
 				DA99FF792C13471200769146 /* User.swift in Sources */,
 				DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */,
+				DA8295602C1CAF5200ADFA1E /* GlobalShortcut.swift in Sources */,
 				DA18CDDC2C1348510027608C /* StatusView.swift in Sources */,
-				DA99FF7B2C13471200769146 /* KeyPressModifierMacOS14.swift in Sources */,
 				DA99FF782C13471200769146 /* UserStore.swift in Sources */,
 				DA18CDDA2C1348510027608C /* CommandVView.swift in Sources */,
+				DAFE18772C178B8100360134 /* CopyContentModifier.swift in Sources */,
 				DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */,
+				DA8295622C1CAF7700ADFA1E /* GlobalShortcutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +366,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ClipboardPortal/ClipboardPortal.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -377,6 +404,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ClipboardPortal/ClipboardPortal.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -430,6 +458,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DAAB33B32BCAFDCB00C82DF4 /* Project object */;
 }

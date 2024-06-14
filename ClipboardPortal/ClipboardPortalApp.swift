@@ -1,14 +1,15 @@
 import SwiftUI
 import UserNotifications
+// Third-party
+import KeyboardShortcuts
 
 // TODO:
-// - Rename to Clipboard Portal (and show cool Portal icon and maybe some default sound)
-// - Global Shortcut for pasting
-// - Fix notification check
 // - Extend button click area to whole top
 // - Make history not scrollable and instead show X entries and make whole UI scrollable
+// - Rewrite server in Python? Swift takes forever to compile
 // - Send images and files
-// - URL Schema for receiving friend code
+// - URL Schema for receiving friend code. Also offer to directly use code if a friend sends you his over ClipboardPortal
+// - Play sound when receiving (with setting to turn it off)
 
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
@@ -21,10 +22,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var clipboardManager = ClipboardManager()
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
+        // Handle global shortcut for pasting
+        KeyboardShortcuts.onKeyDown(for: .sendToFriend) { [self] in
+            Task { await clipboardManager.sendClipboardContent() } // Paste clipboard contents
+        }
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        // Handle app url e.g. clipboardportal://paste?content=Something
         for url in urls {
             handleIncomingURL(url)
         }
