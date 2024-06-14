@@ -5,22 +5,13 @@ struct ClipboardHistoryListView: View {
     var onSend: (ClipboardContent) -> Void
 
     var body: some View {
-        ScrollViewReader { scrollView in
-            ScrollView(.vertical) {
-                LazyVStack {
-                    ForEach(history.reversed(), id: \.self) { entry in
-                        ClipboardHistoryListEntryView(entry: entry) {
-                            onSend(entry.clipboardContent)
-                        }.padding(.vertical, 4)
-                    }
-                }
-                .onAppear { // When a new history entry is added
-                    guard let firstEntry = history.first else { return }
-                    scrollView.scrollTo(firstEntry) // Scroll up to see the newest entry
-                }
-                .scrollContentBackground(.hidden) // Transparent background instead of default darker background
+        LazyVStack {
+            ForEach(history.reversed(), id: \.self) { entry in
+                ClipboardHistoryListEntryView(entry: entry) {
+                    onSend(entry.clipboardContent)
+                }.padding(.vertical, 4)
             }
-        }.frame(maxWidth: 400, maxHeight: 140)
+        }
     }
 }
 

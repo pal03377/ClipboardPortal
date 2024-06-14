@@ -8,36 +8,44 @@ struct ContentView: View {
     let updateTimer = Timer.publish(every: 4, tolerance: 2, on: .main, in: .common).autoconnect() // Timer to fetch new clipboard contents every Xs
 
     var body: some View {
-        VStack {
-            CommandVView() {
-                Task { await clipboardManager.sendClipboardContent() }
-            }
+        ScrollView {
+            VStack {
+                CommandVView() {
+                    Task { await clipboardManager.sendClipboardContent() }
+                }
                 .opacity(clipboardManager.sending ? 0.8 : 1)
                 .overlay {
                     if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
                 }
-            ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
-                // (Re-)Send entry content
-                Task {
-                    await clipboardManager.sendClipboardContent(content: clipboardContent)
+                ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
+                    // (Re-)Send entry content
+                    Task {
+                        await clipboardManager.sendClipboardContent(content: clipboardContent)
+                    }
                 }
             }
-        }
-        .padding()
-        .frame(minWidth: 400, maxWidth: 400, minHeight: 300, maxHeight: 300)
-        .overlay(alignment: .bottomTrailing) {
-            StatusView(errorMessage: clipboardManager.sendErrorMessage ?? clipboardManager.receiveErrorMessage ?? userStore.userLoadErrorMessage ?? nil)
-        }
-        .overlay(alignment: .topTrailing) {
-            Button {  isSettingsOpen = true } label: {
-                Image(systemName: "gear")
-            }
-            .buttonStyle(PlainButtonStyle())
             .padding()
-            .popover(isPresented: $isSettingsOpen, arrowEdge: .top) {
-                SettingsView().padding()
+            .scrollContentBackground(.hidden) // Transparent background instead of default darker background
+        }
+        .frame(minWidth: 400)
+        .frame(minWidth: 300)
+        .frame(minHeight: 120 + 32) // Cmd+V view + 1 row of history
+        .overlay(alignment: .bottomTrailing) {
+            HStack(spacing: 0) {
+                StatusView(errorMessage: clipboardManager.sendErrorMessage ?? clipboardManager.receiveErrorMessage ?? userStore.userLoadErrorMessage ?? nil)
+                Button {  isSettingsOpen = true } label: {
+                    Image(systemName: "gear")
+                }
+                .buttonStyle(PlainButtonStyle())
+                .popover(isPresented: $isSettingsOpen, arrowEdge: .top) {
+                    SettingsView().padding()
+                }
+                .focusEffectDisabledMacOS14()
             }
-            .focusEffectDisabledMacOS14()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(Color.gray.opacity(0.1))
+            .clipShape(.rect(topLeadingRadius: 4))
         }
         .task(id: clipboardManager.clipboardHistory) {
             Task {

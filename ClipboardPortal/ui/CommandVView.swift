@@ -11,7 +11,8 @@ struct CommandVView: View {
                 KeyView(text: "V", isFlat: isFlat)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.background) // Somehow required to make the frame work
+            .frame(minHeight: 120) // Prevent squeezing the button too much
+            .background(Color(white: 0, opacity: 0.01)) // Somehow required to make the frame work. Opacity 0 does not work
             .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
         }
         .focusable(false) // Hide ugly focus border that is not needed because keyboard users can press Cmd+V directly

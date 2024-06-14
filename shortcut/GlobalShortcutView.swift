@@ -4,7 +4,9 @@ import KeyboardShortcuts
 struct GlobalShortcutView: View {
     var body: some View {
         Form {
-            KeyboardShortcuts.Recorder("Global paste shortcut", name: .sendToFriend)
+            KeyboardShortcuts.Recorder("Shortcut", name: .sendToFriend)
+            Text("Paste from any app")
+                .font(.footnote)
         }
     }
 }

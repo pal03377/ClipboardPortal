@@ -4,7 +4,6 @@ import UserNotifications
 import KeyboardShortcuts
 
 // TODO:
-// - Make history not scrollable and instead show X entries and make whole UI scrollable
 // - Rewrite server in Python? Swift takes forever to compile
 // - Send images and files
 // - URL Schema for receiving friend code. Also offer to directly use code if a friend sends you his over ClipboardPortal

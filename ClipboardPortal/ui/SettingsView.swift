@@ -17,6 +17,8 @@ struct SettingsView: View {
                     Group {
                         if let user = userStore.user { // User available?
                             Text(user.id).monospaced().copyContent(ClipboardContent(type: .text, content: user.id))
+                                .gridColumnAlignment(.leading)
+                                .padding(.leading, 4) // Align text with friend code input text
                         } else { ProgressView().scaleEffect(x: 0.5, y: 0.5, anchor: .center) } // User loading
                     }
                     // Column right
@@ -64,16 +66,24 @@ struct SettingsView: View {
                 }
             }
             Divider()
-            NotificationsToggleView()
+            Spacer().frame(height: 8)
             GlobalShortcutView()
+            NotificationsToggleView()
         }
+        .frame(width: 200)
     }
 }
 
 #Preview {
-    SettingsView()
+    @State var userStore = UserStore()
+    @State var settingsStore = SettingsStore()
+    return SettingsView()
         .padding()
         .environmentObject(AppGlobals())
-        .environmentObject(SettingsStore())
-        .environmentObject(UserStore())
+        .environmentObject(settingsStore)
+        .environmentObject(userStore)
+        .onAppear {
+            userStore.user = User(id: "12345678", secret: "", lastReceivedClipboardContent: nil)
+            settingsStore.settingsData.receiverId = "87654321"
+        }
 }

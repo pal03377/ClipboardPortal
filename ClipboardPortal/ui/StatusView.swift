@@ -10,8 +10,6 @@ struct StatusView: View {
         }
         .foregroundColor(errorMessage == nil ? .green : .red)
         .padding(8)
-        .background(Color.gray.opacity(0.1))
-        .clipShape(.rect(topLeadingRadius: 4))
     }
 }
 
