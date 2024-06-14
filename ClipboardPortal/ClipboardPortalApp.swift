@@ -6,7 +6,7 @@ import KeyboardShortcuts
 // TODO:
 // - Rewrite server in Python? Swift takes forever to compile
 // - Send images and files
-// - URL Schema for receiving friend code. Also offer to directly use code if a friend sends you his over ClipboardPortal
+// - URL Schema for receiving friend code
 // - Play sound when receiving (with setting to turn it off)
 
 
