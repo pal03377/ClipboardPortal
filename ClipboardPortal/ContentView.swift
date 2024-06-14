@@ -12,7 +12,6 @@ struct ContentView: View {
             CommandVView() {
                 Task { await clipboardManager.sendClipboardContent() }
             }
-                .padding(32)
                 .opacity(clipboardManager.sending ? 0.8 : 1)
                 .overlay {
                     if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents

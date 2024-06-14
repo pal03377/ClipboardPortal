@@ -10,8 +10,11 @@ struct CommandVView: View {
                 KeyView(symbol: "command", isFlat: isFlat)
                 KeyView(text: "V", isFlat: isFlat)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.background) // Somehow required to make the frame work
             .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
         }
+        .focusable(false) // Hide ugly focus border that is not needed because keyboard users can press Cmd+V directly
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(DragGesture(minimumDistance: 0)
             .onChanged { _ in isFlat = true } // Flat while pressed
@@ -56,5 +59,6 @@ struct KeyView: View {
 
 #Preview {
     CommandVView() {}
+        .frame(width: 400, height: 300)
         .padding()
 }

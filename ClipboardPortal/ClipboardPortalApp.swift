@@ -4,7 +4,6 @@ import UserNotifications
 import KeyboardShortcuts
 
 // TODO:
-// - Extend button click area to whole top
 // - Make history not scrollable and instead show X entries and make whole UI scrollable
 // - Rewrite server in Python? Swift takes forever to compile
 // - Send images and files
