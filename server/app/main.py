@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket
 from pydantic import BaseModel
 from uuid import uuid4
 import secrets
@@ -19,6 +19,11 @@ app = FastAPI()
 
 data_dir = os.environ.get("DATA_DIR", "data")
 
+# Route to check that server works
+@app.get("/")
+async def root():
+    return {"message": "clipboardportal"}
+
 # Create user: POST /users -> {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7"}
 class UserCreateResponse(BaseModel):
     id: str     # 8-digit user id, e.g. "12345678"
@@ -38,18 +43,14 @@ async def create_user() -> UserCreateResponse:
 
 
 # Send clipboard to another user: POST /send {"receiverId": "12345678"} with file upload -> empty response
-class ClipboardSendRequest(BaseModel):
-    receiverId: str # 8-digit user id of receiver, e.g. "12345678"
-class ClipboardResponse(BaseModel): pass
 def is_valid_user_id(user_id): return user_id.isdigit() and len(user_id) == 8 # Check if user id is valid for security, e.g. "12345678"
 @app.post("/send")
-async def send_clipboard_content(send_request: ClipboardSendRequest, content: UploadFile = File(...)) -> ClipboardResponse:
-    if not is_valid_user_id(send_request.receiverId): raise HTTPException(status_code=404, detail="User not found")
-    user_data_file = get_user_data_file(send_request.receiverId) # Get file path for user data, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7" or None (user does not exist)
+async def send_clipboard_content(receiverId: str = Form(...), file: UploadFile = File(...)) -> None:
+    if not is_valid_user_id(receiverId): raise HTTPException(status_code=404, detail="User not found")
+    user_data_file = get_user_data_file(receiverId) # Get file path for user data, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7" or None (user does not exist)
     if user_data_file is None: raise HTTPException(status_code=404, detail="User not found")
     # Save uploaded file to ./data/<receiver_id>_*
-    with open(user_data_file, "wb") as f: f.write(await content.read()) # Save uploaded file to user data file
-    return ClipboardResponse() # Return empty response to indicate success
+    with open(user_data_file, "wb") as f: f.write(await file.read()) # Save uploaded file to user data file
 
 
 # Detect clipboard changes for current user: WebSocket /ws {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes

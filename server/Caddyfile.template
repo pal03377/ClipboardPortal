@@ -3,7 +3,9 @@ $DOMAIN {
 	route {
 		# Serve clipboard contents from data if exists
 		root /root/$PROJECT_NAME/server/data
-		file_server
+		file_server {
+			pass_thru
+		}
 		# Server route from server otherwise
 		reverse_proxy :$PORT
 	}
