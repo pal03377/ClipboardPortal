@@ -8,6 +8,8 @@ struct SettingsData: Codable {
 
 // Store the settings locally
 class SettingsStore: ObservableObject {
+    static let shared = SettingsStore()
+
     static let defaultSettingsData = SettingsData(receiverId: "", notificationsEnabled: false)
     @Published var settingsData = defaultSettingsData
 

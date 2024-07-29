@@ -4,6 +4,7 @@ import UserNotifications
 import KeyboardShortcuts
 
 // TODO:
+// - Remove ClipboardContent and Clipboard history and only show last entry
 // - Rewrite server in Python? Swift takes forever to compile. Change architecture to store files instead of DB entries (so that image sending becomes much easier later)
 // - Send images and files
 
@@ -48,7 +49,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if let content = content {
                     print("Type: \(type), Content: \(content)")
                     Task {
-                        await clipboardManager.sendClipboardContent(content: ClipboardContent(type: ClipboardContentTypes(rawValue: type) ?? .text, content: content))
+                        let clipboardContent: ClipboardContent? = switch type {
+                        case "text": .text(content)
+                        case "file": if let url = URL(string: content) { .file(url) } else { nil }
+                        default: .text(content)
+                        }
+                        guard let clipboardContent else { return }
+                        await clipboardManager.sendClipboardContent(clipboardContent)
                         print("Sent clipboard contents!")
                     }
                 } else {
@@ -68,7 +75,7 @@ struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appGlobals = AppGlobals()
     @StateObject var userStore = UserStore()
-    @StateObject var settingsStore = SettingsStore()
+    @StateObject var settingsStore = SettingsStore.shared
     private var updateTimer: Timer?
     
     var body: some Scene {

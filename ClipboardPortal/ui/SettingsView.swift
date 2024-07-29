@@ -16,7 +16,7 @@ struct SettingsView: View {
                     // Column center
                     Group {
                         if let user = userStore.user { // User available?
-                            Text(user.id).monospaced().copyContent(ClipboardContent(type: .text, content: user.id))
+                            Text(user.id).monospaced().copyContent(.text(user.id))
                                 .gridColumnAlignment(.leading)
                                 .padding(.leading, 4) // Align text with friend code input text
                         } else { ProgressView().scaleEffect(x: 0.5, y: 0.5, anchor: .center) } // User loading
@@ -26,7 +26,7 @@ struct SettingsView: View {
                         if let user = userStore.user {
                             // ShareLink(item: "Connect with me using this connection code: \(user.id)") // Share button
                             Button {} label: { Image(systemName: "doc.on.doc") }
-                                .copyContent(ClipboardContent(type: .text, content: user.id))
+                                .copyContent(.text(user.id))
                         } else { Group {} }
                     }
                 }
@@ -76,14 +76,14 @@ struct SettingsView: View {
 
 #Preview {
     @State var userStore = UserStore()
-    @State var settingsStore = SettingsStore()
+    @State var settingsStore = SettingsStore.shared
     return SettingsView()
         .padding()
         .environmentObject(AppGlobals())
         .environmentObject(settingsStore)
         .environmentObject(userStore)
         .onAppear {
-            userStore.user = User(id: "12345678", secret: "", lastReceivedClipboardContent: nil)
+            userStore.user = User(id: "12345678", secret: "", lastReceiveDate: nil)
             settingsStore.settingsData.receiverId = "87654321"
         }
 }

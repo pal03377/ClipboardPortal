@@ -116,13 +116,13 @@ extension Button {
     VStack {
         // Text button
         Button {} label: { Text("Copy") }
-            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
+            .copyContent(.text("Text to copy"))
         // Image button
         Button {} label: { Image(systemName: "doc.on.doc") }
-            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
+            .copyContent(.text("Text to copy"))
         // Pure text
         Text("Copyme")
-            .copyContent(ClipboardContent(type: .text, content: "Text to copy"))
+            .copyContent(.text("Text to copy"))
     }
     .padding()
 }

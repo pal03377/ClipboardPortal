@@ -8,7 +8,7 @@ struct ClipboardHistoryListView: View {
         LazyVStack {
             ForEach(history.reversed(), id: \.self) { entry in
                 ClipboardHistoryListEntryView(entry: entry) {
-                    onSend(entry.clipboardContent)
+                    onSend(entry.content)
                 }.padding(.vertical, 4)
             }
         }
@@ -25,16 +25,16 @@ struct ClipboardHistoryListEntryView: View {
     var body: some View {
         HStack {
             Image(systemName: entry.received ? "arrow.down" : "arrow.up")
-            Text(entry.clipboardContent.content)
+            Text("\(entry.content)")
                 .lineLimit(4)
                 .truncationMode(.tail)
-            if entry.received && settingsStore.settingsData.receiverId == entry.clipboardContent.content {
+            if entry.received && settingsStore.settingsData.receiverId == "\(entry.content)" {
                 Image(systemName: "person.fill.checkmark")
                     .help("This is your friend's ID.")
             }
-            else if entry.received &&  looksLikeUserId(entry.clipboardContent.content) {
+            else if entry.received &&  looksLikeUserId("\(entry.content)") {
                 Button("Set friend ID") {
-                    settingsStore.settingsData.receiverId = entry.clipboardContent.content
+                    settingsStore.settingsData.receiverId = "\(entry.content)"
                 }
                 Button { isSetFriendCodePopupOpen = true } label: {
                     Image(systemName: "questionmark.circle")
@@ -48,7 +48,7 @@ struct ClipboardHistoryListEntryView: View {
             HStack {
                 Spacer()
                 Button {} label: { Image(systemName: "doc.on.doc") }
-                    .copyContent(entry.clipboardContent)
+                    .copyContent(entry.content)
                     .buttonStyle(PlainButtonStyle())
                 Button { // Resend button
                     onSend()
@@ -70,16 +70,16 @@ struct ClipboardHistoryListEntryView: View {
 
 #Preview {
     @State var history = [
-        ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "Some copied text 1"), received: false),
-        ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "Some copied text 2"), received: false),
-        ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "The next one looks like a user ID"), received: true),
-        ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "12345678"), received: true),
-        ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "87654321"), received: true),
+        ClipboardHistoryEntry(content: .text("Some copied text 1"), received: false),
+        ClipboardHistoryEntry(content: .text("Some copied text 2"), received: false),
+        ClipboardHistoryEntry(content: .text("The next one looks like a user ID"), received: true),
+        ClipboardHistoryEntry(content: .text("12345678"), received: true),
+        ClipboardHistoryEntry(content: .text("87654321"), received: true),
     ]
-    @State var settingsStore = SettingsStore()
+    @State var settingsStore = SettingsStore.shared
     return VStack {
         Button("Add") {
-            history.append(ClipboardHistoryEntry(clipboardContent: ClipboardContent(id: UUID(), type: .text, content: "Some copied text \(history.count + 1)"), received: Bool.random()))
+            history.append(ClipboardHistoryEntry(content: .text("Some copied text \(history.count + 1)"), received: Bool.random()))
         }.padding()
         ClipboardHistoryListView(history: history) { _ in }
             .padding()

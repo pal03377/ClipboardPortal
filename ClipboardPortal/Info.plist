@@ -17,6 +17,8 @@
 	</array>
 	<key>ServerURL</key>
 	<string>$(SERVER_URL)</string>
+	<key>WebsocketServerURL</key>
+	<string>$(WEBSOCKET_SERVER_URL)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -20,7 +20,7 @@ struct ContentView: View {
                 ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
                     // (Re-)Send entry content
                     Task {
-                        await clipboardManager.sendClipboardContent(content: clipboardContent)
+                        await clipboardManager.sendClipboardContent( clipboardContent)
                     }
                 }
             }
@@ -50,7 +50,7 @@ struct ContentView: View {
         .task(id: clipboardManager.clipboardHistory) {
             Task {
                 if let lastClipboardContent = clipboardManager.lastReceivedContent {
-                    await userStore.updateLastReceivedClipboardContent(lastClipboardContent)
+                    await userStore.updateLastReceivedDate(Date())
                 }
             }
         }
@@ -58,19 +58,9 @@ struct ContentView: View {
             // Update clipboardManager so that the ClipboardPortalApp does not need to know the receiver ID itself
             self.clipboardManager.receiverId = self.settingsStore.settingsData.receiverId
         }
-        .onReceive(updateTimer) { _ in
-            Task { await checkForNewClipboardContents() }
-        }
-    }
-    
-    // Check for new clipboard contents on the server
-    func checkForNewClipboardContents() async {
-        guard let user = userStore.user else { return }
-        let isNewClipboardContent = await clipboardManager.checkForUpdates(user: user)
-        // Show notification (if wanted)
-        guard settingsStore.settingsData.notificationsEnabled else { return } // Only continue is notifications are enabled
-        if isNewClipboardContent, let clipboardContent = clipboardManager.clipboardHistory.last?.clipboardContent { // New notification was found?
-            await showClipboardContentNotification(clipboardContent)
+        .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
+            guard let user = userStore.user else { return }
+            clipboardManager.checkForUpdates(user: user)
         }
     }
 }

@@ -18,6 +18,7 @@
 		DA84EF9A2C572845005A2A26 /* CommandVView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8E2C572845005A2A26 /* CommandVView.swift */; };
 		DA84EF9B2C572845005A2A26 /* NotificationsToggleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8F2C572845005A2A26 /* NotificationsToggleView.swift */; };
 		DA84EF9C2C572845005A2A26 /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8A2C572845005A2A26 /* GlobalShortcut.swift */; };
+		DA84EF9F2C574204005A2A26 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DA84EF9E2C574204005A2A26 /* Starscream */; };
 		DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF572C13471200769146 /* LocalNotification.swift */; };
 		DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF582C13471200769146 /* SettingsStore.swift */; };
 		DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF592C13471200769146 /* ClipboardManager.swift */; };
@@ -67,6 +68,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA82955D2C1CAEDA00ADFA1E /* KeyboardShortcuts in Frameworks */,
+				DA84EF9F2C574204005A2A26 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +161,7 @@
 			name = "Clipboard Portal";
 			packageProductDependencies = (
 				DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */,
+				DA84EF9E2C574204005A2A26 /* Starscream */,
 			);
 			productName = ClipboardPortal;
 			productReference = DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */;
@@ -191,6 +194,7 @@
 			mainGroup = DAAB33B22BCAFDCB00C82DF4;
 			packageReferences = (
 				DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				DA84EF9D2C574204005A2A26 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = DAAB33BC2BCAFDCB00C82DF4 /* Products */;
 			projectDirPath = "";
@@ -470,6 +474,14 @@
 				minimumVersion = 2.0.1;
 			};
 		};
+		DA84EF9D2C574204005A2A26 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -477,6 +489,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		DA84EF9E2C574204005A2A26 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA84EF9D2C574204005A2A26 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,11 +1,12 @@
 import UserNotifications
 
 // Show notification about new clipboard content
-func showClipboardContentNotification(_ clipboardContent: ClipboardContent) async {
+func showClipboardContentNotification(_ content: ClipboardContent) async {
+    guard SettingsStore.shared.settingsData.notificationsEnabled else { return } // Only send notifications if enabled
     // Create local notification to show it
     let notificationContent = UNMutableNotificationContent()
     notificationContent.title = "Received Clipboard!"
-    notificationContent.body = clipboardContent.content
+    notificationContent.body = "\(content)"
     notificationContent.sound = UNNotificationSound.default
     // Trigger notification after 5 seconds (for example)
     let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)

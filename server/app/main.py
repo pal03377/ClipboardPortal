@@ -52,8 +52,8 @@ async def send_clipboard_content(send_request: ClipboardSendRequest, content: Up
     return ClipboardResponse() # Return empty response to indicate success
 
 
-# Detect clipboard changes for current user: WebSocket /detect {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes
-@app.websocket("/detect")
+# Detect clipboard changes for current user: WebSocket /ws {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes
+@app.websocket("/ws")
 async def detect_clipboard_content(websocket: WebSocket):
     await websocket.accept() # Accept WebSocket connection
     auth_data = await websocket.receive_json() # Receive auth data from client, e.g. {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"}
