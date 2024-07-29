@@ -17,3 +17,18 @@ services:
       - ./data:/app/data
     user: '0' # Run as root to avoid permission issues with host volumes
     command: ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
+
+services:
+  python-template:
+    container_name: $PROJECT_NAME-server # Needed for admin-alias.yaml to work (service reference). Unique name per project to be able to have multiple projects based on this
+    build: .
+    environment:
+      - PORT
+      - PY_DEBUG_PORT
+      - DATA_DIR=/code/data
+    ports:
+      - "127.0.0.1:$PORT:$PORT" # host port : container port. Bind only locally to avoid exposing the service without Caddy
+      - "127.0.0.1:$PY_DEBUG_PORT:$PY_DEBUG_PORT" # host port : container port. Bind only locally to avoid exposing the service without Caddy
+    volumes:
+      - ./app:/code/app
+      - ./data:/code/data

@@ -1,2 +1,2 @@
-.build/
-.swiftpm/
+data
+__pycache__

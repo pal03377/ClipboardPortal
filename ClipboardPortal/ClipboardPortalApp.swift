@@ -6,8 +6,7 @@ import KeyboardShortcuts
 // TODO:
 // - Rewrite server in Python? Swift takes forever to compile. Change architecture to store files instead of DB entries (so that image sending becomes much easier later)
 // - Send images and files
-// - URL Schema for receiving friend code
-// - Play sound when receiving (with setting to turn it off)
+
 
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
