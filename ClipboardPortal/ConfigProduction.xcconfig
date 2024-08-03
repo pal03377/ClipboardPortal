@@ -1,2 +1,2 @@
-SERVER_URL = https:/$()/clipboardportal.pschwind.de // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257
-WEBSOCKET_SERVER_URL = ws:/$()/clipboardportal.pschwind.de/ws // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257
+SERVER_URL = https:/$()/clipboardportal2.pschwind.de // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257
+WEBSOCKET_SERVER_URL = wss:/$()/clipboardportal2.pschwind.de/ws // Don't treat double slash as comment, see https://stackoverflow.com/a/36297483/4306257

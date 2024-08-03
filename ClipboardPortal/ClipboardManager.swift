@@ -59,7 +59,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
     @Published var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
     @Published var clipboardHistory: [ClipboardHistoryEntry] = []
     var receiverId: String? = nil // Needs to be set from outside because the ClipboardPortalApp does not know it, so the ContentView has to update it
-    var user: User? // Has to be set from outside
+    private var user: User?
     var lastReceivedContent: ClipboardContent? {
         get { clipboardHistory.filter(\.received).last?.content }
     }
@@ -81,7 +81,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
                 // Check if the file is a text or a file
                 if let content = String(data: data, encoding: .utf8), content.hasPrefix(textPrefix) { // Text clipboard contents?
                     print("Got text \(content)")
-                    Task { await self.onReceivedClipboardContent(.text(content)) }
+                    Task { await self.onReceivedClipboardContent(.text(String(content.trimmingPrefix(textPrefix)))) }
                 } else { // File clipboard contents?
                     print("Received file. Downloading...")
                     // Save the file to the Downloads folder
@@ -112,6 +112,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
 
     // Start websocket connection to server to get updates for new clipboard contents
     func checkForUpdates(user: User) {
+        self.user = user // Save user for WebSocket event handling later
         DispatchQueue.main.async { self.receiveErrorMessage = nil } // Reset last receive error message
         var request = URLRequest(url: wsServerUrl)
         request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
@@ -119,17 +120,43 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         socket.delegate = self
         socket.connect()
     }
+    private func retryCheckForUpdateAfterDelay() {
+        guard let user = self.user else { return } // Abort if nothing to retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
+            self.checkForUpdates(user: user)
+        }
+    }
+    private struct UserAuthenticateDTO: Encodable {
+        var id: String
+        var secret: String
+        var date: String
+    }
     func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
         switch event {
         case .connected(let headers):
             DispatchQueue.main.async { self.connected = true }
             print("websocket is connected: \(headers)")
+            // Send authentication to receive events for new clipboard contents
+            guard let user = self.user else {
+                print("Cannot connect to WebSocket without user")
+                return
+            }
+            do {
+                try client.write(string: String(data: JSONEncoder().encode(UserAuthenticateDTO(id: user.id, secret: user.secret, date: (user.lastReceiveDate ?? Date.distantPast).ISO8601Format())), encoding: .utf8)!)
+            } catch {
+                DispatchQueue.main.async {
+                    self.receiveErrorMessage = "Could not authenticate"
+                    self.connected = false
+                }
+                self.retryCheckForUpdateAfterDelay()
+            }
         case .disconnected(let reason, let code):
             DispatchQueue.main.async {
                 self.receiveErrorMessage = reason
                 self.connected = false
             }
             print("Websocket is disconnected: \(reason) with code: \(code)")
+            self.retryCheckForUpdateAfterDelay()
         case .text(let string):
             print("Received text: \(string)")
             Task { await self.downloadAndReceiveClipboardContent() }
@@ -142,18 +169,21 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         case .viabilityChanged(_):
             break
         case .reconnectSuggested(_):
+            self.retryCheckForUpdateAfterDelay()
             break
         case .cancelled:
             DispatchQueue.main.async { self.connected = false }
+            self.retryCheckForUpdateAfterDelay()
         case .error(let error):
             DispatchQueue.main.async {
                 self.receiveErrorMessage = error?.localizedDescription
                 self.connected = false
             }
+            self.retryCheckForUpdateAfterDelay()
         case .peerClosed:
             DispatchQueue.main.async { self.connected = false }
+            self.retryCheckForUpdateAfterDelay()
         }
-        // TODO: Reconnect after disconnect
     }
 
     // Send clipboard content to another user. Throws if there is no sendable clipboard content.
@@ -162,7 +192,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
     }
     struct ClipboardSendResponse: Decodable {}
     func sendClipboardContent(_ content: ClipboardContent) async { // data -> to send, textForm -> to display in history
-        print("sending \(content)")
+        print("Sending \(content)")
         guard let receiverId = self.receiverId, receiverId != "" else {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured. Go to settings." } // Show error if there is no receiver yet. Update UI in main thread.
             return
@@ -178,6 +208,9 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         var request = URLRequest(url: sendUrl); request.httpMethod = "POST" // Create POST request
         let boundary = UUID().uuidString; request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type") // Create boundary for file upload
         var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"receiverId\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(receiverId)\r\n".data(using: .utf8)!)
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.txt\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: text/plain\r\n\r\n".data(using: .utf8)!)
