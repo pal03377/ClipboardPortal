@@ -1,5 +1,9 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket
+from starlette.websockets import WebSocketDisconnect
 from pydantic import BaseModel
+
+import logging
+import sys
 from uuid import uuid4
 import secrets
 import os
@@ -16,6 +20,15 @@ from watchfiles import awatch # watchfiles for notifying client when new clipboa
 
 
 app = FastAPI()
+
+# Logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+stream_handler = logging.StreamHandler(sys.stdout)
+log_formatter = logging.Formatter("%(asctime)s [%(processName)s: %(process)d] [%(threadName)s: %(thread)d] [%(levelname)s] %(name)s: %(message)s")
+stream_handler.setFormatter(log_formatter)
+logger.addHandler(stream_handler)
+logger.info("Starting server")
 
 data_dir = os.environ.get("DATA_DIR", "data")
 
@@ -56,13 +69,22 @@ async def send_clipboard_content(receiverId: str = Form(...), file: UploadFile =
 # Detect clipboard changes for current user: WebSocket /ws {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes
 @app.websocket("/ws")
 async def detect_clipboard_content(websocket: WebSocket):
+    logger.info("Waiting for WS accept...")
     await websocket.accept() # Accept WebSocket connection
-    auth_data = await websocket.receive_json() # Receive auth data from client, e.g. {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"}
+    try:
+        logger.info("Waiting for auth...")
+        auth_data = await websocket.receive_json() # Receive auth data from client, e.g. {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"}
+    except WebSocketDisconnect: return # No error if client disconnects
+    logger.info("Received authentication %s", auth_data)
     user_data_file = f"{data_dir}/{auth_data['id']}_{auth_data['secret']}" # Get file path for user data based on secret, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7"
     if not os.path.exists(user_data_file): raise HTTPException(status_code=403, detail="Unauthorized") # Abort if user data file does not exist (wrong user ID or wrong secret)
+    logger.info("Authenticated! %s", auth_data["id"])
     last_change_date = datetime.fromisoformat(auth_data["date"]) # Get last change date from client, e.g. 2024-01-01 00:00:00+00:00
+    logger.info("Waiting for changes...")
     async for _ in awatch(user_data_file): # On every file change
+        logger.info("Change for user %s", auth_data["id"])
         if os.path.getmtime(user_data_file) > last_change_date.timestamp(): # If file was changed after last change date
+            logger.info("Sending new clipboard contents")
             await websocket.send_text("new") # Send "new" to client
             last_change_date = datetime.now() # Update last change date to current date
     await websocket.close() # Close WebSocket connection when done
