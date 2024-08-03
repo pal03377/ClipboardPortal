@@ -71,8 +71,8 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
     func downloadAndReceiveClipboardContent() async {
         guard let user = self.user else { fatalError("Missing user on ClipboardManager") }
         DispatchQueue.main.async { self.receiveErrorMessage = nil } // Reset last receive error message
-        let url = serverUrl.appendingPathComponent("\(user.id)_\(user.secret)") // Download URL for clipboard content, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7
-        let downloadTask = URLSession.shared.downloadTask(with: url) { (location, response, error) in // Download clipboard content
+        let contentUrl = serverUrl.appendingPathComponent("\(user.id)_\(user.secret)") // Download URL for clipboard content, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7
+        let downloadTask = URLSession.shared.downloadTask(with: contentUrl) { (location, response, error) in // Download clipboard content
             guard let location = location, error == nil else {
                 print("Download error: \(String(describing: error))")
                 self.receiveErrorMessage = error?.localizedDescription
@@ -86,13 +86,23 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
                     Task { await self.onReceivedClipboardContent(.text(String(content.trimmingPrefix(textPrefix)))) }
                 } else { // File clipboard contents?
                     print("Received file. Downloading...")
-                    // Save the file to the Downloads folder
-                    let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-                    let destinationURL = downloadsDirectory.appendingPathComponent(url.lastPathComponent)
-                    try FileManager.default.moveItem(at: location, to: destinationURL)
-                    print("Downloaded file.")
-                    // Copy the file to the clipboard, update the history and send a notification
-                    Task { await self.onReceivedClipboardContent(.file(destinationURL)) }
+                    Task {
+                        let filenameUrl = contentUrl.appendingPathExtension("filename") // Download URL for filename, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7.filename
+                        let filename: String? = try? await ServerRequest.get(path: filenameUrl.path()) // Download filename from server e.g. "myfile.txt"
+                        // Choose destination that does not exist
+                        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+                        var destinationURL = downloadsDirectory.appendingPathComponent(filename ?? "file")
+                        var counter = 1
+                        while FileManager.default.fileExists(atPath: destinationURL.path) {
+                            destinationURL = destinationURL.deletingLastPathComponent().appendingPathComponent(destinationURL.lastPathComponent + " (\(counter))")
+                            counter += 1
+                        }
+                        // Save the file to the Downloads folder
+                        try FileManager.default.moveItem(at: location, to: destinationURL)
+                        print("Downloaded file.")
+                        // Copy the file to the clipboard, update the history and send a notification
+                        await self.onReceivedClipboardContent(.file(destinationURL))
+                    }
                 }
             } catch {
                 print("File handling error: \(error)")
@@ -218,6 +228,10 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         DispatchQueue.main.async { self.sending = true; self.sendErrorMessage = nil } // Show loading spinner in UI. Update UI in main thread.
         defer { DispatchQueue.main.async { self.sending = false } } // Hide loading spinner when done. Update UI in main thread.
         let sendUrl = serverUrl.appendingPathComponent("send") // Send URL for clipboard content, e.g. https://clipboardportal.pschwind.de/send
+        let filename = switch content { // Filename for sending
+        case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
+        case .text(_): "text.txt" // Default filename because it does not matter
+        }
         // Send data to server
         var request = URLRequest(url: sendUrl); request.httpMethod = "POST" // Create POST request
         let boundary = UUID().uuidString; request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type") // Create boundary for file upload
@@ -226,7 +240,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         body.append("Content-Disposition: form-data; name=\"receiverId\"\r\n\r\n".data(using: .utf8)!)
         body.append("\(receiverId)\r\n".data(using: .utf8)!)
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.txt\"\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!)\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: text/plain\r\n\r\n".data(using: .utf8)!)
         body.append(data)
         body.append("\r\n".data(using: .utf8)!)
