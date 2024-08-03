@@ -81,13 +81,15 @@ async def detect_clipboard_content(websocket: WebSocket):
     logger.info("Authenticated! %s", auth_data["id"])
     last_change_date = datetime.fromisoformat(auth_data["date"]) # Get last change date from client, e.g. 2024-01-01 00:00:00+00:00
     logger.info("Waiting for changes...")
-    async for _ in awatch(user_data_file): # On every file change
-        logger.info("Change for user %s", auth_data["id"])
-        if os.path.getmtime(user_data_file) > last_change_date.timestamp(): # If file was changed after last change date
-            logger.info("Sending new clipboard contents")
-            await websocket.send_text("new") # Send "new" to client
-            last_change_date = datetime.now() # Update last change date to current date
-    await websocket.close() # Close WebSocket connection when done
+    try:
+        async for _ in awatch(user_data_file): # On every file change
+            logger.info("Change for user %s", auth_data["id"])
+            if os.path.getmtime(user_data_file) > last_change_date.timestamp(): # If file was changed after last change date
+                logger.info("Sending new clipboard contents")
+                await websocket.send_text("new") # Send "new" to client
+                last_change_date = datetime.now() # Update last change date to current date
+        await websocket.close() # Close WebSocket connection when done
+    except WebSocketDisconnect: return # No error if client disconnects
 
 
 if __name__ == "__main__":

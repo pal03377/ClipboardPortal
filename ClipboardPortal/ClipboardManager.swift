@@ -94,7 +94,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
                 }
             } catch {
                 print("File handling error: \(error)")
-                self.receiveErrorMessage = error.localizedDescription
+                Task { self.receiveErrorMessage = error.localizedDescription }
             }
         }
         downloadTask.resume()
@@ -108,6 +108,12 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         DispatchQueue.main.async { self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: true)) } // Update clipboard history. Update UI in main thread.
         // Show notification (if wanted)
         await showClipboardContentNotification(content)
+        // Open URLs in browser
+        if case let ClipboardContent.text(textContent) = content {
+            if (textContent.starts(with: "http:") || textContent.starts(with: "https:")) && !textContent.contains(" "), let url = URL(string: textContent) { // Text content looks like URL?
+                NSWorkspace.shared.open(url) // Open URL in browser
+            }
+        }
     }
 
     // Start websocket connection to server to get updates for new clipboard contents
@@ -223,7 +229,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
             if let httpResponse = response as? HTTPURLResponse {
                 print("Status Code: \(httpResponse.statusCode)")
                 if httpResponse.statusCode != 200 {
-                    DispatchQueue.main.async { self.sendErrorMessage = "Error \(httpResponse.statusCode)" }
+                    DispatchQueue.main.async { self.sendErrorMessage = (ServerRequestError(rawValue: httpResponse.statusCode) ?? .unknown).localizedDescription }
                 }
             }
 

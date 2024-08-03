@@ -1,13 +1,13 @@
 import Foundation
 
-enum ServerRequestError: Error {
-    case networkError
-    case badRequest
-    case forbidden
-    case notFound
-    case payloadTooLarge
-    case serverError
-    case unknown(Int)
+enum ServerRequestError: Int, Error {
+    case networkError = 0
+    case badRequest = 400
+    case forbidden = 403
+    case notFound = 404
+    case payloadTooLarge = 413
+    case serverError = 500
+    case unknown = -1
 }
 extension ServerRequestError: LocalizedError { // Nice error messages
     public var errorDescription: String? {
@@ -24,8 +24,8 @@ extension ServerRequestError: LocalizedError { // Nice error messages
             return "Too much data."
         case .serverError:
             return "A server error occurred. Please try again later."
-        case .unknown(let code):
-            return "An unknown error occurred. (Error code: \(code))"
+        case .unknown:
+            return "An unknown error occurred."
         }
     }
 }
@@ -59,17 +59,10 @@ struct ServerRequest {
             print(error)
             throw ServerRequestError.networkError
         }
-        guard let response = response as? HTTPURLResponse else { throw ServerRequestError.unknown(-1) }
+        guard let response = response as? HTTPURLResponse else { throw ServerRequestError.unknown }
         guard (200...299).contains(response.statusCode) else {
             // Throw if server responded with non-ok status code
-            switch response.statusCode {
-            case 400: throw ServerRequestError.badRequest
-            case 403: throw ServerRequestError.forbidden
-            case 404: throw ServerRequestError.notFound
-            case 413: throw ServerRequestError.payloadTooLarge
-            case 500: throw ServerRequestError.serverError
-            default: throw ServerRequestError.unknown(response.statusCode)
-            }
+            throw ServerRequestError(rawValue: response.statusCode) ?? .unknown
         }
         return try JSONDecoder().decode(T.self, from: responseData) // Decode and return response
     }
