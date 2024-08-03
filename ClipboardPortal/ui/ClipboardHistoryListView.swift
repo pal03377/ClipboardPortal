@@ -6,7 +6,7 @@ struct ClipboardHistoryListView: View {
 
     var body: some View {
         LazyVStack {
-            ForEach(history.reversed(), id: \.self) { entry in
+            ForEach(history.reversed(), id: \.receiveDate) { entry in
                 ClipboardHistoryListEntryView(entry: entry) {
                     onSend(entry.content)
                 }.padding(.vertical, 4)

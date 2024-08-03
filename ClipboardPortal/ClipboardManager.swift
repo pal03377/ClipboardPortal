@@ -47,6 +47,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
 }
 
 struct ClipboardHistoryEntry: Hashable {
+    var receiveDate: Date = Date() // For unique IDs in UI list
     var content: ClipboardContent
     var received: Bool // Whether the content was sent or received
 }
