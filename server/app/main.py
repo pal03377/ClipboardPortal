@@ -64,6 +64,8 @@ async def send_clipboard_content(receiverId: str = Form(...), file: UploadFile =
     if user_data_file is None: raise HTTPException(status_code=404, detail="User not found")
     # Save uploaded file to ./data/<receiver_id>_*
     with open(user_data_file, "wb") as f: f.write(await file.read()) # Save uploaded file to user data file
+    # Save filename so that the receiver can download the file with the correct name
+    with open(user_data_file + ".filename", "w") as f: f.write(file.filename) # Save filename in metadata file next to user data file
 
 
 # Detect clipboard changes for current user: WebSocket /ws {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes

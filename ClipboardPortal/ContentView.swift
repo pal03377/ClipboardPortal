@@ -32,7 +32,7 @@ struct ContentView: View {
         .frame(minHeight: 120 + 32) // Cmd+V view + 1 row of history
         .overlay(alignment: .bottomTrailing) {
             HStack(spacing: 0) {
-                StatusView(errorMessage: clipboardManager.sendErrorMessage ?? clipboardManager.receiveErrorMessage ?? userStore.userLoadErrorMessage ?? nil)
+                StatusView(connecting: clipboardManager.connecting, errorMessage: clipboardManager.sendErrorMessage ?? clipboardManager.receiveErrorMessage ?? userStore.userLoadErrorMessage ?? nil)
                 Button {  isSettingsOpen = true } label: {
                     Image(systemName: "gear")
                 }
@@ -48,8 +48,8 @@ struct ContentView: View {
             .clipShape(.rect(topLeadingRadius: 4))
         }
         .task(id: clipboardManager.clipboardHistory) {
-            Task {
-                if let lastClipboardContent = clipboardManager.lastReceivedContent {
+            if clipboardManager.lastReceivedContent != nil {
+                Task {
                     await userStore.updateLastReceivedDate(Date())
                 }
             }

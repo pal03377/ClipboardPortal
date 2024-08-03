@@ -7,6 +7,7 @@ enum ServerRequestError: Int, Error {
     case notFound = 404
     case payloadTooLarge = 413
     case serverError = 500
+    case serverDown = 502
     case unknown = -1
 }
 extension ServerRequestError: LocalizedError { // Nice error messages
@@ -24,6 +25,8 @@ extension ServerRequestError: LocalizedError { // Nice error messages
             return "Too much data."
         case .serverError:
             return "A server error occurred. Please try again later."
+        case .serverDown:
+            return "The server is offline. Please try again later."
         case .unknown:
             return "An unknown error occurred."
         }

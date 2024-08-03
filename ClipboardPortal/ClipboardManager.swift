@@ -54,6 +54,7 @@ struct ClipboardHistoryEntry: Hashable {
 
 // Send and receive clipboard contents
 class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
+    @Published var connecting: Bool = false // Whether the connection is in progress
     @Published var connected: Bool = false // Whether the manager is connected to the server
     @Published var sending: Bool = false // Whether clipboard contents are being sent right now
     @Published var sendErrorMessage: String? = nil // Error message when sending the clipboard fails
@@ -120,7 +121,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
     // Start websocket connection to server to get updates for new clipboard contents
     func checkForUpdates(user: User) {
         self.user = user // Save user for WebSocket event handling later
-        DispatchQueue.main.async { self.receiveErrorMessage = nil } // Reset last receive error message
+        DispatchQueue.main.async { self.connecting = true; self.receiveErrorMessage = nil } // Reset last receive error message and mark as connecting
         var request = URLRequest(url: wsServerUrl)
         request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
         socket = WebSocket(request: request)
@@ -139,6 +140,7 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         var date: String
     }
     func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+        DispatchQueue.main.async { self.connecting = false } // Not connecting any more when event was received
         switch event {
         case .connected(let headers):
             DispatchQueue.main.async { self.connected = true }
@@ -158,11 +160,11 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
                 self.retryCheckForUpdateAfterDelay()
             }
         case .disconnected(let reason, let code):
+            print("Websocket is disconnected: \(reason) with code: \(code)")
             DispatchQueue.main.async {
-                self.receiveErrorMessage = reason
+                self.receiveErrorMessage = "Disconnected from the server"
                 self.connected = false
             }
-            print("Websocket is disconnected: \(reason) with code: \(code)")
             self.retryCheckForUpdateAfterDelay()
         case .text(let string):
             print("Received text: \(string)")
@@ -173,7 +175,8 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
             break
         case .pong(_):
             break
-        case .viabilityChanged(_):
+        case .viabilityChanged(let connected):
+            DispatchQueue.main.async { self.connected = connected }
             break
         case .reconnectSuggested(_):
             self.retryCheckForUpdateAfterDelay()
@@ -183,7 +186,11 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
             self.retryCheckForUpdateAfterDelay()
         case .error(let error):
             DispatchQueue.main.async {
-                self.receiveErrorMessage = error?.localizedDescription
+                if let error, case HTTPUpgradeError.notAnUpgrade(let code, _) = error, let serverRequestErr = ServerRequestError(rawValue: code) { // Detected server error? e.g. 502
+                    self.receiveErrorMessage = serverRequestErr.localizedDescription // Show user-friendly server error message
+                } else {
+                    self.receiveErrorMessage = error?.localizedDescription
+                }
                 self.connected = false
             }
             self.retryCheckForUpdateAfterDelay()
