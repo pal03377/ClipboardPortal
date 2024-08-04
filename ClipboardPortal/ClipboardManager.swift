@@ -138,6 +138,8 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
     
     // Helper function for adding new clipboard content to the history and sending a notification
     private func onReceivedClipboardContent(_ content: ClipboardContent) async {
+        // Play sound effect
+        playSoundEffect(.receive)
         // Copy to clipboard
         content.copyToClipboard()
         // Add to history
@@ -279,18 +281,16 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         request.httpBody = body // Set request body to file upload
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
-            if let httpResponse = response as? HTTPURLResponse {
-                print("Status Code: \(httpResponse.statusCode)")
-                if httpResponse.statusCode != 200 {
-                    DispatchQueue.main.async { self.sendErrorMessage = (ServerRequestError(rawValue: httpResponse.statusCode) ?? .unknown).localizedDescription }
-                }
+            let httpResponse = response as! HTTPURLResponse
+            print("Status Code: \(httpResponse.statusCode)")
+            if httpResponse.statusCode != 200 {
+                DispatchQueue.main.async { self.sendErrorMessage = (ServerRequestError(rawValue: httpResponse.statusCode) ?? .unknown).localizedDescription }
             }
-
-            if let responseString = String(data: data, encoding: .utf8) {
-                print("Response: \(responseString)")
-                DispatchQueue.main.async {
-                    self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
-                }
+            let responseString = String(data: data, encoding: .utf8)!
+            print("Response: \(responseString)")
+            DispatchQueue.main.async {
+                self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
+                playSoundEffect(.send)
             }
         } catch {
             print("Error: \(error.localizedDescription)")

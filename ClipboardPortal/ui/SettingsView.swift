@@ -69,6 +69,16 @@ struct SettingsView: View {
             Spacer().frame(height: 8)
             GlobalShortcutView()
             NotificationsToggleView()
+            Toggle(isOn: $settingsStore.settingsData.sendSoundEnabled) {
+                Text("Sound when sending")
+            }.task(id: settingsStore.settingsData.sendSoundEnabled) {
+                Task { try await settingsStore.save() }
+            }
+            Toggle(isOn: $settingsStore.settingsData.receiveSoundEnabled) {
+                Text("Sound when receiving")
+            }.task(id: settingsStore.settingsData.receiveSoundEnabled) {
+                Task { try await settingsStore.save() }
+            }
         }
         .frame(width: 200)
     }

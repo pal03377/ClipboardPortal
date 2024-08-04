@@ -4,13 +4,15 @@ import SwiftUI
 struct SettingsData: Codable {
     var receiverId: String
     var notificationsEnabled: Bool
+    var sendSoundEnabled: Bool
+    var receiveSoundEnabled: Bool
 }
 
 // Store the settings locally
 class SettingsStore: ObservableObject {
     static let shared = SettingsStore()
 
-    static let defaultSettingsData = SettingsData(receiverId: "", notificationsEnabled: false)
+    static let defaultSettingsData = SettingsData(receiverId: "", notificationsEnabled: false, sendSoundEnabled: false, receiveSoundEnabled: false)
     @Published var settingsData = defaultSettingsData
 
     // Helper function to get the file path for the user data

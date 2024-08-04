@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA4A24852C5F357D0032E3F0 /* SoundEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A24842C5F357D0032E3F0 /* SoundEffects.swift */; };
+		DA4A24892C5F381D0032E3F0 /* send.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA4A24872C5F381D0032E3F0 /* send.mp3 */; };
+		DA4A248A2C5F381D0032E3F0 /* receive.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA4A24882C5F381D0032E3F0 /* receive.mp3 */; };
 		DA82955D2C1CAEDA00ADFA1E /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */; };
 		DA84EF932C572845005A2A26 /* ClipboardHistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8D2C572845005A2A26 /* ClipboardHistoryListView.swift */; };
 		DA84EF942C572845005A2A26 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF902C572845005A2A26 /* SettingsView.swift */; };
@@ -33,6 +36,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DA4A24842C5F357D0032E3F0 /* SoundEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffects.swift; sourceTree = "<group>"; };
+		DA4A24872C5F381D0032E3F0 /* send.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = send.mp3; sourceTree = "<group>"; };
+		DA4A24882C5F381D0032E3F0 /* receive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = receive.mp3; sourceTree = "<group>"; };
 		DA84EF862C572845005A2A26 /* CopyContentModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
 		DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledModifierMacOS14.swift; sourceTree = "<group>"; };
 		DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
@@ -75,6 +81,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DA4A24862C5F37FE0032E3F0 /* sound */ = {
+			isa = PBXGroup;
+			children = (
+				DA4A24842C5F357D0032E3F0 /* SoundEffects.swift */,
+				DA4A24882C5F381D0032E3F0 /* receive.mp3 */,
+				DA4A24872C5F381D0032E3F0 /* send.mp3 */,
+			);
+			path = sound;
+			sourceTree = "<group>";
+		};
 		DA84EF892C572845005A2A26 /* modifiers */ = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +131,7 @@
 				DA84EF892C572845005A2A26 /* modifiers */,
 				DA84EF8C2C572845005A2A26 /* shortcut */,
 				DA84EF922C572845005A2A26 /* ui */,
+				DA4A24862C5F37FE0032E3F0 /* sound */,
 				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
 				DA99FF5D2C13471200769146 /* ContentView.swift */,
 				DA99FF592C13471200769146 /* ClipboardManager.swift */,
@@ -175,7 +192,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1510;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					DAAB33BA2BCAFDCB00C82DF4 = {
 						CreatedOnToolsVersion = 15.1;
@@ -210,6 +227,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA4A24892C5F381D0032E3F0 /* send.mp3 in Resources */,
+				DA4A248A2C5F381D0032E3F0 /* receive.mp3 in Resources */,
 				DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,6 +257,7 @@
 				DA84EF992C572845005A2A26 /* GlobalShortcutView.swift in Sources */,
 				DA84EF9A2C572845005A2A26 /* CommandVView.swift in Sources */,
 				DA84EF9B2C572845005A2A26 /* NotificationsToggleView.swift in Sources */,
+				DA4A24852C5F357D0032E3F0 /* SoundEffects.swift in Sources */,
 				DA84EF9C2C572845005A2A26 /* GlobalShortcut.swift in Sources */,
 				DA99FF782C13471200769146 /* UserStore.swift in Sources */,
 				DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */,
@@ -282,6 +302,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -346,6 +367,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -379,7 +401,8 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -395,7 +418,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -417,7 +440,8 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -433,7 +457,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
