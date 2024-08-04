@@ -92,22 +92,22 @@ async def detect_clipboard_content(websocket: WebSocket):
         return
     logger.info("Authenticated! %s", auth_data["id"])
     logger.info("Waiting for changes...")
+    watch_files_stop_event = asyncio.Event() # Event to stop watching files after WebSocket connection is closed
     async def watch_files():
         try:
             last_change_date = datetime.fromisoformat(auth_data["date"]) # Get last change date from client, e.g. 2024-01-01 00:00:00+00:00
-            async for _ in awatch(user_data_file): # On every file change
+            async for _ in awatch(user_data_file, stop_event=watch_files_stop_event): # On every file change
                 logger.info("Change for user %s", auth_data["id"])
                 if os.path.getmtime(user_data_file) > last_change_date.timestamp(): # If file was changed after last change date
                     logger.info("Sending new clipboard contents")
                     await websocket.send_text("new") # Send "new" to client
                     last_change_date = datetime.now() # Update last change date to current date
-            await websocket.close() # Close WebSocket connection when done
-        except WebSocketDisconnect:
-            print("WebSocket disconnected")
-            return # No error if client disconnects
+        except WebSocketDisconnect: print("WebSocket disconnected")
     asyncio.ensure_future(watch_files()) # Start watching files in background so that a uvicorn reload can stop file watching
     try: await websocket.receive_text() # Wait for client to keep connection alive while watching files in the background
-    except WebSocketDisconnect: return # No error if client disconnects or uvicorn reload closes the connection
+    except WebSocketDisconnect:
+        watch_files_stop_event.set() # Stop watching files when client disconnects
+        return # No error if client disconnects or uvicorn reload closes the connection
     raise Exception("Client sent a WebSocket message. This is not intended.")
 
 
