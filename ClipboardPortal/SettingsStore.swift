@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+// Settings model
 struct SettingsData: Codable {
     var receiverId: String
     var notificationsEnabled: Bool

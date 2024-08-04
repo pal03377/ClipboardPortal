@@ -29,7 +29,6 @@
 		DA99FF722C13471200769146 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF5D2C13471200769146 /* ContentView.swift */; };
 		DA99FF762C13471200769146 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF622C13471200769146 /* Config.swift */; };
 		DA99FF782C13471200769146 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF642C13471200769146 /* UserStore.swift */; };
-		DA99FF792C13471200769146 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF652C13471200769146 /* User.swift */; };
 		DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF662C13471200769146 /* ViewIfModifier.swift */; };
 		DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF682C13471200769146 /* ServerRequest.swift */; };
 		DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA99FF5B2C13471200769146 /* Assets.xcassets */; };
@@ -61,8 +60,7 @@
 		DA99FF622C13471200769146 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Config.swift; path = ClipboardPortal/Config.swift; sourceTree = "<group>"; };
 		DA99FF632C13471200769146 /* ConfigProduction.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = ConfigProduction.xcconfig; path = ClipboardPortal/ConfigProduction.xcconfig; sourceTree = "<group>"; };
 		DA99FF642C13471200769146 /* UserStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UserStore.swift; path = ClipboardPortal/UserStore.swift; sourceTree = "<group>"; };
-		DA99FF652C13471200769146 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = User.swift; path = ClipboardPortal/User.swift; sourceTree = "<group>"; };
-		DA99FF662C13471200769146 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewIfModifier.swift; path = ClipboardPortal/ViewIfModifier.swift; sourceTree = "<group>"; };
+		DA99FF662C13471200769146 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewIfModifier.swift; sourceTree = "<group>"; };
 		DA99FF682C13471200769146 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardPortal/ServerRequest.swift; sourceTree = "<group>"; };
 		DA99FF692C13471200769146 /* ClipboardPortal.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardPortal.entitlements; path = ClipboardPortal/ClipboardPortal.entitlements; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Portal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,6 +95,7 @@
 				DA84EF862C572845005A2A26 /* CopyContentModifier.swift */,
 				DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */,
 				DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */,
+				DA99FF662C13471200769146 /* ViewIfModifier.swift */,
 			);
 			name = modifiers;
 			path = ClipboardPortal/modifiers;
@@ -128,20 +127,18 @@
 		DAAB33B22BCAFDCB00C82DF4 = {
 			isa = PBXGroup;
 			children = (
+				DA84EF922C572845005A2A26 /* ui */,
 				DA84EF892C572845005A2A26 /* modifiers */,
 				DA84EF8C2C572845005A2A26 /* shortcut */,
-				DA84EF922C572845005A2A26 /* ui */,
 				DA4A24862C5F37FE0032E3F0 /* sound */,
 				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
 				DA99FF5D2C13471200769146 /* ContentView.swift */,
 				DA99FF592C13471200769146 /* ClipboardManager.swift */,
-				DA99FF622C13471200769146 /* Config.swift */,
-				DA99FF572C13471200769146 /* LocalNotification.swift */,
 				DA99FF682C13471200769146 /* ServerRequest.swift */,
-				DA99FF582C13471200769146 /* SettingsStore.swift */,
-				DA99FF652C13471200769146 /* User.swift */,
+				DA99FF572C13471200769146 /* LocalNotification.swift */,
 				DA99FF642C13471200769146 /* UserStore.swift */,
-				DA99FF662C13471200769146 /* ViewIfModifier.swift */,
+				DA99FF582C13471200769146 /* SettingsStore.swift */,
+				DA99FF622C13471200769146 /* Config.swift */,
 				DA99FF5B2C13471200769146 /* Assets.xcassets */,
 				DA99FF692C13471200769146 /* ClipboardPortal.entitlements */,
 				DA99FF5E2C13471200769146 /* MainMenu.xib */,
@@ -246,7 +243,6 @@
 				DA99FF762C13471200769146 /* Config.swift in Sources */,
 				DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */,
 				DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */,
-				DA99FF792C13471200769146 /* User.swift in Sources */,
 				DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */,
 				DA84EF932C572845005A2A26 /* ClipboardHistoryListView.swift in Sources */,
 				DA84EF942C572845005A2A26 /* SettingsView.swift in Sources */,
