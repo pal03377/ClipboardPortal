@@ -32,9 +32,9 @@ struct ClipboardHistoryListEntryView: View {
                 Image(systemName: "person.fill.checkmark")
                     .help("This is your friend's ID.")
             }
-            else if entry.received &&  looksLikeUserId("\(entry.content)") {
+            else if case let ClipboardContent.text(textContent) = entry.content, looksLikeUserId(textContent), entry.received {
                 Button("Set friend ID") {
-                    settingsStore.settingsData.receiverId = "\(entry.content)"
+                    settingsStore.settingsData.receiverId = textContent
                 }
                 Button { isSetFriendCodePopupOpen = true } label: {
                     Image(systemName: "questionmark.circle")

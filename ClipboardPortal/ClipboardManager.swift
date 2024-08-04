@@ -8,18 +8,28 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     case text(String)
     case file(URL)
     
+    // String representation of content for UI. Use pattern matching for getting the text or URL.
     var description: String {
         switch self {
         case .text(let text): return text
-        case .file(let url):  return url.absoluteString
+        case .file(let url):  return url.lastPathComponent // Filename e.g. "myfile.txt"
         }
     }
     
-    var data: Data? { // Data for sending
+    // Data representation for sending to the server
+    var data: Data? {
         print("Read data of \(self)")
         switch self {
         case .text(let text): return (textPrefix + text).data(using: .utf8) // Encode with text prefix for detection, e.g. "text: This is the content"
         case .file(let url):  return try? Data(contentsOf: url)
+        }
+    }
+    
+    // String representation of the content type for notifications
+    var typeDescription: String {
+        switch self {
+        case .text: "text"
+        case .file: "file"
         }
     }
     
@@ -33,19 +43,17 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         case .text(let text):
             if let _ = URL(string: text) { // Text looks like URL? -> Copy as URL
                 pasteboard.declareTypes([.URL, .string], owner: nil) // Prepare clipboard to receive string contents
-                pasteboard.setString("\(self)", forType: .URL) // Put content as URL into clipboard
-                pasteboard.setString("\(self)", forType: .string) // Put content as string into clipboard
+                pasteboard.setString(text, forType: .URL) // Put content as URL into clipboard
+                pasteboard.setString(text, forType: .string) // Put content as string into clipboard
             } else { // Text looks like normal text? -> Copy as normal text
                 pasteboard.declareTypes([.string], owner: nil) // Prepare clipboard to receive string contents
-                pasteboard.setString("\(self)", forType: .string) // Put string into clipboard
+                pasteboard.setString(text, forType: .string) // Put string into clipboard
             }
-        case .file:
-            let pasteboardTypes: [NSPasteboard.PasteboardType] =
-            if let fileURL = URL(string: "\(self)"), fileURL.pathExtension != "" { [.fileURL, .fileContentsType(forPathExtension: fileURL.pathExtension)] }
-                else { [.fileURL] }
-            pasteboard.declareTypes(pasteboardTypes, owner: nil) // Prepare clipboard for file
-            pasteboard.setString("\(self)", forType: .fileURL) // Put content as URL into clipboard
-            if let _ = URL(string: "\(self)") { pasteboard.writeFileContents("\(self)") } // Put file content into clipboard
+        case .file(let fileURL):
+            pasteboard.writeFileContents(fileURL.relativePath)
+            //pasteboard.declareTypes([.fileURL, .fileContents], owner: nil) // Prepare clipboard for file
+            //pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Put file URL into clipboard
+            //let _ = try? pasteboard.setData(Data(contentsOf: fileURL), forType: .fileContents) // Put file contents into clipboard
         }
     }
 }
