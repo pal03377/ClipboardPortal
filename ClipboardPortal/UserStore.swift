@@ -94,7 +94,7 @@ class UserStore: ObservableObject {
     // Helper function to create a new user on the server if no user is stored
     struct UserCreateDTO: Codable {}
     private func createUserOnServer() async throws -> User {
-        try await ServerRequest.post(path: "/users", body: UserCreateDTO()) // Send create request to server and get back User
+        try await ServerRequest.post(url: serverUrl.appendingPathComponent("/users"), body: UserCreateDTO()) // Send create request to server and get back User
     }
     
     // Update the APN push notification token on the server if it changed

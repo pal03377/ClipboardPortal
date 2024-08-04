@@ -16,6 +16,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     }
     
     var data: Data? { // Data for sending
+        print("Read data of \(self)")
         switch self {
         case .text(let text): return (textPrefix + text).data(using: .utf8) // Encode with text prefix for detection, e.g. "text: This is the content"
         case .file(let url):  return try? Data(contentsOf: url)
@@ -39,9 +40,12 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
                 pasteboard.setString("\(self)", forType: .string) // Put string into clipboard
             }
         case .file:
-            pasteboard.declareTypes([.URL, .string], owner: nil) // Prepare clipboard to receive string contents
-            pasteboard.setString("\(self)", forType: .URL) // Put content as URL into clipboard
-            pasteboard.setString("\(self)", forType: .string) // Put content as string into clipboard
+            let pasteboardTypes: [NSPasteboard.PasteboardType] =
+            if let fileURL = URL(string: "\(self)"), fileURL.pathExtension != "" { [.fileURL, .fileContentsType(forPathExtension: fileURL.pathExtension)] }
+                else { [.fileURL] }
+            pasteboard.declareTypes(pasteboardTypes, owner: nil) // Prepare clipboard for file
+            pasteboard.setString("\(self)", forType: .fileURL) // Put content as URL into clipboard
+            if let _ = URL(string: "\(self)") { pasteboard.writeFileContents("\(self)") } // Put file content into clipboard
         }
     }
 }
@@ -86,22 +90,21 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
                     Task { await self.onReceivedClipboardContent(.text(String(content.trimmingPrefix(textPrefix)))) }
                 } else { // File clipboard contents?
                     print("Received file. Downloading...")
+                    // Move file to another temp file because otherwise the temp file might be deleted too quickly
+                    let tempLocation = try self.moveToDownloadsFolder(fileURL: location, preferredFilename: "clipboard-portal.temp")
+                    // Get real filename from server and rename file
                     Task {
                         let filenameUrl = contentUrl.appendingPathExtension("filename") // Download URL for filename, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7.filename
-                        let filename: String? = try? await ServerRequest.get(path: filenameUrl.path()) // Download filename from server e.g. "myfile.txt"
-                        // Choose destination that does not exist
-                        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-                        var destinationURL = downloadsDirectory.appendingPathComponent(filename ?? "file")
-                        var counter = 1
-                        while FileManager.default.fileExists(atPath: destinationURL.path) {
-                            destinationURL = destinationURL.deletingLastPathComponent().appendingPathComponent(destinationURL.lastPathComponent + " (\(counter))")
-                            counter += 1
+                        do {
+                            let filename: String = try! await ServerRequest.get(url: filenameUrl) // Download filename from server e.g. "myfile.txt"
+                            let downloadFolderFileURL = try self.moveToDownloadsFolder(fileURL: tempLocation, preferredFilename: filename)
+                            print("Downloaded file.")
+                            // Copy the file to the clipboard, update the history and send a notification
+                            await self.onReceivedClipboardContent(.file(downloadFolderFileURL))
+                        } catch {
+                            print(error)
+                            DispatchQueue.main.async { self.receiveErrorMessage = "Saving download failed: " + error.localizedDescription }
                         }
-                        // Save the file to the Downloads folder
-                        try FileManager.default.moveItem(at: location, to: destinationURL)
-                        print("Downloaded file.")
-                        // Copy the file to the clipboard, update the history and send a notification
-                        await self.onReceivedClipboardContent(.file(destinationURL))
                     }
                 }
             } catch {
@@ -110,6 +113,25 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
             }
         }
         downloadTask.resume()
+    }
+    
+    // Helper function to move a file to the user's Downloads directory without overwriting a file. Returns URL to new path.
+    // Might change the filename to make it unique.
+    private func moveToDownloadsFolder(fileURL: URL, preferredFilename: String) throws -> URL {
+        // Choose destination that does not exist
+        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+        let destinationURL = downloadsDirectory.appendingPathComponent(preferredFilename)
+        var counter = 1
+        var uniqueDestinationURL = destinationURL // URL to unique destination path e.g. "myfile-2.txt" or "myfile-3.txt"
+        while FileManager.default.fileExists(atPath: uniqueDestinationURL.path) { // Make filename unique e.g. "myfile.txt" -> "myfile-2.txt" or "myfile-3.txt"
+            counter += 1
+            uniqueDestinationURL = destinationURL.deletingLastPathComponent().appendingPathComponent("\(destinationURL.deletingPathExtension().lastPathComponent)-\(counter).\(destinationURL.pathExtension)")
+        }
+        // Save the file to the Downloads folder
+        do {
+            try FileManager.default.moveItem(at: fileURL, to: uniqueDestinationURL)
+        } catch { return fileURL } // Keep original (maybe temp) file URL when file moving fails
+        return uniqueDestinationURL
     }
     
     // Helper function for adding new clipboard content to the history and sending a notification
@@ -172,13 +194,20 @@ class ClipboardManager: ObservableObject, Equatable, WebSocketDelegate {
         case .disconnected(let reason, let code):
             print("Websocket is disconnected: \(reason) with code: \(code)")
             DispatchQueue.main.async {
-                self.receiveErrorMessage = "Disconnected from the server"
+                self.receiveErrorMessage = self.receiveErrorMessage ?? "Disconnected from the server" // Keep current error message or just say "Disconnected" if no detail is known
                 self.connected = false
             }
             self.retryCheckForUpdateAfterDelay()
         case .text(let string):
             print("Received text: \(string)")
-            Task { await self.downloadAndReceiveClipboardContent() }
+            if string == "new" {
+                Task { await self.downloadAndReceiveClipboardContent() } // Receive new content
+            } else if string == "forbidden" {
+                DispatchQueue.main.async { self.receiveErrorMessage = "Could not authenticate with server. Use File > Reset User to fix this." }
+            } else {
+                print("Unknown text from server")
+                DispatchQueue.main.async { self.receiveErrorMessage = ServerRequestError.unknown.localizedDescription }
+            }
         case .binary(let data):
             print("Received data: \(data.count)")
         case .ping(_):

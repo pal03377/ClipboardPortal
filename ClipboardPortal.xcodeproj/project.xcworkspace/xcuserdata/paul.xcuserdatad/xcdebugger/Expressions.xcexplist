@@ -25,6 +25,14 @@
          contextName = "ClipboardManager.sendClipboardContent():ClipboardManager.swift">
       </ContextState>
       <ContextState
+         contextName = "ClipboardContent.copyToClipboard():ClipboardManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "fileURL.pathExtension">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "serverUrl.unsafeMutableAddressor:Config.swift">
          <PersistentStrings>
             <PersistentString

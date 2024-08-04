@@ -37,8 +37,7 @@ struct ServerRequest {
     // Configure these values by editing ConfigDevelopment.xcconfig and ConfigProduction.xcconfig
 
     // Send a POST request to the server
-    static func post<T: Decodable>(path: String, body: Encodable) async throws -> T { // Send POST data to server at e.g. "/path"
-        let url = serverUrl.appendingPathComponent(path) // Create URL from path e.g. "/path" -> URL("https://example.com/path")
+    static func post<T: Decodable>(url: URL, body: Encodable) async throws -> T { // Send POST data to server
         print("url \(url)")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -48,8 +47,7 @@ struct ServerRequest {
         return try await sendRequest(request)
     }
     // Send a GET request to the server
-    static func get<T: Decodable>(path: String) async throws -> T { // Send GET request to server at e.g. "/path"
-        let url = serverUrl.appendingPathComponent(path) // Create URL from path e.g. "/path" -> URL("https://example.com/path")
+    static func get<T: Decodable>(url: URL) async throws -> T { // Send GET request to server
         let request = URLRequest(url: url)
         return try await sendRequest(request)
     }
@@ -67,6 +65,14 @@ struct ServerRequest {
             // Throw if server responded with non-ok status code
             throw ServerRequestError(rawValue: response.statusCode) ?? .unknown
         }
-        return try JSONDecoder().decode(T.self, from: responseData) // Decode and return response
+        if T.self == String.self { // String wanted?
+            if let stringValue = String(data: responseData, encoding: .utf8) { // Decode as string
+                return stringValue as! T
+            } else { // Decode error?
+                throw ServerRequestError.unknown // Throw
+            }
+        } else { // Some other data structure?
+            return try JSONDecoder().decode(T.self, from: responseData) // Decode with JSON
+        }
     }
 }
