@@ -39,21 +39,15 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents() // Clear clipboard to only have the new content in there, even if before there was e.g. an image in there as well
         // Write to clipboard
+        pasteboard.clearContents() // Clear old contents
         switch self {
         case .text(let text):
+            pasteboard.setString(text, forType: .string) // Copy as text
             if let _ = URL(string: text) { // Text looks like URL? -> Copy as URL
-                pasteboard.declareTypes([.URL, .string], owner: nil) // Prepare clipboard to receive string contents
-                pasteboard.setString(text, forType: .URL) // Put content as URL into clipboard
-                pasteboard.setString(text, forType: .string) // Put content as string into clipboard
-            } else { // Text looks like normal text? -> Copy as normal text
-                pasteboard.declareTypes([.string], owner: nil) // Prepare clipboard to receive string contents
-                pasteboard.setString(text, forType: .string) // Put string into clipboard
+                pasteboard.setString(text, forType: .URL) // Copy as URL
             }
         case .file(let fileURL):
-            pasteboard.writeFileContents(fileURL.relativePath)
-            //pasteboard.declareTypes([.fileURL, .fileContents], owner: nil) // Prepare clipboard for file
-            //pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Put file URL into clipboard
-            //let _ = try? pasteboard.setData(Data(contentsOf: fileURL), forType: .fileContents) // Put file contents into clipboard
+            pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Copy as file URL e.g. for pasting in Finder or an image into an image editing app
         }
     }
 }

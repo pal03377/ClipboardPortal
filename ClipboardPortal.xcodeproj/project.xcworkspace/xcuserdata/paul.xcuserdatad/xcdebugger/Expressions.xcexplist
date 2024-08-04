@@ -28,7 +28,7 @@
          contextName = "ClipboardContent.copyToClipboard():ClipboardManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "fileURL.pathExtension">
+               value = "pasteboard.pasteboardItems">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

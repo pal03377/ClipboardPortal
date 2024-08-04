@@ -3,12 +3,6 @@ import UserNotifications
 // Third-party
 import KeyboardShortcuts
 
-// TODO:
-// - Remove ClipboardContent and Clipboard history and only show last entry
-// - Rewrite server in Python? Swift takes forever to compile. Change architecture to store files instead of DB entries (so that image sending becomes much easier later)
-// - Send images and files
-
-
 
 // Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
 // - APNs was very hard to debug locally with a sandbox
