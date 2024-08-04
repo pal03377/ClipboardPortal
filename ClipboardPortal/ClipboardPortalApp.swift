@@ -3,20 +3,18 @@ import UserNotifications
 // Third-party
 import KeyboardShortcuts
 
-
-// Reasons to fetch every Xs instead of using the Apple Notification Service APNs:
+// Reasons to use a websocket connection instead of using the Apple Notification Service APNs:
 // - APNs was very hard to debug locally with a sandbox
 // - The notifications were really unreliable, even with highest priority.
 // - Notifications can still be prevented from being delivered because of energy consumption considerations and because of some screen recording software or so (AltTab, Rewind, ...)
-// APNs has a content size limit of around 1000 characters, which is way too low for general clipboard contents
+// - APNs has a content size limit of around 1000 characters, which is way too low for general clipboard contents
+// - Fetching every X seconds was less satisfying. WebSockets are so fast!
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var clipboardManager = ClipboardManager()
-    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Handle global shortcut for pasting
-        KeyboardShortcuts.onKeyDown(for: .sendToFriend) { [self] in
-            Task { await clipboardManager.sendClipboardContent() } // Paste clipboard contents
+        KeyboardShortcuts.onKeyDown(for: .sendToFriend) {
+            Task { await ClipboardManager.shared.sendClipboardContent() } // Paste clipboard contents
         }
     }
 
@@ -49,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         default: .text(content)
                         }
                         guard let clipboardContent else { return }
-                        await clipboardManager.sendClipboardContent(clipboardContent)
+                        await ClipboardManager.shared.sendClipboardContent(clipboardContent)
                         print("Sent clipboard contents!")
                     }
                 } else {
@@ -60,28 +58,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+// Global variables for the app
 class AppGlobals: ObservableObject {
+    static let shared = AppGlobals()
+    
     @Published var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
 }
 
 @main
 struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject var appGlobals = AppGlobals()
-    @StateObject var userStore = UserStore()
-    @StateObject var settingsStore = SettingsStore.shared
+    @StateObject var appGlobals = AppGlobals.shared // Observe changes to change behavior in SwiftUI (enable / disable paste dynamically)
     private var updateTimer: Timer?
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appGlobals)
-                .environmentObject(userStore)
-                .environmentObject(settingsStore)
-                .environmentObject(appDelegate.clipboardManager)
                 .frame(minWidth: 400) // Min window width to now squeeze text
-                .task { await userStore.load() } // Load user data
-                .task { await settingsStore.load() } // Load settings
+                .frame(width: 400) // Default width as small as possible
+                .task { await UserStore.shared.load() } // Load user data
+                .task { await SettingsStore.shared.load() } // Load settings
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
@@ -90,9 +86,7 @@ struct ClipboardPortalApp: App {
             if !appGlobals.pasteShortcutDisabledTemporarily {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
-                        Task {
-                            await appDelegate.clipboardManager.sendClipboardContent()
-                        }
+                        Task { await ClipboardManager.shared.sendClipboardContent() }
                     } label: { Text("Paste") }
                         .keyboardShortcut("v", modifiers: [.command])
                 }
@@ -100,8 +94,8 @@ struct ClipboardPortalApp: App {
             CommandGroup(after: .newItem) {
                 Button {
                     Task {
-                        await userStore.delete()
-                        await userStore.load() // Reload user data
+                        await UserStore.shared.delete()
+                        await UserStore.shared.load() // Reload user data
                     }
                 } label: { Text("Reset user") }
             }

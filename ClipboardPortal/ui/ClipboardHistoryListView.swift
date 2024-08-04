@@ -18,7 +18,6 @@ struct ClipboardHistoryListView: View {
 struct ClipboardHistoryListEntryView: View {
     var entry: ClipboardHistoryEntry
     var onSend: () -> Void
-    @EnvironmentObject var settingsStore: SettingsStore // Store for quickly setting the friend ID when receiving it
     @State var showingActions = false
     @State var isSetFriendCodePopupOpen = false
 
@@ -29,13 +28,13 @@ struct ClipboardHistoryListEntryView: View {
                 .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
-            if case let ClipboardContent.text(textContent) = entry.content, settingsStore.settingsData.receiverId == textContent, entry.received {
+            if case let ClipboardContent.text(textContent) = entry.content, SettingsStore.shared.settingsData.receiverId == textContent, entry.received {
                 Image(systemName: "person.fill.checkmark")
                     .help("This is your friend's ID.")
             }
             else if case let ClipboardContent.text(textContent) = entry.content, looksLikeUserId(textContent), entry.received {
                 Button("Set friend ID") {
-                    settingsStore.settingsData.receiverId = textContent
+                    SettingsStore.shared.settingsData.receiverId = textContent
                 }
                 Button { isSetFriendCodePopupOpen = true } label: {
                     Image(systemName: "questionmark.circle")
@@ -78,7 +77,6 @@ struct ClipboardHistoryListEntryView: View {
         ClipboardHistoryEntry(content: .text("12345678"), received: true),
         ClipboardHistoryEntry(content: .text("87654321"), received: true),
     ]
-    @State var settingsStore = SettingsStore.shared
     return VStack {
         Button("Add") {
             history.append(ClipboardHistoryEntry(content: .text("Some copied text \(history.count + 1)"), received: Bool.random()))
@@ -86,9 +84,8 @@ struct ClipboardHistoryListEntryView: View {
         ClipboardHistoryListView(history: history) { _ in }
             .frame(maxWidth: 300)
             .padding()
-            .environmentObject(settingsStore)
             .onAppear {
-                settingsStore.settingsData.receiverId = "87654321"
+                SettingsStore.shared.settingsData.receiverId = "87654321"
             }
     }
 }

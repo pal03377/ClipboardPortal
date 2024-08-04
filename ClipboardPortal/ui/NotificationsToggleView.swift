@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 struct NotificationsToggleView: View {
-    @EnvironmentObject var settingsStore: SettingsStore
+    @StateObject var settingsStore = SettingsStore.shared // Observe settings changes for notification toggle setting
     @State private var isNotificationsAllowed: Bool = false
 
     var body: some View {

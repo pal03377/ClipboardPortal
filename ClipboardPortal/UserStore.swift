@@ -2,6 +2,8 @@ import SwiftUI
 
 // Create user on server, update the APN token and store it locally
 class UserStore: ObservableObject {
+    static let shared = UserStore()
+    
     @Published var user: User? = nil
     @Published var userLoadErrorMessage: String? = nil
 

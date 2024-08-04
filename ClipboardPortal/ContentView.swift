@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var userStore: UserStore
-    @EnvironmentObject private var settingsStore: SettingsStore
-    @EnvironmentObject private var clipboardManager: ClipboardManager
+    @StateObject private var userStore = UserStore.shared // Observe user store
+    @StateObject private var settingsStore = SettingsStore.shared // Observe settings store
+    @StateObject private var clipboardManager = ClipboardManager.shared // Observe changes to clipboard sending / receiving
     @State var isSettingsOpen = false
     let updateTimer = Timer.publish(every: 4, tolerance: 2, on: .main, in: .common).autoconnect() // Timer to fetch new clipboard contents every Xs
 
@@ -47,28 +47,12 @@ struct ContentView: View {
             .background(Color.gray.opacity(0.1))
             .clipShape(.rect(topLeadingRadius: 4))
         }
-        .task(id: clipboardManager.clipboardHistory) {
-            if clipboardManager.lastReceivedContent != nil {
-                Task {
-                    await userStore.updateLastReceivedDate(Date())
-                }
-            }
-        }
-        .task(id: settingsStore.settingsData.receiverId) {
-            // Update clipboardManager so that the ClipboardPortalApp does not need to know the receiver ID itself
-            self.clipboardManager.receiverId = self.settingsStore.settingsData.receiverId
-        }
         .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
-            guard let user = userStore.user else { return }
-            clipboardManager.checkForUpdates(user: user)
+            clipboardManager.checkForUpdates()
         }
     }
 }
 
 #Preview {
     return ContentView()
-        .environmentObject(AppGlobals())
-        .environmentObject(SettingsStore())
-        .environmentObject(UserStore())
-        .environmentObject(ClipboardManager())
 }

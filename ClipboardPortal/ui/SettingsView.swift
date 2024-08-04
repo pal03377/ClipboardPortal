@@ -1,9 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject private var appGlobals: AppGlobals
-    @EnvironmentObject private var settingsStore: SettingsStore
-    @EnvironmentObject private var userStore: UserStore
+    @StateObject private var settingsStore = SettingsStore.shared // Observe changes to settings
+    @StateObject private var userStore = UserStore.shared // Observe changes to user
     @State private var isFriendsCodePopupOpen = false
     @FocusState private var receiverIdInputFocused
     
@@ -52,7 +51,7 @@ struct SettingsView: View {
                         }
                         // Disable global paste shortcut while the receiver ID TextField is shown to be able to paste the receiver ID in the TextField
                         .task(id: receiverIdInputFocused) {
-                            appGlobals.pasteShortcutDisabledTemporarily = self.receiverIdInputFocused
+                            AppGlobals.shared.pasteShortcutDisabledTemporarily = self.receiverIdInputFocused
                         }
                     // Column right
                     Button { isFriendsCodePopupOpen = true } label: {
@@ -85,15 +84,10 @@ struct SettingsView: View {
 }
 
 #Preview {
-    @State var userStore = UserStore()
-    @State var settingsStore = SettingsStore.shared
     return SettingsView()
         .padding()
-        .environmentObject(AppGlobals())
-        .environmentObject(settingsStore)
-        .environmentObject(userStore)
         .onAppear {
-            userStore.user = User(id: "12345678", secret: "", lastReceiveDate: nil)
-            settingsStore.settingsData.receiverId = "87654321"
+            UserStore.shared.user = User(id: "12345678", secret: "", lastReceiveDate: nil)
+            SettingsStore.shared.settingsData.receiverId = "87654321"
         }
 }
