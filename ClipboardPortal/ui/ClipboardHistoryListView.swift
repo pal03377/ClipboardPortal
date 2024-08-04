@@ -28,7 +28,8 @@ struct ClipboardHistoryListEntryView: View {
             Text("\(entry.content)")
                 .lineLimit(4)
                 .truncationMode(.tail)
-            if entry.received && settingsStore.settingsData.receiverId == "\(entry.content)" {
+                .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
+            if case let ClipboardContent.text(textContent) = entry.content, settingsStore.settingsData.receiverId == textContent, entry.received {
                 Image(systemName: "person.fill.checkmark")
                     .help("This is your friend's ID.")
             }
@@ -45,8 +46,8 @@ struct ClipboardHistoryListEntryView: View {
                         .padding()
                 }
             }
+            // Actions on hover
             HStack {
-                Spacer()
                 Button {} label: { Image(systemName: "doc.on.doc") }
                     .copyContent(entry.content)
                     .buttonStyle(PlainButtonStyle())
@@ -72,6 +73,7 @@ struct ClipboardHistoryListEntryView: View {
     @State var history = [
         ClipboardHistoryEntry(content: .text("Some copied text 1"), received: false),
         ClipboardHistoryEntry(content: .text("Some copied text 2"), received: false),
+        ClipboardHistoryEntry(content: .text("This is a pretty long text that will break Lorem ipsum dolor sit amet"), received: false),
         ClipboardHistoryEntry(content: .text("The next one looks like a user ID"), received: true),
         ClipboardHistoryEntry(content: .text("12345678"), received: true),
         ClipboardHistoryEntry(content: .text("87654321"), received: true),
@@ -82,6 +84,7 @@ struct ClipboardHistoryListEntryView: View {
             history.append(ClipboardHistoryEntry(content: .text("Some copied text \(history.count + 1)"), received: Bool.random()))
         }.padding()
         ClipboardHistoryListView(history: history) { _ in }
+            .frame(maxWidth: 300)
             .padding()
             .environmentObject(settingsStore)
             .onAppear {
