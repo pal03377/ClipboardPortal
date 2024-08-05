@@ -20,7 +20,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     // Data representation for sending to the server
     var data: Data? {
         switch self {
-        case .text(let text): return (textPrefix + text).data(using: .utf8) // Encode with text prefix for detection, e.g. "text: This is the content"
+        case .text(let text): return text.data(using: .utf8)
         case .file(let url):  return try? Data(contentsOf: url)
         }
     }
@@ -52,6 +52,36 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     }
 }
 
+// Clipboard content metadata for sending
+struct ClipboardContentSendMetadata: Codable {
+    let senderId: String // ID of sending user e.g. "12345678"
+    enum ClipboardContentType: String, Codable {
+        case text = "text"
+        case file = "file"
+        static func fromClipboardContent(_ content: ClipboardContent) -> Self {
+            switch content {
+            case .text: .text
+            case .file: .file
+            }
+        }
+    }
+    let type: ClipboardContentType // Type of content
+    let filename: String? // Filename for files or nil
+    
+    static func fromClipboardContent(_ content: ClipboardContent) -> Self {
+        let filename: String? = switch content { // Filename for sending
+        case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
+        case .text: nil
+        }
+        return Self(senderId: UserStore.shared.user!.id, type: .fromClipboardContent(content), filename: filename)
+    }
+}
+// Clipboard content metadata for receiving
+struct ClipboardContentReceiveMetadata: Codable {
+    let sendMetadata: ClipboardContentSendMetadata // Metadata from the sender
+    let senderPublicKeyBase64: String // Base64 of the sender's public key to save one request to get it
+}
+
 // History entry to show in the UI
 struct ClipboardHistoryEntry: Hashable {
     var receiveDate: Date = Date() // For unique IDs in UI list
@@ -73,11 +103,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
 
     // ### Send ###
     /// Send specific clipboard content to the friend. Used with a parameter to enable re-sending clipboard contents from the history.
-    struct ClipboardSendRequest: Encodable { var receiverId: String } // POST body for send request. Content is sent as file next to this request data.
     struct ClipboardSendResponse: Decodable {} // Empty response from the server on send success
     func sendClipboardContent(_ content: ClipboardContent) async { // data -> to send, textForm -> to display in history
         print("Sending \(content)")
-        guard SettingsStore.shared.settingsData.receiverId != "" else {
+        let receiverId = SettingsStore.shared.settingsData.receiverId
+        guard receiverId != "" else {
             DispatchQueue.main.async { self.sendErrorMessage = "No receiver configured. Go to settings." } // Show error if there is no receiver yet. Update UI in main thread.
             return
         }
@@ -85,24 +115,38 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             DispatchQueue.main.async { self.sendErrorMessage = "Could not read data from clipboard." } // Show error if reading data from clipboard failed, e.g. because of missing file. Update UI in main thread.
             return
         }
+        guard let friend = try? await UserStore.shared.getFriend(userId: receiverId) else {
+            DispatchQueue.main.async { self.sendErrorMessage = "Could not find friend. Is the user ID in the settings correct?" } // Show error if friend does not exist, e.g. if the user ID is wrong and therefore the public key was not found
+            return
+        }
+        // Encode clipboard metadata for sending
+        let meta = ClipboardContentSendMetadata.fromClipboardContent(content)
+        guard let metaJson = try? JSONEncoder().encode(meta) else {
+            DispatchQueue.main.async { self.sendErrorMessage = "Could not encode metadata for sending." } // Show error. Update UI in main thread.
+            return
+        }
+        // Show sending status in UI
         DispatchQueue.main.async { self.sending = true; self.sendErrorMessage = nil } // Show loading spinner in UI. Update UI in main thread.
         defer { DispatchQueue.main.async { self.sending = false } } // Hide loading spinner when done. Update UI in main thread.
-        let sendUrl = serverUrl.appendingPathComponent("send") // Send URL for clipboard content, e.g. https://clipboardportal.pschwind.de/send
-        let filename = switch content { // Filename for sending
-        case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
-        case .text(_): "text.txt" // Default filename because it does not matter
+        // Encrypt data
+        guard let encryptedData = try? encrypt(data: data, friendPublicKey: friend.publicKey) else {
+            DispatchQueue.main.async { self.sendErrorMessage = "Clipboard contents could not be encrypted." } // Show error if encrypting fails
+            return
         }
         // Send data to server
+        let sendUrl = serverUrl.appendingPathComponent("send").appendingPathComponent(receiverId) // Send URL for clipboard content, e.g. https://clipboardportal.pschwind.de/send/87654321
         var request = URLRequest(url: sendUrl); request.httpMethod = "POST" // Create POST request
         let boundary = UUID().uuidString; request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type") // Create boundary for file upload
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"receiverId\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(SettingsStore.shared.settingsData.receiverId)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"meta\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
+        body.append(metaJson) // Send metadata JSON string
+        body.append("\r\n".data(using: .utf8)!)
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!)\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: text/plain\r\n\r\n".data(using: .utf8)!)
-        body.append(data)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"content\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+        body.append(encryptedData)
         body.append("\r\n".data(using: .utf8)!)
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body // Set request body to file upload
@@ -111,7 +155,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             let httpResponse = response as! HTTPURLResponse
             print("Status Code: \(httpResponse.statusCode)")
             if httpResponse.statusCode != 200 {
-                DispatchQueue.main.async { self.sendErrorMessage = (ServerRequestError(rawValue: httpResponse.statusCode) ?? .unknown).localizedDescription }
+                DispatchQueue.main.async { self.sendErrorMessage = (ServerRequestError.fromStatusCode(httpResponse.statusCode)).localizedDescription }
             }
             let responseString = String(data: data, encoding: .utf8)!
             print("Response: \(responseString)")
@@ -140,7 +184,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     
     // ### Receive ###
     /// Start websocket connection to server to get updates for new clipboard contents
-    func checkForUpdates() {
+    func connectForUpdates() {
         guard let _ = UserStore.shared.user else { return } // Only start connections when a user exists because before that it won't work
         DispatchQueue.main.async { self.connecting = true; self.receiveErrorMessage = nil } // Reset last receive error message and mark as connecting
         var request = URLRequest(url: wsServerUrl)
@@ -149,18 +193,20 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         socket.delegate = self
         socket.connect()
     }
-    private func retryCheckForUpdateAfterDelay() {
+    private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
-            self.checkForUpdates()
+            self.connectForUpdates()
         }
     }
-    private struct UserAuthenticateDTO: Encodable { // Authentication structure to auth against websocket endpoint
+    private struct UserAuthenticateDTO: Encodable { // Authentication structure to auth against websocket endpoint TODO: Secret is not gone!
         var id: String
-        var secret: String
-        var date: String
     }
-    // Event listener callback for all WebSocket events
-    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
+    // Receive WebSocket events
+    struct WebsocketServerMessage: Codable {
+        var event: String // Event type, e.g. "new" or "forbidden"
+        var meta: ClipboardContentSendMetadata? // Clipboard content metadata or None
+    }
+    func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) { // Event listener callback for all WebSocket events
         DispatchQueue.main.async { self.connecting = false } // Not connecting any more when event was received. Update in UI thread.
         switch event {
         case .connected(let headers): // Connection established
@@ -169,10 +215,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             // Send authentication to receive events for new clipboard contents
             guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to authenticate
             do {
-                try client.write(string: String(data: JSONEncoder().encode(UserAuthenticateDTO(id: user.id, secret: user.secret, date: (user.lastReceiveDate ?? Date.distantPast).ISO8601Format())), encoding: .utf8)!) // Send initial authentication message to server
-            } catch { // Error while sending authentication message?
-                DispatchQueue.main.async { self.receiveErrorMessage = "Could not authenticate"; self.connected = false } // Update connection status. Update in UI thread.
-                self.retryCheckForUpdateAfterDelay() // Retry later
+                // TODO: Make user sign a challenge to authenticate or something?
+                try client.write(string: String(data: JSONEncoder().encode(UserAuthenticateDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server
+            } catch { // Error while sending greeting message?
+                DispatchQueue.main.async { self.receiveErrorMessage = "User does not exist"; self.connected = false } // Update connection status. Update in UI thread.
+                self.retryConnectForUpdatesAfterDelay() // Retry later
             }
         case .disconnected(let reason, let code): // Disconnected
             print("Websocket is disconnected: \(reason) with code: \(code)")
@@ -180,16 +227,24 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 self.receiveErrorMessage = self.receiveErrorMessage ?? "Disconnected from the server" // Keep current error message or just say "Disconnected" if no detail is known
                 self.connected = false
             }
-            self.retryCheckForUpdateAfterDelay() // Retry later
+            self.retryConnectForUpdatesAfterDelay() // Retry later
         case .text(let message): // Received text event from server
             print("Received message: \(message)")
-            if message == "new" { // Event "New clipboard contents available"
-                Task { await self.downloadAndReceiveClipboardContent() } // Download the new received clipboard content from server
-            } else if message == "forbidden" { // Event "Authentication failed"
-                DispatchQueue.main.async { self.receiveErrorMessage = "Could not authenticate with server. Use File > Reset User to fix this." } // Show message to resolve error. Update in UI thread.
-            } else { // Unknown server event
+            guard let messageData = message.data(using: .utf8), let serverMessage = try? JSONDecoder().decode(WebsocketServerMessage.self, from: messageData) else {
                 print("Unknown text from server")
-                DispatchQueue.main.async { self.receiveErrorMessage = "Server sent unknown event: \(message)" } // Show error. Update in UI thread.
+                DispatchQueue.main.async { self.receiveErrorMessage = "Server sent unknown event: \(message) Please update the app." } // Show error. Update in UI thread.
+                return
+            }
+            switch serverMessage.event {
+            case "new": // Event "New clipboard contents available"
+                Task { await self.downloadAndReceiveClipboardContent(serverMessage: serverMessage) } // Download the new received clipboard content from server
+                break
+            case "forbidden": // Event "Authentication failed"
+                DispatchQueue.main.async { self.receiveErrorMessage = "Could not authenticate with server. Use File > Reset User to fix this." } // Show message to resolve error. Update in UI thread.
+                break
+            default:
+                print("Unknown event from server: \(serverMessage.event)")
+                DispatchQueue.main.async { self.receiveErrorMessage = "Server sent unknown event: \(serverMessage.event). Please update the app." } // Show error. Update in UI thread.
             }
         case .binary:
             print("Unsupported binary data from server")
@@ -200,32 +255,41 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             DispatchQueue.main.async { self.connected = connected } // Show new connection status in status view on the bottom right
             break
         case .reconnectSuggested: // Connection should be restarted?
-            self.retryCheckForUpdateAfterDelay() // Restart connection after delay
+            self.retryConnectForUpdatesAfterDelay() // Restart connection after delay
             break
         case .cancelled: // Connection cancelled
             DispatchQueue.main.async { self.connected = false } // Update connection status
-            self.retryCheckForUpdateAfterDelay() // Retry after delay
+            self.retryConnectForUpdatesAfterDelay() // Retry after delay
         case .error(let error): // Connection error?
             DispatchQueue.main.async { // Show connection error. Update in UI thread.
-                if let error, case HTTPUpgradeError.notAnUpgrade(let code, _) = error, let serverRequestErr = ServerRequestError(rawValue: code) { // Detected server error? e.g. 502
+                if let error, case HTTPUpgradeError.notAnUpgrade(let code, _) = error { // Detected server error? e.g. 502
+                    let serverRequestErr = ServerRequestError.fromStatusCode(code)
                     self.receiveErrorMessage = serverRequestErr.localizedDescription // Show user-friendly server error message
                 } else {
                     self.receiveErrorMessage = error?.localizedDescription
                 }
                 self.connected = false
             }
-            self.retryCheckForUpdateAfterDelay() // Retry after delay
+            self.retryConnectForUpdatesAfterDelay() // Retry after delay
         case .peerClosed: // Server closed connection? e.g. server is restarting
             DispatchQueue.main.async { self.connected = false } // Update connection status
-            self.retryCheckForUpdateAfterDelay() // Retry after delay
+            self.retryConnectForUpdatesAfterDelay() // Retry after delay
         }
     }
     
     /// Download the current clipboard content from server (and paste to text clipboard or save in Downloads)
-    func downloadAndReceiveClipboardContent() async {
-        guard let user = UserStore.shared.user else { fatalError("Missing user on ClipboardManager") }
+    func downloadAndReceiveClipboardContent(serverMessage: WebsocketServerMessage) async {
+        guard let user = UserStore.shared.user else {
+            DispatchQueue.main.async { self.receiveErrorMessage = "No user found when downloading clipboard content" } // Update UI in main thread
+            return
+        }
         DispatchQueue.main.async { self.receiveErrorMessage = nil } // Reset last receive error message
-        let contentUrl = serverUrl.appendingPathComponent("\(user.id)_\(user.secret)") // Download URL for clipboard content, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7
+        guard let senderId = serverMessage.meta?.senderId, let friend = try? await UserStore.shared.getFriend(userId: senderId) else {
+            DispatchQueue.main.async { self.sendErrorMessage = "Could not find the person that sent the clipboard contents." } // Show error if friend does not exist
+            // TODO: Don't just blindly add friends but ask the user instead!
+            return
+        }
+        let contentUrl = serverUrl.appendingPathComponent(user.id) // Download URL for clipboard content, e.g. https://clipboardportal.pschwind.de/12345678
         let downloadTask = URLSession.shared.downloadTask(with: contentUrl) { (location, response, error) in // Download clipboard content
             guard let location = location, error == nil else {
                 print("Download error: \(String(describing: error))")
@@ -233,54 +297,34 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 return
             }
             do {
-                let data = try Data(contentsOf: location)
+                let encryptedData = try Data(contentsOf: location)
+                let data = try decrypt(encryptedData: encryptedData, friendPublicKey: friend.publicKey) // Decrypt encrypted clipboard contents
                 // Check if the file is a text or a file
-                if let content = String(data: data, encoding: .utf8), content.hasPrefix(textPrefix) { // Text clipboard contents?
-                    print("Got text \(content)")
-                    Task { await self.onReceivedClipboardContent(.text(String(content.trimmingPrefix(textPrefix)))) }
-                } else { // File clipboard contents?
-                    print("Received file. Downloading...")
-                    // Move file to another temp file because otherwise the temp file might be deleted too quickly
-                    let tempLocation = try self.moveToDownloadsFolder(fileURL: location, preferredFilename: "clipboard-portal.temp")
-                    // Get real filename from server and rename file
-                    Task {
-                        let filenameUrl = contentUrl.appendingPathExtension("filename") // Download URL for filename, e.g. https://clipboardportal.pschwind.de/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7.filename
-                        do {
-                            let filename: String = try! await ServerRequest.get(url: filenameUrl) // Download filename from server e.g. "myfile.txt"
-                            let downloadFolderFileURL = try self.moveToDownloadsFolder(fileURL: tempLocation, preferredFilename: filename)
-                            print("Downloaded file.")
-                            // Copy the file to the clipboard, update the history and send a notification
-                            await self.onReceivedClipboardContent(.file(downloadFolderFileURL))
-                        } catch {
-                            print(error)
-                            DispatchQueue.main.async { self.receiveErrorMessage = "Saving download failed: " + error.localizedDescription }
-                        }
+                if serverMessage.meta?.type == .text, let text = String(data: data, encoding: .utf8) { // Text clipboard contents?
+                    print("Got text \(text)")
+                    Task { await self.onReceivedClipboardContent(.text(text)) }
+                } else if serverMessage.meta?.type == .file { // File clipboard contents?
+                    print("Got file \(location)")
+                    try data.write(to: location) // Write decrypted contents into file
+                    do {
+                        // Move the temporary file into the Downloads folder
+                        let downloadFolderFileURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: serverMessage.meta!.filename!)
+                        // Copy the file to the clipboard, update the history and send a notification
+                        Task { await self.onReceivedClipboardContent(.file(downloadFolderFileURL)) }
+                    } catch {
+                        print(error)
+                        DispatchQueue.main.async { self.receiveErrorMessage = "Saving download failed: " + error.localizedDescription }
                     }
+                } else {
+                    print("Unexpected server message meta type")
+                    DispatchQueue.main.async { self.receiveErrorMessage = "Unexpected server message meta type. Please update the app." }
                 }
             } catch {
-                print("File handling error: \(error)")
-                Task { self.receiveErrorMessage = error.localizedDescription }
+                print("File handling or decryption error: \(error)")
+                DispatchQueue.main.async { self.receiveErrorMessage = error.localizedDescription }
             }
         }
         downloadTask.resume()
-    }
-    // Helper function to move a file to the user's Downloads directory without overwriting a file. Returns URL to new path.
-    // Might change the filename to make it unique.
-    private func moveToDownloadsFolder(fileURL: URL, preferredFilename: String) throws -> URL {
-        // Choose destination that does not exist
-        let downloadsDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-        let destinationURL = downloadsDirectory.appendingPathComponent(preferredFilename)
-        var counter = 1
-        var uniqueDestinationURL = destinationURL // URL to unique destination path e.g. "myfile-2.txt" or "myfile-3.txt"
-        while FileManager.default.fileExists(atPath: uniqueDestinationURL.path) { // Make filename unique e.g. "myfile.txt" -> "myfile-2.txt" or "myfile-3.txt"
-            counter += 1
-            uniqueDestinationURL = destinationURL.deletingLastPathComponent().appendingPathComponent("\(destinationURL.deletingPathExtension().lastPathComponent)-\(counter).\(destinationURL.pathExtension)")
-        }
-        // Save the file to the Downloads folder
-        do {
-            try FileManager.default.moveItem(at: fileURL, to: uniqueDestinationURL)
-        } catch { return fileURL } // Keep original (maybe temp) file URL when file moving fails
-        return uniqueDestinationURL
     }
     
     /// Handle received and downloaded clipboard content (sound effect, notification, UI updates, ...)
@@ -291,7 +335,6 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         content.copyToClipboard()
         // Add to history
         DispatchQueue.main.async { self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: true)) } // Update clipboard history. Update UI in main thread.
-        Task { await UserStore.shared.updateLastReceivedDate(Date()) } // Update last received date to avoid getting the same clipboard content twice
         // Show notification
         await showClipboardContentNotification(content)
         // Open URLs in browser

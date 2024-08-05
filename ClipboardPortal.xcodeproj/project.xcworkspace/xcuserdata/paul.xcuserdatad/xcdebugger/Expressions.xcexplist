@@ -3,10 +3,10 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #2 in NotificationsToggle.body.getter:NotificationsToggle.swift">
+         contextName = "getPrivateKey():Crypto.swift">
          <PersistentStrings>
             <PersistentString
-               value = "settingsStore.settingsData.notificationsEnabled">
+               value = "SecItemAdd(saveQuery as CFDictionary, nil)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -37,6 +37,14 @@
          <PersistentStrings>
             <PersistentString
                value = "Bundle.main.object(forInfoDictionaryKey: &quot;ServerURL&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in NotificationsToggle.body.getter:NotificationsToggle.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "settingsStore.settingsData.notificationsEnabled">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

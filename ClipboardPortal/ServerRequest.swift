@@ -1,34 +1,43 @@
 import Foundation
 
-enum ServerRequestError: Int, Error {
-    case networkError = 0
-    case badRequest = 400
-    case forbidden = 403
-    case notFound = 404
-    case payloadTooLarge = 413
-    case serverError = 500
-    case serverDown = 502
-    case unknown = -1
+enum ServerRequestError: Error {
+    case networkError
+    case badRequest
+    case forbidden
+    case notFound
+    case payloadTooLarge
+    case unprocessableEntity
+    case serverError
+    case serverDown
+    case unknown
+    case brokenJsonResponse(detail: String)
+    
+    static func fromStatusCode(_ status: Int) -> Self {
+        switch status {
+        case 400: .badRequest
+        case 403: .forbidden
+        case 404: .notFound
+        case 413: .payloadTooLarge
+        case 422: .unprocessableEntity
+        case 500: .serverError
+        case 502: .serverDown
+        default: .unknown
+        }
+    }
 }
 extension ServerRequestError: LocalizedError { // Nice error messages
     public var errorDescription: String? {
         switch self {
-        case .networkError:
-            return "A network error occurred. Please check your connection and try again."
-        case .badRequest:
-            return "Bad request. Please check the request and try again."
-        case .forbidden:
-            return "Forbidden. You don't have permission to access this resource."
-        case .notFound:
-            return "Resource not found. Please check the URL and try again."
-        case .payloadTooLarge:
-            return "Too much data."
-        case .serverError:
-            return "A server error occurred. Please try again later."
-        case .serverDown:
-            return "The server is offline. Please try again later."
-        case .unknown:
-            return "An unknown error occurred."
+        case .networkError: return "A network error occurred. Please check your connection and try again."
+        case .badRequest: return "Bad request. Please check the request and try again."
+        case .forbidden: return "Forbidden. You don't have permission to access this resource."
+        case .notFound: return "Resource not found. Please check the URL and try again."
+        case .payloadTooLarge: return "Too much data."
+        case .unprocessableEntity: return "The app sent invalid data to the server. Please update the app."
+        case .serverError: return "A server error occurred. Please try again later."
+        case .serverDown: return "The server is offline. Please try again later."
+        case .brokenJsonResponse(let detail): return "The server response was not expected. Please update the app. (\(detail))"
+        case .unknown: return "An unknown error occurred."
         }
     }
 }
@@ -63,7 +72,7 @@ struct ServerRequest {
         guard let response = response as? HTTPURLResponse else { throw ServerRequestError.unknown }
         guard (200...299).contains(response.statusCode) else {
             // Throw if server responded with non-ok status code
-            throw ServerRequestError(rawValue: response.statusCode) ?? .unknown
+            throw ServerRequestError.fromStatusCode(response.statusCode)
         }
         if T.self == String.self { // String wanted?
             if let stringValue = String(data: responseData, encoding: .utf8) { // Decode as string
@@ -72,7 +81,19 @@ struct ServerRequest {
                 throw ServerRequestError.unknown // Throw
             }
         } else { // Some other data structure?
-            return try JSONDecoder().decode(T.self, from: responseData) // Decode with JSON
+            do {
+                return try JSONDecoder().decode(T.self, from: responseData) // Decode with JSON
+            } catch let DecodingError.dataCorrupted(context) {
+                throw ServerRequestError.brokenJsonResponse(detail: "Corrupted JSON: \(context.debugDescription)")
+            } catch let DecodingError.keyNotFound(key, context) {
+                throw ServerRequestError.brokenJsonResponse(detail: "Key '\(key)' not found: \(context.debugDescription) (codingPath: \(context.codingPath)")
+            } catch let DecodingError.valueNotFound(value, context) {
+                throw ServerRequestError.brokenJsonResponse(detail: "Value '\(value)' not found: \(context.debugDescription) (codingPath: \(context.codingPath)")
+            } catch let DecodingError.typeMismatch(type, context)  {
+                throw ServerRequestError.brokenJsonResponse(detail: "Type '\(type)' mismatch: \(context.debugDescription) (codingPath: \(context.codingPath)")
+            } catch {
+                throw error
+            }
         }
     }
 }

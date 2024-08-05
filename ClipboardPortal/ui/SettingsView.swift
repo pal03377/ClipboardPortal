@@ -87,7 +87,7 @@ struct SettingsView: View {
     return SettingsView()
         .padding()
         .onAppear {
-            UserStore.shared.user = User(id: "12345678", secret: "", lastReceiveDate: nil)
+            UserStore.shared.user = User(id: "12345678")
             SettingsStore.shared.settingsData.receiverId = "87654321"
         }
 }

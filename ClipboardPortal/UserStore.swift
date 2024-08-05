@@ -2,13 +2,39 @@ import Foundation
 import SwiftUI
 
 // User model
-struct User: Codable, Equatable {
+struct User: Codable {
     var id: String // User ID to choose who to send clipboard contents to. 8 digits. e.g. "12345678"
-    var secret: String // Secret to allow fetching the last clipboard content. Using the ID would be insecure because the ID is public. e.g. "1a2b3c..."
-    var lastReceiveDate: Date? // Last clipboard content received date
+    var friends: [Friend] = [] // Friends that are allowed to send the user clipboard their clipboard
 }
 
-// Create user on server, update the APN token and store it locally
+// Friend model
+struct Friend {
+    var id: String // User ID for clipboard contents to. 8 digits. e.g. "12345678"
+    var publicKey: PublicKey // Public key of the friend for encryption
+}
+// Codable friend for saving friends
+extension Friend: Codable {
+    // Make friend decodable
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        let rawRepresentation = try container.decode(Data.self, forKey: .publicKey)
+        publicKey = try PublicKey(rawRepresentation: rawRepresentation)
+    }
+    // Make friend encodable
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(publicKey.rawRepresentation, forKey: .publicKey)
+    }
+    // Keys for codable
+    enum CodingKeys: String, CodingKey {
+        case id
+        case publicKey
+    }
+}
+
+// Store own user
 class UserStore: ObservableObject {
     static let shared = UserStore()
     
@@ -92,24 +118,31 @@ class UserStore: ObservableObject {
         }
     }
     
-    // Update local storage for last received clipboard contents to not re-fetch when restarting the app
-    func updateLastReceivedDate(_ date: Date) async {
-        guard let _ = self.user else { return; }
-        DispatchQueue.main.async { // Update UI in main thread
-            self.user!.lastReceiveDate = date
-            Task { await self.save(user: self.user!) }
+    // Get a friend by their user ID. Fetches the friend's public key if it is not stored locally yet.
+    func getFriend(userId: String) async throws -> Friend { // userID e.g. "12345678"
+        if let friend = self.user?.friends.first(where: { $0.id == userId }) { // Friend already exists locally?
+            return friend // Return existing friend
         }
+        // Fetch friend's public key for storage
+        let friendPublicKeyBase64: String = try await ServerRequest.get(url: serverUrl.appendingPathComponent(userId).appendingPathExtension("publickey")) // Fetch friend's public key base64 from the server, e.g. https://clipboardportal.pschwind.de/12345678.pub
+        let friend = try Friend(id: userId, publicKey: .fromBase64(friendPublicKeyBase64))
+        DispatchQueue.main.async { self.user!.friends.append(friend) }
+        await self.save(user: self.user!)
+        return friend
     }
     
     // Helper function to create a new user on the server if no user is stored
-    struct UserCreateDTO: Codable {}
-    private func createUserOnServer() async throws -> User {
-        try await ServerRequest.post(url: serverUrl.appendingPathComponent("/users"), body: UserCreateDTO()) // Send create request to server and get back User
+    struct UserCreateRequest: Codable {
+        var publicKeyBase64: String
     }
-    
-    // Update the APN push notification token on the server if it changed
-    struct UserUpdateDTO: Codable {
+    struct UserCreateResponse: Codable {
         var id: String
-        var secret: String
+    }
+    private func createUserOnServer() async throws -> User {
+        let userCreateRequest = UserCreateRequest(
+            publicKeyBase64: try getPublicKey().rawRepresentation.base64EncodedString()
+        )
+        let resp: UserCreateResponse = try await ServerRequest.post(url: serverUrl.appendingPathComponent("/users"), body: userCreateRequest) // Send create request to server and get back User
+        return User(id: resp.id)
     }
 }

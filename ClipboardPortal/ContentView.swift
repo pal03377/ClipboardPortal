@@ -48,7 +48,7 @@ struct ContentView: View {
             .clipShape(.rect(topLeadingRadius: 4))
         }
         .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
-            clipboardManager.checkForUpdates()
+            clipboardManager.connectForUpdates()
         }
     }
 }
