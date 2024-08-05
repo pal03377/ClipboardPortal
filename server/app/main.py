@@ -1,9 +1,8 @@
 from fastapi import FastAPI, Form, UploadFile, File, HTTPException, WebSocket
 from starlette.websockets import WebSocketDisconnect
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from watchfiles import awatch # watchfiles for notifying client when new clipboard content is available
 
-from typing import Literal
 import logging
 import json
 import sys
@@ -62,11 +61,11 @@ def is_valid_user_id(user_id): return user_id.isdigit() and len(user_id) == 8 # 
 # Clipboard content metadata for sending
 class ClipboardContentSendMetadata(BaseModel):
     senderId: str # 8-digit user id, e.g. "12345678"
-    type: Literal["text"] | Literal["file"] # Type of content≤
-    filename: str | None = None # Filename for file content or None
+    encryptedContentMetadataBase64: str # Encrypted metadata including content type and filename to store as few unencrypted information as possible
 @app.post("/send/{receiver_id}")
 async def send_clipboard_content(receiver_id: str, meta: str = Form(...), file: UploadFile = File(...)) -> None:
-    meta = ClipboardContentSendMetadata.parse_raw(meta) # Parse metadata for clipboard content
+    try: meta = ClipboardContentSendMetadata.parse_raw(meta) # Parse metadata for clipboard content
+    except ValidationError: raise HTTPException(status_code=422, detail="Invalid metadata")
     if not is_valid_user_id(receiver_id): raise HTTPException(status_code=404, detail="User not found")
     user_data_file = get_user_data_file(receiver_id) # Get file path for user data, e.g. "./data/12345678" or None (user does not exist)
     if user_data_file is None: raise HTTPException(status_code=404, detail="User not found")
