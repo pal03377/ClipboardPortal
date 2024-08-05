@@ -94,13 +94,13 @@ async def detect_clipboard_content(websocket: WebSocket):
     except WebSocketDisconnect: return # No error if client disconnects before sending the initial connection message
     # TODO: Authenticate? Send "forbidden" event if user is not authenticated
     logger.info("Received connect message %s", connect_message)
-    user_data_file = get_user_data_file(connect_message["id"]) # Get file path for content  , e.g. "./data/12345678"
-    meta_data_file = user_data_file + ".meta"                  # Get file path for meta data, e.g. "./data/12345678.meta"
-    if not os.path.exists(user_data_file): # Abort if user data file does not exist (wrong user ID)
+    user_data_file = get_user_data_file(connect_message["id"]) # Get file path for content, e.g. "./data/12345678"
+    if user_data_file is None: # Abort if user data file does not exist (wrong user ID)
         logger.info("User not found %s", user_data_file)
         await websocket.send_text(json.dumps(WebsocketServerMessage(event="forbidden").dict())) # Send "forbidden" event to client
         await websocket.close() # Close WebSocket connection so that app notices error
         return
+    meta_data_file = user_data_file + ".meta"                  # Get file path for meta data, e.g. "./data/12345678.meta"
     logger.info("Authenticated! %s", connect_message["id"])
     logger.info("Waiting for changes...")
     watch_files_stop_event = asyncio.Event() # Event to stop watching files after WebSocket connection is closed
