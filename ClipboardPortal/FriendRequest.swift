@@ -8,16 +8,19 @@ class FriendRequest: ObservableObject {
     @Published var errorMessage: String? = nil
     private var callbackAfterAccepted: (() -> ())?
     
-    /// Show a friend request with a callback when accepted
-    func showRequest(userId: String, whenAccepted: @escaping () -> ()) {
-        self.requestingUserId = userId
-        self.callbackAfterAccepted = whenAccepted
-    }
-
+    // Reset everything
     public func reset() {
         self.requestingUserId = nil
         self.callbackAfterAccepted = nil
+        self.errorMessage = nil
         self.loading = false
+    }
+    
+    /// Show a friend request with a callback when accepted
+    func showRequest(userId: String, whenAccepted: @escaping () -> ()) {
+        self.reset()
+        self.requestingUserId = userId
+        self.callbackAfterAccepted = whenAccepted
     }
     
     /// Accept the current friend request
