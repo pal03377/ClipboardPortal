@@ -1,23 +1,22 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket
+from fastapi import FastAPI, Form, UploadFile, File, HTTPException, WebSocket
 from starlette.websockets import WebSocketDisconnect
 from pydantic import BaseModel
 from watchfiles import awatch # watchfiles for notifying client when new clipboard content is available
 
+from typing import Literal
 import logging
+import json
 import sys
-from uuid import uuid4
 import secrets
 import os
-import glob
-from datetime import datetime
-from urllib.parse import unquote
 import asyncio
 
-# - For each user, there is one file <user_id>_<secret>: Contains the last clipboard content received by the user (just the file or "text:<some text>" for text content)
-# - Create user: Creates empty file in ./data/<user_id>_<secret>
-# - Send clipboard content: Writes clipboard content to ./data/<user_id>_<secret> (file directly or "text:<some text>")
-# - Detect clipboard content: WebSocket endpoint that receives an initial message with {"id": "<user id>", "secret": "<user secret>", "date": "2024-01-01T00:00:00Z"} for auth and change detection and then sends an event as soon as the file date is newer until the connection is broken
+# - For each user, there is one file <user_id>: Contains the last clipboard content received by the user (just the file for files or "<some text>" for text content)
+# - Create user: Creates empty files in ./data/<user_id>, ./data/<user_id>.meta and writes public key to ./data/<user_id>.publickey for encryption
+# - Send clipboard content: Writes clipboard content to ./data/<user_id> and transmitted metadata to ./data/<user_id>.meta including the user's public key for quicker access
+# - Detect clipboard content: WebSocket endpoint that receives an initial message with {"id": "<user id>", "date": "2024-01-01T00:00:00Z"} then sends an event as soon as the file date is newer until the connection is broken
 # - Download clipboard content: Directly download the static file (does not involve the Python server)
+# - Decryption and verification of authenticity: Done on the client
 
 
 app = FastAPI()
@@ -38,70 +37,86 @@ data_dir = os.environ.get("DATA_DIR", "data")
 async def root():
     return {"message": "clipboardportal"}
 
-# Create user: POST /users -> {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7"}
+# Create user: POST /users {"publicKeyBase64": "..."} -> {"id": "12345678"}
+class UserCreateRequest(BaseModel):
+    publicKeyBase64: str # Base64 of the user's public key
 class UserCreateResponse(BaseModel):
-    id: str     # 8-digit user id, e.g. "12345678"
-    secret: str # Secret, e.g. "ab8902d2-75c1-4dec-baae-1f5ee859e0c7"
-def get_user_data_file(user_id): # Get file path for user data, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7" or None (user does not exist)
-    files = glob.glob(f"{data_dir}/{user_id}_*") # Get all files for user id, e.g. ["./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7"]
-    files = [f for f in files if not f.endswith(".filename")] # Filter out metadata files
-    if files: return files[0] # Return file for user id if it exists, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7"
-    else: return None # Return None if user does not exist
+    id: str # 8-digit user id, e.g. "12345678"
+def get_user_data_file(user_id): # Get file path for user data, e.g. "./data/12345678" or None (user does not exist)
+    user_data_file_path = os.path.join(data_dir, user_id) # Get file path for user data, e.g. "./data/12345678"
+    if not os.path.exists(user_data_file_path): return None # Return None if user does not exist
+    return user_data_file_path # Return file path for user data
 @app.post("/users")
-async def create_user() -> UserCreateResponse:
+async def create_user(create_request: UserCreateRequest) -> UserCreateResponse:
     user_id = None
     while user_id is None or get_user_data_file(user_id) is not None: # Generate new user id until it is unique
         user_id = str(secrets.choice(range(0, 99999999))).zfill(8) # Create 8-digit user id, e.g. 12345678
-    secret = str(uuid4()) # Generate secret, e.g. ab8902d2-75c1-4dec-baae-1f5ee859e0c7
-    open(f"{data_dir}/{user_id}_{secret}", "w").close() # Create empty file for user, e.g. ./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7
-    return UserCreateResponse(id=user_id, secret=secret) # Return user id and secret for the app, e.g. {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7"}
+    open(f"{data_dir}/{user_id}",      "w").close() # Create empty file for clipboard content, e.g. ./data/12345678
+    open(f"{data_dir}/{user_id}.meta", "w").close() # Init metadata file next to the content file for change detection
+    with open(f"{data_dir}/{user_id}.publickey", "w") as f: f.write(create_request.publicKeyBase64) # Save public key
+    return UserCreateResponse(id=user_id) # Return user id for the app, e.g. {"id": "12345678"}
 
 
 # Send clipboard to another user: POST /send {"receiverId": "12345678"} with file upload -> empty response
 def is_valid_user_id(user_id): return user_id.isdigit() and len(user_id) == 8 # Check if user id is valid for security, e.g. "12345678"
-@app.post("/send")
-async def send_clipboard_content(receiverId: str = Form(...), file: UploadFile = File(...)) -> None:
-    if not is_valid_user_id(receiverId): raise HTTPException(status_code=404, detail="User not found")
-    user_data_file = get_user_data_file(receiverId) # Get file path for user data, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7" or None (user does not exist)
+# Clipboard content metadata for sending
+class ClipboardContentSendMetadata(BaseModel):
+    senderId: str # 8-digit user id, e.g. "12345678"
+    type: Literal["text"] | Literal["file"] # Type of content≤
+    filename: str | None = None # Filename for file content or None
+@app.post("/send/{receiver_id}")
+async def send_clipboard_content(receiver_id: str, meta: str = Form(...), file: UploadFile = File(...)) -> None:
+    meta = ClipboardContentSendMetadata.parse_raw(meta) # Parse metadata for clipboard content
+    if not is_valid_user_id(receiver_id): raise HTTPException(status_code=404, detail="User not found")
+    user_data_file = get_user_data_file(receiver_id) # Get file path for user data, e.g. "./data/12345678" or None (user does not exist)
     if user_data_file is None: raise HTTPException(status_code=404, detail="User not found")
-    # Save filename so that the receiver can download the file with the correct name
-    logger.info("Saving filename for user %s", receiverId)
-    with open(user_data_file + ".filename", "w") as f: f.write(unquote(file.filename)) # Save filename in metadata file next to user data file. Save filename first because the send event fires on the content update after this. unquote -> Undo URL-decoding in the app (safety measurement against strange file names)
-    # Save uploaded file to ./data/<receiver_id>_*
-    logger.info("Saving file for user %s", receiverId)
+    # Save uploaded file to ./data/<receiver_id>
+    logger.info("Saving file for user %s", receiver_id)
     with open(user_data_file, "wb") as f: f.write(await file.read()) # Save uploaded file to user data file
-    os.utime(user_data_file, None) # Touch file for change detection below
+    # Save metadata for the receiver including the filename for correct filename when downloading. Save metadata last because the send event fires as soon as this file is updated.
+    logger.info("Saving metadata for user %s", receiver_id)
+    with open(user_data_file + ".meta", "w") as f: # Save metadata file next to user data file
+        json.dump(meta.dict(), f)
+    os.utime(user_data_file + ".meta", None) # Touch metadata file for change detection below
 
 
-# Detect clipboard changes for current user: WebSocket /ws {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"} -> Get message "new" when clipboard content changes
+# Detect clipboard changes for current user: WebSocket /ws {"id": "12345678"} -> Get message with ClipboardContentReceiveMetadata when clipboard content changes
+class WebsocketServerMessage(BaseModel):
+    event: str # Event type, e.g. "new" or "forbidden"
+    meta: ClipboardContentSendMetadata | None # Clipboard content metadata or None
+    publicKeyBase64: str | None # Public key (for saving a request on the client to get it) or None
 @app.websocket("/ws")
 async def detect_clipboard_content(websocket: WebSocket):
     logger.info("Waiting for WS accept...")
     await websocket.accept() # Accept WebSocket connection
     try:
-        logger.info("Waiting for auth...")
-        auth_data = await websocket.receive_json() # Receive auth data from client, e.g. {"id": "12345678", "secret": "ab8902d2-75c1-4dec-baae-1f5ee859e0c7", "date": "2024-01-01T00:00:00Z"}
-    except WebSocketDisconnect: # No error if client disconnects
-        return
-    logger.info("Received authentication %s", auth_data)
-    user_data_file = f"{data_dir}/{auth_data['id']}_{auth_data['secret']}" # Get file path for user data based on secret, e.g. "./data/12345678_ab8902d2-75c1-4dec-baae-1f5ee859e0c7"
-    if not os.path.exists(user_data_file): # Abort if user data file does not exist (wrong user ID or wrong secret)
-        logger.info("User not found or unauthorized %s", user_data_file)
-        await websocket.send_text("forbidden") # Send "unauthorized" to client
+        logger.info("Waiting for initial connect message...")
+        connect_message = await websocket.receive_json() # Receive connection message from client, e.g. {"id": "12345678"}
+    except WebSocketDisconnect: return # No error if client disconnects before sending the initial connection message
+    # TODO: Authenticate? Send "forbidden" event if user is not authenticated
+    logger.info("Received connect message %s", connect_message)
+    user_data_file = get_user_data_file(connect_message["id"]) # Get file path for content  , e.g. "./data/12345678"
+    meta_data_file = user_data_file + ".meta"                  # Get file path for meta data, e.g. "./data/12345678.meta"
+    if not os.path.exists(user_data_file): # Abort if user data file does not exist (wrong user ID)
+        logger.info("User not found %s", user_data_file)
+        await websocket.send_text(json.dumps(WebsocketServerMessage(event="forbidden").dict())) # Send "forbidden" event to client
         await websocket.close() # Close WebSocket connection so that app notices error
         return
-    logger.info("Authenticated! %s", auth_data["id"])
+    logger.info("Authenticated! %s", connect_message["id"])
     logger.info("Waiting for changes...")
     watch_files_stop_event = asyncio.Event() # Event to stop watching files after WebSocket connection is closed
     async def watch_files():
         try:
-            last_change_date = datetime.fromisoformat(auth_data["date"]) # Get last change date from client, e.g. 2024-01-01 00:00:00+00:00
-            async for _ in awatch(user_data_file, stop_event=watch_files_stop_event): # On every file change
-                logger.info("Change for user %s", auth_data["id"])
-                if os.path.getmtime(user_data_file) > last_change_date.timestamp(): # If file was changed after last change date
-                    logger.info("Sending new clipboard contents")
-                    await websocket.send_text("new") # Send "new" to client
-                    last_change_date = datetime.now() # Update last change date to current date
+            async for _ in awatch(meta_data_file, stop_event=watch_files_stop_event): # On every file change
+                logger.info("Change for user %s", connect_message["id"])
+                logger.info("Sending new clipboard content metadata")
+                with open(meta_data_file, "r") as f: metadata = f.read() # Read metadata file for clipboard content, e.g. '{"senderId": "12345678", "type": "text", "filename": null}'
+                with open(user_data_file + ".publickey", "r") as f: public_key_base64 = f.read() # Read public key for quick access on the client without another request
+                await websocket.send_text(json.dumps(WebsocketServerMessage( # Send new clipboard event to client
+                    event="new",
+                    meta=ClipboardContentSendMetadata.parse_raw(metadata),
+                    publicKeyBase64=public_key_base64
+                ).dict()))
         except WebSocketDisconnect: print("WebSocket disconnected")
     asyncio.ensure_future(watch_files()) # Start watching files in background so that a uvicorn reload can stop file watching
     try: await websocket.receive_text() # Wait for client to keep connection alive while watching files in the background
