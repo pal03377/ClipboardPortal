@@ -17,6 +17,7 @@ struct ContentView: View {
                 .overlay {
                     if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
                 }
+                FriendRequestView()
                 ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
                     // (Re-)Send entry content
                     Task {

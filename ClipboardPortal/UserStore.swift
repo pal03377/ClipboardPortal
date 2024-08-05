@@ -118,17 +118,30 @@ class UserStore: ObservableObject {
         }
     }
     
-    // Get a friend by their user ID. Fetches the friend's public key if it is not stored locally yet.
-    func getFriend(userId: String) async throws -> Friend { // userID e.g. "12345678"
-        if let friend = self.user?.friends.first(where: { $0.id == userId }) { // Friend already exists locally?
-            return friend // Return existing friend
-        }
+    // Add a friend by their user ID. Fetches the friend's public key if it is not stored locally yet.
+    func addFriend(userId: String) async throws -> Friend { // userID e.g. "12345678"
         // Fetch friend's public key for storage
         let friendPublicKeyBase64: String = try await ServerRequest.get(url: serverUrl.appendingPathComponent(userId).appendingPathExtension("publickey")) // Fetch friend's public key base64 from the server, e.g. https://clipboardportal.pschwind.de/12345678.pub
         let friend = try Friend(id: userId, publicKey: .fromBase64(friendPublicKeyBase64))
-        DispatchQueue.main.async { self.user!.friends.append(friend) }
+        await withCheckedContinuation { continuation in // Ensure that the friends array is updated before returning to avoid lots of issues with infinite loops and assumptions about the friend existing
+            DispatchQueue.main.async {
+                self.user!.friends.append(friend)
+                Task { continuation.resume() }
+            }
+        }
         await self.save(user: self.user!)
         return friend
+    }
+    
+    // Get a friend or nil if the user is no friend
+    func getFriend(userId: String) -> Friend? {
+        return self.user?.friends.first(where: { $0.id == userId })
+    }
+    
+    // Get friend or add them if missing
+    func getOrAddFriend(userId: String) async throws -> Friend { // userID e.g. "12345678"
+        if let friend = self.getFriend(userId: userId) { return friend }
+        return try await self.addFriend(userId: userId)
     }
     
     // Helper function to create a new user on the server if no user is stored

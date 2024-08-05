@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		DA3703742C601AC1004B326F /* MoveFileToDownloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */; };
+		DA3703762C6070E1004B326F /* FriendRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703752C6070E1004B326F /* FriendRequest.swift */; };
+		DA3703782C607258004B326F /* FriendRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703772C607258004B326F /* FriendRequestView.swift */; };
 		DA4A24852C5F357D0032E3F0 /* SoundEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4A24842C5F357D0032E3F0 /* SoundEffects.swift */; };
 		DA6F61772C601298007C30FB /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6F61762C601298007C30FB /* Crypto.swift */; };
 		DA6F617A2C601335007C30FB /* receive.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA4A24882C5F381D0032E3F0 /* receive.mp3 */; };
@@ -38,6 +40,8 @@
 
 /* Begin PBXFileReference section */
 		DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MoveFileToDownloads.swift; path = ClipboardPortal/MoveFileToDownloads.swift; sourceTree = "<group>"; };
+		DA3703752C6070E1004B326F /* FriendRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendRequest.swift; path = ClipboardPortal/FriendRequest.swift; sourceTree = "<group>"; };
+		DA3703772C607258004B326F /* FriendRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendRequestView.swift; path = ClipboardPortal/ui/FriendRequestView.swift; sourceTree = "<group>"; };
 		DA4A24842C5F357D0032E3F0 /* SoundEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffects.swift; sourceTree = "<group>"; };
 		DA4A24872C5F381D0032E3F0 /* send.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = send.mp3; sourceTree = "<group>"; };
 		DA4A24882C5F381D0032E3F0 /* receive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = receive.mp3; sourceTree = "<group>"; };
@@ -139,6 +143,8 @@
 				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
 				DA99FF5D2C13471200769146 /* ContentView.swift */,
 				DA99FF592C13471200769146 /* ClipboardManager.swift */,
+				DA3703772C607258004B326F /* FriendRequestView.swift */,
+				DA3703752C6070E1004B326F /* FriendRequest.swift */,
 				DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */,
 				DA99FF682C13471200769146 /* ServerRequest.swift */,
 				DA99FF572C13471200769146 /* LocalNotification.swift */,
@@ -249,6 +255,7 @@
 				DA99FF722C13471200769146 /* ContentView.swift in Sources */,
 				DA99FF762C13471200769146 /* Config.swift in Sources */,
 				DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */,
+				DA3703762C6070E1004B326F /* FriendRequest.swift in Sources */,
 				DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */,
 				DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */,
 				DA84EF932C572845005A2A26 /* ClipboardHistoryListView.swift in Sources */,
@@ -257,6 +264,7 @@
 				DA84EF952C572845005A2A26 /* KeyPressModifierMacOS14.swift in Sources */,
 				DA84EF962C572845005A2A26 /* CopyContentModifier.swift in Sources */,
 				DA84EF972C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift in Sources */,
+				DA3703782C607258004B326F /* FriendRequestView.swift in Sources */,
 				DA84EF982C572845005A2A26 /* StatusView.swift in Sources */,
 				DA84EF992C572845005A2A26 /* GlobalShortcutView.swift in Sources */,
 				DA84EF9A2C572845005A2A26 /* CommandVView.swift in Sources */,
@@ -406,7 +414,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
@@ -445,7 +453,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;

@@ -4,12 +4,14 @@ import AppKit
 import Starscream // For WebSockets
 
 enum ClipboardManagerError {
-    case encryptedMetadataEncodingError
+    case encryptedMetadataEncoding
+    case contentsFromStranger
 }
 extension ClipboardManagerError: LocalizedError { // Nice error messages
     public var errorDescription: String? {
         switch self {
-        case .encryptedMetadataEncodingError: "Clipboard metadata broken. Update the app."
+        case .encryptedMetadataEncoding: "Clipboard metadata broken. Update the app."
+        case .contentsFromStranger: "Received clipboard contents from a stranger. Add them as a friend first."
         }
     }
 }
@@ -82,41 +84,41 @@ struct ClipboardContentSendMetadata: Codable {
         let type: ClipboardContentType // Type of content
         let filename: String? // Filename for files or nil
         
-        static func fromEncryptedMetadataBase64(_ encryptedBase64: String, senderId: String) async throws -> Self {
-            let friend = try await UserStore.shared.getFriend(userId: senderId)
-            guard let encryptedData = Data(base64Encoded: encryptedBase64) else { throw ClipboardManagerError.encryptedMetadataEncodingError }
+        static func fromEncryptedMetadataBase64(_ encryptedBase64: String, senderId: String) throws -> Self {
+            guard let friend = UserStore.shared.getFriend(userId: senderId) else { throw ClipboardManagerError.contentsFromStranger }
+            guard let encryptedData = Data(base64Encoded: encryptedBase64) else { throw ClipboardManagerError.encryptedMetadataEncoding }
             do {
                 let metadataJson = try decrypt(encryptedData: encryptedData, friendPublicKey: friend.publicKey)
                 return try JSONDecoder().decode(Self.self, from: metadataJson)
             } catch {
                 print(error)
-                throw ClipboardManagerError.encryptedMetadataEncodingError
+                throw ClipboardManagerError.encryptedMetadataEncoding
             }
         }
         
-        func toEncryptedMetadatabase64(receiverId: String) async throws -> String {
-            let friend = try await UserStore.shared.getFriend(userId: receiverId)
+        func toEncryptedMetadatabase64(receiverId: String) throws -> String {
+            guard let friend = UserStore.shared.getFriend(userId: receiverId) else { fatalError("Trying to encrypt metadata for a stranger. The user ID should already have been added before sending.") }
             let metadataJson = try JSONEncoder().encode(self)
             return try encrypt(data: metadataJson, friendPublicKey: friend.publicKey).base64EncodedString()
         }
     }
     /// Decrypt the metadata about the content
-    func getContentMeta() async throws -> ContentMetadata {
-        return try await .fromEncryptedMetadataBase64(self.encryptedContentMetadataBase64, senderId: self.senderId)
+    func getContentMeta() throws -> ContentMetadata {
+        return try .fromEncryptedMetadataBase64(self.encryptedContentMetadataBase64, senderId: self.senderId)
     }
 
     /// Create a metadata object with encrypted type and file metadata from a ClipboardContent object
-    static func fromClipboardContent(_ content: ClipboardContent) async throws -> Self {
+    static func fromClipboardContent(_ content: ClipboardContent, receiverId: String) throws -> Self {
         let filename: String? = switch content { // Filename for sending
         case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
         case .text: nil
         }
-        return try await Self(
+        return try Self(
             senderId: UserStore.shared.user!.id,
             encryptedContentMetadataBase64: ContentMetadata(
                 type: .fromClipboardContent(content),
                 filename: filename
-            ).toEncryptedMetadatabase64(receiverId: UserStore.shared.user!.id)
+            ).toEncryptedMetadatabase64(receiverId: receiverId)
         )
     }
 }
@@ -159,12 +161,13 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             DispatchQueue.main.async { self.sendErrorMessage = "Could not read data from clipboard." } // Show error if reading data from clipboard failed, e.g. because of missing file. Update UI in main thread.
             return
         }
-        guard let friend = try? await UserStore.shared.getFriend(userId: receiverId) else {
+        guard let friend = try? await UserStore.shared.getOrAddFriend(userId: receiverId) else { // Automatically add people that we send our clipboard to as friends
             DispatchQueue.main.async { self.sendErrorMessage = "Could not find friend. Is the user ID in the settings correct?" } // Show error if friend does not exist, e.g. if the user ID is wrong and therefore the public key was not found
             return
         }
+        guard let _ = UserStore.shared.getFriend(userId: receiverId) else { fatalError("?") }
         // Encode clipboard metadata for sending
-        guard let meta = try? await ClipboardContentSendMetadata.fromClipboardContent(content),
+        guard let meta = try? ClipboardContentSendMetadata.fromClipboardContent(content, receiverId: SettingsStore.shared.settingsData.receiverId),
               let metaJson = try? JSONEncoder().encode(meta) else {
             DispatchQueue.main.async { self.sendErrorMessage = "Could not encode metadata for sending." } // Show error. Update UI in main thread.
             return
@@ -242,9 +245,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             self.connectForUpdates()
         }
     }
-    private struct UserAuthenticateDTO: Encodable { // Authentication structure to auth against websocket endpoint TODO: Secret is not gone!
-        var id: String
-    }
+    private struct UserInitialMessageDTO: Encodable { var id: String }
     // Receive WebSocket events
     struct WebsocketServerMessage: Codable {
         var event: String // Event type, e.g. "new" or "forbidden"
@@ -256,11 +257,10 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         case .connected(let headers): // Connection established
             DispatchQueue.main.async { self.connected = true } // Update connection status. Update in UI thread.
             print("websocket is connected: \(headers)")
-            // Send authentication to receive events for new clipboard contents
-            guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to authenticate
+            // Send user ID to receive events for new clipboard contents
+            guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to register for events
             do {
-                // TODO: Make user sign a challenge to authenticate or something?
-                try client.write(string: String(data: JSONEncoder().encode(UserAuthenticateDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server
+                try client.write(string: String(data: JSONEncoder().encode(UserInitialMessageDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server with user ID to get updates for that ID
             } catch { // Error while sending greeting message?
                 DispatchQueue.main.async { self.receiveErrorMessage = "User does not exist"; self.connected = false } // Update connection status. Update in UI thread.
                 self.retryConnectForUpdatesAfterDelay() // Retry later
@@ -331,19 +331,24 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             DispatchQueue.main.async { self.receiveErrorMessage = "Server response misses metadata. Update the app." } // Update UI in main thread
             return
         }
+        guard let senderId = serverMessage.meta?.senderId else {
+            DispatchQueue.main.async { self.sendErrorMessage = "Could not find the person that sent the clipboard contents." } // Show error if friend does not exist
+            return
+        }
+        guard let friend = UserStore.shared.getFriend(userId: senderId) else {
+            // Show friend request from sender and continue copying the contents when accepted
+            FriendRequest.shared.showRequest(userId: senderId) { Task { await self.downloadAndReceiveClipboardContent(serverMessage: serverMessage) } }
+            return
+        }
+        DispatchQueue.main.async { FriendRequest.shared.reset() } // Reset pending friend requests when successfully receiving content. Update UI in main thread.
         DispatchQueue.main.async { self.receiveErrorMessage = nil } // Reset last receive error message
         var contentMeta: ClipboardContentSendMetadata.ContentMetadata?
-        do { contentMeta = try await meta.getContentMeta() }
+        do { contentMeta = try meta.getContentMeta() }
         catch {
             DispatchQueue.main.async { self.receiveErrorMessage = error.localizedDescription } // Update UI in main thread
             return
         }
         guard let contentMeta = contentMeta else { return } // Make Swift happy my declaring contentMeta as a constant
-        guard let senderId = serverMessage.meta?.senderId, let friend = try? await UserStore.shared.getFriend(userId: senderId) else {
-            DispatchQueue.main.async { self.sendErrorMessage = "Could not find the person that sent the clipboard contents." } // Show error if friend does not exist
-            // TODO: Don't just blindly add friends but ask the user instead!
-            return
-        }
         let contentUrl = serverUrl.appendingPathComponent(user.id) // Download URL for clipboard content, e.g. https://clipboardportal.pschwind.de/12345678
         let downloadTask = URLSession.shared.downloadTask(with: contentUrl) { (location, response, error) in // Download clipboard content
             guard let location = location, error == nil else {
