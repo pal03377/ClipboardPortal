@@ -21,10 +21,10 @@
 		DA84EF962C572845005A2A26 /* CopyContentModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF862C572845005A2A26 /* CopyContentModifier.swift */; };
 		DA84EF972C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */; };
 		DA84EF982C572845005A2A26 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF912C572845005A2A26 /* StatusView.swift */; };
-		DA84EF992C572845005A2A26 /* GlobalShortcutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8B2C572845005A2A26 /* GlobalShortcutView.swift */; };
+		DA84EF992C572845005A2A26 /* GlobalKeyboardShortcutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8B2C572845005A2A26 /* GlobalKeyboardShortcutView.swift */; };
 		DA84EF9A2C572845005A2A26 /* CommandVView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8E2C572845005A2A26 /* CommandVView.swift */; };
 		DA84EF9B2C572845005A2A26 /* NotificationsToggleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8F2C572845005A2A26 /* NotificationsToggleView.swift */; };
-		DA84EF9C2C572845005A2A26 /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8A2C572845005A2A26 /* GlobalShortcut.swift */; };
+		DA84EF9C2C572845005A2A26 /* GlobalKeyboardShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8A2C572845005A2A26 /* GlobalKeyboardShortcut.swift */; };
 		DA84EF9F2C574204005A2A26 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DA84EF9E2C574204005A2A26 /* Starscream */; };
 		DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF572C13471200769146 /* LocalNotification.swift */; };
 		DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF582C13471200769146 /* SettingsStore.swift */; };
@@ -38,6 +38,19 @@
 		DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA99FF5B2C13471200769146 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DA71BBDF2C6EC622002CDBCE /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MoveFileToDownloads.swift; path = ClipboardPortal/MoveFileToDownloads.swift; sourceTree = "<group>"; };
 		DA3703752C6070E1004B326F /* FriendRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendRequest.swift; path = ClipboardPortal/FriendRequest.swift; sourceTree = "<group>"; };
@@ -46,11 +59,15 @@
 		DA4A24872C5F381D0032E3F0 /* send.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = send.mp3; sourceTree = "<group>"; };
 		DA4A24882C5F381D0032E3F0 /* receive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = receive.mp3; sourceTree = "<group>"; };
 		DA6F61762C601298007C30FB /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Crypto.swift; path = ClipboardPortal/Crypto.swift; sourceTree = "<group>"; };
+		DA71BBD32C6EC622002CDBCE /* ClipboardPortalIntentExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPortalIntentExtension.swift; sourceTree = "<group>"; };
+		DA71BBD52C6EC622002CDBCE /* ClipboardPortalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPortalIntent.swift; sourceTree = "<group>"; };
+		DA71BBD72C6EC622002CDBCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA71BBD82C6EC622002CDBCE /* ClipboardPortalIntent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClipboardPortalIntent.entitlements; sourceTree = "<group>"; };
 		DA84EF862C572845005A2A26 /* CopyContentModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
 		DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledModifierMacOS14.swift; sourceTree = "<group>"; };
 		DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
-		DA84EF8A2C572845005A2A26 /* GlobalShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcut.swift; sourceTree = "<group>"; };
-		DA84EF8B2C572845005A2A26 /* GlobalShortcutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalShortcutView.swift; sourceTree = "<group>"; };
+		DA84EF8A2C572845005A2A26 /* GlobalKeyboardShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalKeyboardShortcut.swift; sourceTree = "<group>"; };
+		DA84EF8B2C572845005A2A26 /* GlobalKeyboardShortcutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalKeyboardShortcutView.swift; sourceTree = "<group>"; };
 		DA84EF8D2C572845005A2A26 /* ClipboardHistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryListView.swift; sourceTree = "<group>"; };
 		DA84EF8E2C572845005A2A26 /* CommandVView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandVView.swift; sourceTree = "<group>"; };
 		DA84EF8F2C572845005A2A26 /* NotificationsToggleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsToggleView.swift; sourceTree = "<group>"; };
@@ -98,6 +115,17 @@
 			path = ClipboardPortal/sound;
 			sourceTree = SOURCE_ROOT;
 		};
+		DA71BBD22C6EC622002CDBCE /* ClipboardPortalIntent */ = {
+			isa = PBXGroup;
+			children = (
+				DA71BBD32C6EC622002CDBCE /* ClipboardPortalIntentExtension.swift */,
+				DA71BBD52C6EC622002CDBCE /* ClipboardPortalIntent.swift */,
+				DA71BBD72C6EC622002CDBCE /* Info.plist */,
+				DA71BBD82C6EC622002CDBCE /* ClipboardPortalIntent.entitlements */,
+			);
+			path = ClipboardPortalIntent;
+			sourceTree = "<group>";
+		};
 		DA84EF892C572845005A2A26 /* modifiers */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,14 +138,14 @@
 			path = ClipboardPortal/modifiers;
 			sourceTree = "<group>";
 		};
-		DA84EF8C2C572845005A2A26 /* shortcut */ = {
+		DA84EF8C2C572845005A2A26 /* keyboardshortcut */ = {
 			isa = PBXGroup;
 			children = (
-				DA84EF8A2C572845005A2A26 /* GlobalShortcut.swift */,
-				DA84EF8B2C572845005A2A26 /* GlobalShortcutView.swift */,
+				DA84EF8A2C572845005A2A26 /* GlobalKeyboardShortcut.swift */,
+				DA84EF8B2C572845005A2A26 /* GlobalKeyboardShortcutView.swift */,
 			);
-			name = shortcut;
-			path = ClipboardPortal/shortcut;
+			name = keyboardshortcut;
+			path = ClipboardPortal/keyboardshortcut;
 			sourceTree = "<group>";
 		};
 		DA84EF922C572845005A2A26 /* ui */ = {
@@ -138,7 +166,7 @@
 			children = (
 				DA84EF922C572845005A2A26 /* ui */,
 				DA84EF892C572845005A2A26 /* modifiers */,
-				DA84EF8C2C572845005A2A26 /* shortcut */,
+				DA84EF8C2C572845005A2A26 /* keyboardshortcut */,
 				DA4A24862C5F37FE0032E3F0 /* sound */,
 				DA99FF5C2C13471200769146 /* ClipboardPortalApp.swift */,
 				DA99FF5D2C13471200769146 /* ContentView.swift */,
@@ -158,6 +186,7 @@
 				DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */,
 				DA99FF632C13471200769146 /* ConfigProduction.xcconfig */,
 				DA99FF562C13471200769146 /* Info.plist */,
+				DA71BBD22C6EC622002CDBCE /* ClipboardPortalIntent */,
 				DAAB33BC2BCAFDCB00C82DF4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -180,6 +209,7 @@
 				DAAB33B72BCAFDCB00C82DF4 /* Sources */,
 				DAAB33B82BCAFDCB00C82DF4 /* Frameworks */,
 				DAAB33B92BCAFDCB00C82DF4 /* Resources */,
+				DA71BBDF2C6EC622002CDBCE /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
@@ -201,7 +231,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1510;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					DAAB33BA2BCAFDCB00C82DF4 = {
@@ -266,11 +296,11 @@
 				DA84EF972C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift in Sources */,
 				DA3703782C607258004B326F /* FriendRequestView.swift in Sources */,
 				DA84EF982C572845005A2A26 /* StatusView.swift in Sources */,
-				DA84EF992C572845005A2A26 /* GlobalShortcutView.swift in Sources */,
+				DA84EF992C572845005A2A26 /* GlobalKeyboardShortcutView.swift in Sources */,
 				DA84EF9A2C572845005A2A26 /* CommandVView.swift in Sources */,
 				DA84EF9B2C572845005A2A26 /* NotificationsToggleView.swift in Sources */,
 				DA4A24852C5F357D0032E3F0 /* SoundEffects.swift in Sources */,
-				DA84EF9C2C572845005A2A26 /* GlobalShortcut.swift in Sources */,
+				DA84EF9C2C572845005A2A26 /* GlobalKeyboardShortcut.swift in Sources */,
 				DA99FF782C13471200769146 /* UserStore.swift in Sources */,
 				DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */,
 				DA3703742C601AC1004B326F /* MoveFileToDownloads.swift in Sources */,
@@ -405,6 +435,7 @@
 		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -444,6 +475,7 @@
 		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;

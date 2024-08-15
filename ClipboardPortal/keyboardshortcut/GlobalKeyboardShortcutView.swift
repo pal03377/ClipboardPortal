@@ -1,7 +1,7 @@
 import SwiftUI
 import KeyboardShortcuts
 
-struct GlobalShortcutView: View {
+struct GlobalKeyboardShortcutView: View {
     var body: some View {
         Form {
             KeyboardShortcuts.Recorder("Shortcut", name: .sendToFriend)
@@ -12,5 +12,5 @@ struct GlobalShortcutView: View {
 }
 
 #Preview {
-    GlobalShortcutView()
+    GlobalKeyboardShortcutView()
 }

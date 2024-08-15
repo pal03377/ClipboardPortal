@@ -15,10 +15,16 @@
 			</array>
 		</dict>
 	</array>
+	<key>INIntentsSupported</key>
+	<array>
+		<string>SendClipboard</string>
+	</array>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>SendClipboardIntent</string>
+	</array>
 	<key>ServerURL</key>
 	<string>$(SERVER_URL)</string>
-	<key>WebsocketServerURL</key>
-	<string>$(WEBSOCKET_SERVER_URL)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -26,5 +32,7 @@
 		<key>UIApplicationSupportsTabbedSceneCollection</key>
 		<false/>
 	</dict>
+	<key>WebsocketServerURL</key>
+	<string>$(WEBSOCKET_SERVER_URL)</string>
 </dict>
 </plist>

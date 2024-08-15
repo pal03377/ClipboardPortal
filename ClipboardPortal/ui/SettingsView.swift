@@ -66,7 +66,7 @@ struct SettingsView: View {
             }
             Divider()
             Spacer().frame(height: 8)
-            GlobalShortcutView()
+            GlobalKeyboardShortcutView()
             NotificationsToggleView()
             Toggle(isOn: $settingsStore.settingsData.sendSoundEnabled) {
                 Text("Sound when sending")
