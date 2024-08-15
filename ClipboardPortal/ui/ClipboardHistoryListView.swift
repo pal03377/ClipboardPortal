@@ -24,36 +24,46 @@ struct ClipboardHistoryListEntryView: View {
     var body: some View {
         HStack {
             Image(systemName: entry.received ? "arrow.down" : "arrow.up")
+                .help(entry.received ? "Your friend sent you this" : "You sent this")
             Text("\(entry.content)")
                 .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
-            if case let ClipboardContent.text(textContent) = entry.content, SettingsStore.shared.settingsData.receiverId == textContent, entry.received {
-                Image(systemName: "person.fill.checkmark")
-                    .help("This is your friend's ID.")
-            }
-            else if case let ClipboardContent.text(textContent) = entry.content, looksLikeUserId(textContent), entry.received {
-                Button("Set friend ID") {
-                    SettingsStore.shared.settingsData.receiverId = textContent
+            Group {
+                if case let ClipboardContent.text(textContent) = entry.content, SettingsStore.shared.settingsData.receiverId == textContent, entry.received {
+                    Image(systemName: "person.fill.checkmark")
+                        .help("This is your friend's ID.")
                 }
-                Button { isSetFriendCodePopupOpen = true } label: {
-                    Image(systemName: "questionmark.circle")
+                else if case let ClipboardContent.text(textContent) = entry.content, looksLikeUserId(textContent), entry.received {
+                    if textContent == UserStore.shared.user?.id { // Own user ID?
+                        Image(systemName: "person.fill")
+                            .help("This is your ID.")
+                    } else { // Another user ID?
+                        Button("Set friend ID") {
+                            SettingsStore.shared.settingsData.receiverId = textContent
+                        }
+                        Button { isSetFriendCodePopupOpen = true } label: {
+                            Image(systemName: "questionmark.circle")
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .popover(isPresented: $isSetFriendCodePopupOpen) {
+                            Text("Change the friend ID setting to this ID")
+                                .padding()
+                        }
+                    }
                 }
-                .buttonStyle(PlainButtonStyle())
-                .popover(isPresented: $isSetFriendCodePopupOpen) {
-                    Text("Change the friend ID setting to this ID")
-                        .padding()
+                // Actions on hover
+                HStack {
+                    Button {} label: { Image(systemName: "doc.on.doc") }
+                        .copyContent(entry.content)
+                        .help("Copy again")
+                        .buttonStyle(PlainButtonStyle())
+                    Button { // Resend button
+                        onSend()
+                    } label: { Image(systemName: "arrow.up.circle") }
+                        .help("Send to friend")
+                        .buttonStyle(PlainButtonStyle())
                 }
-            }
-            // Actions on hover
-            HStack {
-                Button {} label: { Image(systemName: "doc.on.doc") }
-                    .copyContent(entry.content)
-                    .buttonStyle(PlainButtonStyle())
-                Button { // Resend button
-                    onSend()
-                } label: { Image(systemName: "arrow.up.circle") }
-                    .buttonStyle(PlainButtonStyle())
             }
             .isHidden(!showingActions)
         }

@@ -45,7 +45,7 @@ struct ContentView: View {
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
-            .background(Color.gray.opacity(0.1))
+            .background(Color.gray.opacity(0.25))
             .clipShape(.rect(topLeadingRadius: 4))
         }
         .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user

@@ -145,7 +145,8 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @Published var sendErrorMessage: String?    = nil // Error message when sending   the clipboard fails
     @Published var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
     @Published var clipboardHistory: [ClipboardHistoryEntry] = [] // History of clipboard entries for the UI
-    var socket: WebSocket! // WebSocket connection to the server
+    private var socket: WebSocket! // WebSocket connection to the server
+    private var pingTimer: Timer? // Periodic timer to ping server to keep connection alive
 
     // ### Send ###
     /// Send specific clipboard content to the friend. Used with a parameter to enable re-sending clipboard contents from the history.
@@ -261,6 +262,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to register for events
             do {
                 try client.write(string: String(data: JSONEncoder().encode(UserInitialMessageDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server with user ID to get updates for that ID
+                pingTimer?.invalidate() // Cancel previous ping task to restart it
+                pingTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { timer in // Ping every Xs to keep the server connection alive
+                    guard self.connected else { timer.invalidate(); return } // Stop pinging when server is disconnected
+                    client.write(ping: Data()) // Ping server to keep connection alive
+                }
             } catch { // Error while sending greeting message?
                 DispatchQueue.main.async { self.receiveErrorMessage = "User does not exist"; self.connected = false } // Update connection status. Update in UI thread.
                 self.retryConnectForUpdatesAfterDelay() // Retry later
