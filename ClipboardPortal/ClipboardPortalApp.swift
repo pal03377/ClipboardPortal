@@ -17,6 +17,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             Task { await ClipboardManager.shared.sendClipboardContent() } // Paste clipboard contents
         }
     }
+    
+    public func applicationWillFinishLaunching(_ notification: Notification) {
+        NSWindow.allowsAutomaticWindowTabbing = false // Disable tabs window tabs
+    }
 
     func application(_ application: NSApplication, open urls: [URL]) {
         // Handle app url e.g. clipboardportal://paste?content=Something
@@ -83,6 +87,7 @@ struct ClipboardPortalApp: App {
         .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
+            CommandGroup(replacing: CommandGroupPlacement.newItem) {} // Remove option to open new window
             if !appGlobals.pasteShortcutDisabledTemporarily {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
