@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Portal</title>
+    <meta name="theme-color" content="#007bff">
+    <link rel="icon" type="image/png" href="logo.png" />
+    <style>
+        ::selection {
+            background-color: rgb(255, 140, 0);
+            color: white;
+        }
+
+        body {
+            background: rgb(0,21,62);
+            background: radial-gradient(ellipse at center, rgba(0,47,96,1) 0%, rgba(0,21,62,1) 33%, rgba(0,21,62,1) 100%);
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        #logo {
+            margin-top: 50px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #downloadButton {
+            margin-top: 50px;
+            width: 80%;
+            max-width: 200px;
+        }
+
+        #downloadButton img {
+            width: 100%;
+        }
+
+        #contactButton {
+            color: gray;
+        }
+
+        #impressum {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: gray;
+            text-decoration: none;
+        }
+
+        /* privacy policy as popup */
+        privacy-policy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        privacy-policy .popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            pointer-events: all;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <img src="logo.png" alt="Confetti Magic Logo" id="logo">
+        <h1>Clipboard Portal</h1>
+        <p>Send your clipboard to a friend!</p>
+        <a href="https://apps.apple.com/app/clipboard-portal/id6504111900" target="_blank" rel="noopener noreferrer" class="button" id="downloadButton">
+            <img src="app-store-badge.svg" alt="Download on the Mac App Store">
+        </a>
+        <a href="#" class="button" id="contactButton">Contact Us</a>
+        <a href="https://pschwind.de/impressum" target="_blank" id="impressum">Impressum</a>
+    </main>
+    <privacy-policy style="display:none;">
+        <div class="popup">
+            The app does not collect any analytics data! 🎉 All your clipboard contents are end-to-end encrypted. The server stores technically necessary meta-information about when you send your clipboard to whom (using anonymous friend codes) and the approximate size of the clipboard content can be seen by the transferred size. This is un-avoidable.<br>
+            <button onclick="document.getElementsByTagName('privacy-policy')[0].remove()">Close</button>
+        </div>
+    </privacy-policy>
+
+    <script>
+        // Add mail to contact button
+        document.getElementById("contactButton").href = `mailto:${"clipboard"}` + "portal@" + `pschwind.de?subject=Clipboard Portal App`;
+    </script>
+    <script>
+        // Show privacy policy popup when GET param is set
+        if (window.location.search.includes("privacy")) {
+            document.getElementsByTagName("privacy-policy")[0].style.display = "block";
+        }
+    </script>
+</body>
+</html>

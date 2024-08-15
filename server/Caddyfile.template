@@ -1,6 +1,18 @@
 $DOMAIN {
 	log $PROJECT_NAME # Enable Caddy access logs (for goaccess)
 	route {
+		# Homepage
+		file_server / {
+			root /root/$PROJECT_NAME/server
+			index index.html
+		}
+		file_server /logo.png {
+			root /root/$PROJECT_NAME/server
+		}
+		file_server /app-store-badge.svg {
+			root /root/$PROJECT_NAME/server
+		}
+
 		# Serve clipboard contents from data if exists
 		root /root/$PROJECT_NAME/server/data
 		file_server {
