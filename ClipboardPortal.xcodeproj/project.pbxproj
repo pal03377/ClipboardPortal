@@ -59,10 +59,6 @@
 		DA4A24872C5F381D0032E3F0 /* send.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = send.mp3; sourceTree = "<group>"; };
 		DA4A24882C5F381D0032E3F0 /* receive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = receive.mp3; sourceTree = "<group>"; };
 		DA6F61762C601298007C30FB /* Crypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Crypto.swift; path = ClipboardPortal/Crypto.swift; sourceTree = "<group>"; };
-		DA71BBD32C6EC622002CDBCE /* ClipboardPortalIntentExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPortalIntentExtension.swift; sourceTree = "<group>"; };
-		DA71BBD52C6EC622002CDBCE /* ClipboardPortalIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPortalIntent.swift; sourceTree = "<group>"; };
-		DA71BBD72C6EC622002CDBCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA71BBD82C6EC622002CDBCE /* ClipboardPortalIntent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClipboardPortalIntent.entitlements; sourceTree = "<group>"; };
 		DA84EF862C572845005A2A26 /* CopyContentModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyContentModifier.swift; sourceTree = "<group>"; };
 		DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusEffectDisabledModifierMacOS14.swift; sourceTree = "<group>"; };
 		DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPressModifierMacOS14.swift; sourceTree = "<group>"; };
@@ -114,17 +110,6 @@
 			name = sound;
 			path = ClipboardPortal/sound;
 			sourceTree = SOURCE_ROOT;
-		};
-		DA71BBD22C6EC622002CDBCE /* ClipboardPortalIntent */ = {
-			isa = PBXGroup;
-			children = (
-				DA71BBD32C6EC622002CDBCE /* ClipboardPortalIntentExtension.swift */,
-				DA71BBD52C6EC622002CDBCE /* ClipboardPortalIntent.swift */,
-				DA71BBD72C6EC622002CDBCE /* Info.plist */,
-				DA71BBD82C6EC622002CDBCE /* ClipboardPortalIntent.entitlements */,
-			);
-			path = ClipboardPortalIntent;
-			sourceTree = "<group>";
 		};
 		DA84EF892C572845005A2A26 /* modifiers */ = {
 			isa = PBXGroup;
@@ -186,7 +171,6 @@
 				DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */,
 				DA99FF632C13471200769146 /* ConfigProduction.xcconfig */,
 				DA99FF562C13471200769146 /* Info.plist */,
-				DA71BBD22C6EC622002CDBCE /* ClipboardPortalIntent */,
 				DAAB33BC2BCAFDCB00C82DF4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -445,7 +429,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
@@ -485,7 +469,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;

@@ -17,7 +17,8 @@ enum SoundEffects {
 }
 
 var soundEffectPlayers: Dictionary<SoundEffects, AVAudioPlayer> = [:]
-func playSoundEffect(_ effect: SoundEffects) {
+@MainActor
+func playSoundEffect(_ effect: SoundEffects) async {
     guard (effect == .receive && SettingsStore.shared.settingsData.receiveSoundEnabled) ||
           (effect == .send    && SettingsStore.shared.settingsData.sendSoundEnabled) else { return } // Abort if sound is not enabled
     print("Sound effect \(effect)")

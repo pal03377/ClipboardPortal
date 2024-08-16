@@ -66,7 +66,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 class AppGlobals: ObservableObject {
     static let shared = AppGlobals()
     
-    @Published var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
+    @Published @MainActor var pasteShortcutDisabledTemporarily: Bool = false // Disable paste to clipboard-send to be able to paste a receiver ID temporarily
 }
 
 @main
@@ -101,8 +101,13 @@ struct ClipboardPortalApp: App {
                     Task {
                         await UserStore.shared.delete()
                         await UserStore.shared.load() // Reload user data
+                        SettingsStore.shared.settingsData.receiverId = "" // Clear receiving user because that's less confusing
+                        try? await SettingsStore.shared.save()
                     }
                 } label: { Text("Reset user") }
+                Button {
+                    ClipboardManager.shared.clipboardHistory = []
+                } label: { Text("Clear history") }
             }
         }
     }

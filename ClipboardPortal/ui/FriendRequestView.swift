@@ -23,7 +23,8 @@ struct FriendRequestView: View {
                     }
                     Spacer()
                     if !friendRequest.loading {
-                        Button("Accept") { Task { await friendRequest.acceptCurrentFriendRequest() } }
+                        Button("Accept") { Task { await friendRequest.acceptCurrentFriendRequest()
+                        } }
                         Button("Deny") { friendRequest.denyCurrentFriendRequest() }
                     } else { // Loading?
                         ProgressView().scaleEffect(0.5)

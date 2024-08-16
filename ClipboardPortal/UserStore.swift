@@ -35,6 +35,7 @@ extension Friend: Codable {
 }
 
 // Store own user
+@MainActor
 class UserStore: ObservableObject {
     static let shared = UserStore()
     
@@ -47,15 +48,15 @@ class UserStore: ObservableObject {
                                     in: .userDomainMask,
                                     appropriateFor: nil,
                                     create: false)
-            .appendingPathComponent("user.data")
+        .appendingPathComponent("user.data")
     }
 
     // Load user from storage - or create a new user on the server if it does not exist yet.
     func load() async {
-        DispatchQueue.main.async { self.userLoadErrorMessage = nil } // Clear previous error message
+        self.userLoadErrorMessage = nil // Clear previous error message
         let fileURL = try? Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
         guard let fileURL else {
-            DispatchQueue.main.async { self.userLoadErrorMessage = "Could not get file URL" }
+            self.userLoadErrorMessage = "Could not get file URL"
             return
         }
         print(fileURL)
@@ -64,35 +65,35 @@ class UserStore: ObservableObject {
             // If no file exists, create a new user on the server
             do {
                 let newUser = try await createUserOnServer()
-                DispatchQueue.main.async { self.user = newUser } // Update UI on main thread
+                self.user = newUser
                 await save(user: newUser) // Store user data locally
             } catch {
-                DispatchQueue.main.async { self.userLoadErrorMessage = "User creation failed: \(error.localizedDescription)" }
+                self.userLoadErrorMessage = "User creation failed: \(error.localizedDescription)"
             }
             return
         }
         do {
             let data = try Data(contentsOf: fileURL) // Read user data from file
             let storedUser = try JSONDecoder().decode(User?.self, from: data) // Decode user from JSON
-            DispatchQueue.main.async { self.user = storedUser } // Update UI on main thread
+            self.user = storedUser
         } catch let DecodingError.dataCorrupted(context) {
             print(context)
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data corrupted" }
+            self.userLoadErrorMessage = "User data corrupted"
         } catch let DecodingError.keyNotFound(key, context) {
             print("Key '\(key)' not found:", context.debugDescription)
             print("codingPath:", context.codingPath)
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data key missing: \(key.stringValue)" }
+            self.userLoadErrorMessage = "User data key missing: \(key.stringValue)"
         } catch let DecodingError.valueNotFound(value, context) {
             print("Value '\(value)' not found:", context.debugDescription)
             print("codingPath:", context.codingPath)
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data value missing: \(value)" }
+            self.userLoadErrorMessage = "User data value missing: \(value)"
         } catch let DecodingError.typeMismatch(type, context)  {
             print("Type '\(type)' mismatch:", context.debugDescription)
             print("codingPath:", context.codingPath)
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data type mismatch: \(type)" }
+            self.userLoadErrorMessage = "User data type mismatch: \(type)"
         } catch {
             print("error: ", error)
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data decoding failed: \(error.localizedDescription)" }
+            self.userLoadErrorMessage = "User data decoding failed: \(error.localizedDescription)"
         }
     }
 
@@ -103,18 +104,18 @@ class UserStore: ObservableObject {
             let outfile = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
             try data.write(to: outfile) // Write user data to file
         } catch {
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data saving failed: \(error.localizedDescription)" }
+            self.userLoadErrorMessage = "User data saving failed: \(error.localizedDescription)"
         }
     }
 
     // Delete the user data file to reset the user
     func delete() async {
-        DispatchQueue.main.async { self.user = nil; self.userLoadErrorMessage = nil } // Update UI on main thread
+        self.user = nil; self.userLoadErrorMessage = nil
         do {
             let fileURL = try Self.fileURL() // Get filepath e.g. file:///Users/paul/Library/Containers/de.pschwind.ClipboardPortal/Data/Library/Application%20Support/user.data
             try FileManager.default.removeItem(at: fileURL) // Delete user data file
         } catch {
-            DispatchQueue.main.async { self.userLoadErrorMessage = "User data deletion failed: \(error.localizedDescription)" }
+            self.userLoadErrorMessage = "User data deletion failed: \(error.localizedDescription)"
         }
     }
     
@@ -124,10 +125,8 @@ class UserStore: ObservableObject {
         let friendPublicKeyBase64: String = try await ServerRequest.get(url: serverUrl.appendingPathComponent(userId).appendingPathExtension("publickey")) // Fetch friend's public key base64 from the server, e.g. https://clipboardportal.pschwind.de/12345678.pub
         let friend = try Friend(id: userId, publicKey: .fromBase64(friendPublicKeyBase64))
         await withCheckedContinuation { continuation in // Ensure that the friends array is updated before returning to avoid lots of issues with infinite loops and assumptions about the friend existing
-            DispatchQueue.main.async {
-                self.user!.friends.append(friend)
-                Task { continuation.resume() }
-            }
+            self.user!.friends.append(friend)
+            Task { continuation.resume() }
         }
         await self.save(user: self.user!)
         return friend

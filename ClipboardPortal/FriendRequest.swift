@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 class FriendRequest: ObservableObject {
     static let shared = FriendRequest()
     
@@ -26,11 +27,11 @@ class FriendRequest: ObservableObject {
     /// Accept the current friend request
     func acceptCurrentFriendRequest() async {
         self.loading = true
+        defer { self.loading = false }
         do {
             let _ = try await UserStore.shared.addFriend(userId: self.requestingUserId!) // Add friend
         } catch {
             print(error)
-            self.loading = false
             self.errorMessage = error.localizedDescription
             return
         }

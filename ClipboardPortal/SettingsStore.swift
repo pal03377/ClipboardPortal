@@ -10,6 +10,7 @@ struct SettingsData: Codable {
 }
 
 // Store the settings locally
+@MainActor
 class SettingsStore: ObservableObject {
     static let shared = SettingsStore()
 
@@ -31,7 +32,7 @@ class SettingsStore: ObservableObject {
         let data = try? Data(contentsOf: fileURL) // Read user data from file
         guard let data else { return } // No load possible because nothing saved yet
         let settingsData = try? JSONDecoder().decode(SettingsData?.self, from: data) // Decode string from JSON
-        DispatchQueue.main.async { self.settingsData = settingsData! } // Update UI on main thread
+        self.settingsData = settingsData!
     }
 
     // Helper function to save the receiver ID locally

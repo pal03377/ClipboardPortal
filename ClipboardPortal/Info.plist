@@ -15,10 +15,6 @@
 			</array>
 		</dict>
 	</array>
-	<key>INIntentsSupported</key>
-	<array>
-		<string>SendClipboard</string>
-	</array>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>SendClipboardIntent</string>
