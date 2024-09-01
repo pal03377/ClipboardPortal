@@ -149,7 +149,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @Published @MainActor var sendErrorMessage: String?    = nil // Error message when sending   the clipboard fails
     @Published @MainActor var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
     @Published @MainActor var clipboardHistory: [ClipboardHistoryEntry] = [] // History of clipboard entries for the UI
-    private var socket: WebSocket! // WebSocket connection to the server
+    private var socket: WebSocket? // WebSocket connection to the server. Use WebSocket? instead of WebSocket! in hopes of fixing a crash that occurred 2024-08-30 via Testflight
     private var pingTimer: Timer? // Periodic timer to ping server to keep connection alive
 
     // ### Send ###
@@ -242,8 +242,8 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         var request = URLRequest(url: wsServerUrl)
         request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
         socket = WebSocket(request: request)
-        socket.delegate = self
-        socket.connect()
+        socket?.delegate = self
+        socket?.connect()
     }
     private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
@@ -417,5 +417,12 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 NSWorkspace.shared.open(url) // Open URL in browser
             }
         }
+    }
+    
+    // Attempt at fixing a crash reported via Testflight on 2024-08-30
+    deinit {
+        // Ensure the socket is properly closed when the instance is deallocated
+        socket?.disconnect()
+        socket?.delegate = nil
     }
 }
