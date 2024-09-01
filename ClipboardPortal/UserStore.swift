@@ -64,6 +64,7 @@ class UserStore: ObservableObject {
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             // If no file exists, create a new user on the server
             do {
+                print("No user file exists, creating new user...")
                 let newUser = try await createUserOnServer()
                 self.user = newUser
                 await save(user: newUser) // Store user data locally

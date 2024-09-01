@@ -5,6 +5,7 @@ struct ContentView: View {
     @StateObject private var settingsStore = SettingsStore.shared // Observe settings store
     @StateObject private var clipboardManager = ClipboardManager.shared // Observe changes to clipboard sending / receiving
     @State var isSettingsOpen = false
+    @State private var isDropTargeted = false
     let updateTimer = Timer.publish(every: 4, tolerance: 2, on: .main, in: .common).autoconnect() // Timer to fetch new clipboard contents every Xs
 
     var body: some View {
@@ -48,9 +49,7 @@ struct ContentView: View {
             .background(Color.gray.opacity(0.25))
             .clipShape(.rect(topLeadingRadius: 4))
         }
-        .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
-            await clipboardManager.connectForUpdates()
-        }
+        .modifier(DropToSendModifier())
     }
 }
 

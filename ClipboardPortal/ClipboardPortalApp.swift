@@ -73,6 +73,7 @@ class AppGlobals: ObservableObject {
 struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appGlobals = AppGlobals.shared // Observe changes to change behavior in SwiftUI (enable / disable paste dynamically)
+    @StateObject private var userStore = UserStore.shared // Observe user store
     private var updateTimer: Timer?
     
     var body: some Scene {
@@ -82,6 +83,9 @@ struct ClipboardPortalApp: App {
                 .frame(width: 400) // Default width as small as possible
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
+                .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
+                    await ClipboardManager.shared.connectForUpdates()
+                }
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
