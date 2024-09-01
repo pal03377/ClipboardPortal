@@ -77,7 +77,7 @@ struct ClipboardPortalApp: App {
     private var updateTimer: Timer?
     
     var body: some Scene {
-        WindowGroup {
+        Window("Clipboard Portal", id: "main") {
             ContentView()
                 .frame(minWidth: 400) // Min window width to now squeeze text
                 .frame(width: 400) // Default width as small as possible
@@ -91,7 +91,7 @@ struct ClipboardPortalApp: App {
         .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
-            CommandGroup(replacing: CommandGroupPlacement.newItem) {} // Remove option to open new window
+            CommandGroup(replacing: CommandGroupPlacement.newItem) {}
             if !appGlobals.pasteShortcutDisabledTemporarily {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
