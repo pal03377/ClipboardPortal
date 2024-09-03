@@ -3,6 +3,11 @@ import UserNotifications
 // Third-party
 import KeyboardShortcuts
 
+// Ideas
+// - Clipboard portal clears the file on the server after receiving? (To save me some space)
+// - A history of previously entered IDs that is then accessible from a drop list to pick an ID again in future? Made more useful with a text entry field to add a note, tag or name to the ID?
+// - Support for Windows + Android + iOS + Linux?
+
 // Reasons to use a websocket connection instead of using the Apple Notification Service APNs:
 // - APNs was very hard to debug locally with a sandbox
 // - The notifications were really unreliable, even with highest priority.
