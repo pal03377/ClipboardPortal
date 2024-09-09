@@ -21,6 +21,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .sendToFriend) {
             Task { await ClipboardManager.shared.sendClipboardContent() } // Paste clipboard contents
         }
+        // Register global internal app notifications to make Clipboard Portal sync of confetti possible :D
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("de.pschwind.Confetti.wasFired"), object: nil, queue: .main) { notification in // User is throwing confetti?
+            print("Received global confetti notification")
+            Task { await ClipboardManager.shared.sendClipboardContent(.confetti) } // Let the other person participate in the fun by sending the confetti over
+        }
     }
     
     public func applicationWillFinishLaunching(_ notification: Notification) {
