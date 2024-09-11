@@ -248,11 +248,13 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     func connectForUpdates() async {
         guard let _ = await UserStore.shared.user else { return } // Only start connections when a user exists because before that it won't work
         DispatchQueue.main.async { self.connecting = true; self.receiveErrorMessage = nil } // Reset last receive error message and mark as connecting
-        var request = URLRequest(url: wsServerUrl)
-        request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
-        socket = WebSocket(request: request)
-        socket?.delegate = self
-        socket?.connect()
+        if (socket == nil) { // Only init WebSocket if it was not already initialized to avoid crash reported in TestFlight on 2024-09-08 about a WebSocket-deinit-crash
+            var request = URLRequest(url: wsServerUrl)
+            request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
+            socket = WebSocket(request: request)
+        }
+        socket!.delegate = self
+        socket!.connect()
     }
     private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
@@ -435,12 +437,5 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 NSWorkspace.shared.open(url) // Open URL in browser
             }
         }
-    }
-    
-    // Attempt at fixing a crash reported via Testflight on 2024-08-30
-    deinit {
-        // Ensure the socket is properly closed when the instance is deallocated
-        socket?.disconnect()
-        socket?.delegate = nil
     }
 }
