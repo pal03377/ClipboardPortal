@@ -20,12 +20,14 @@ extension ClipboardManagerError: LocalizedError { // Nice error messages
 enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     case text(String)
     case file(URL)
+    case confetti // For showing confetti in the Confetti Magic app
     
     // String representation of content for UI. Use pattern matching for getting the text or URL.
     var description: String {
         switch self {
         case .text(let text): return text
         case .file(let url):  return url.lastPathComponent // Filename e.g. "myfile.txt"
+        case .confetti:       return "🎉"
         }
     }
     
@@ -34,6 +36,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text(let text): return text.data(using: .utf8)
         case .file(let url):  return try? Data(contentsOf: url)
+        case .confetti:       return Data()
         }
     }
     
@@ -42,6 +45,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text: "text"
         case .file: "file"
+        case .confetti: "confetti"
         }
     }
     
@@ -60,6 +64,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
             }
         case .file(let fileURL):
             pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Copy as file URL e.g. for pasting in Finder or an image into an image editing app
+        case .confetti: break // Cannot copy confetti event. This will never be executed anyway.
         }
     }
 }
@@ -74,10 +79,12 @@ struct ClipboardContentSendMetadata: Codable {
         enum ClipboardContentType: String, Codable {
             case text = "text"
             case file = "file"
+            case confetti = "confetti"
             static func fromClipboardContent(_ content: ClipboardContent) -> Self {
                 switch content {
                 case .text: .text
                 case .file: .file
+                case .confetti: .confetti
                 }
             }
         }
@@ -116,6 +123,7 @@ struct ClipboardContentSendMetadata: Codable {
         let filename: String? = switch content { // Filename for sending
         case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
         case .text: nil
+        case .confetti: nil
         }
         return try Self(
             senderId: UserStore.shared.user!.id,
@@ -149,7 +157,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @Published @MainActor var sendErrorMessage: String?    = nil // Error message when sending   the clipboard fails
     @Published @MainActor var receiveErrorMessage: String? = nil // Error message when receiving the clipboard fails
     @Published @MainActor var clipboardHistory: [ClipboardHistoryEntry] = [] // History of clipboard entries for the UI
-    private var socket: WebSocket! // WebSocket connection to the server
+    private var socket: WebSocket? // WebSocket connection to the server. Use WebSocket? instead of WebSocket! in hopes of fixing a crash that occurred 2024-08-30 via Testflight
     private var pingTimer: Timer? // Periodic timer to ping server to keep connection alive
 
     // ### Send ###
@@ -212,6 +220,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             let responseString = String(data: data, encoding: .utf8)!
             print("Response: \(responseString)")
             DispatchQueue.main.async {
+                if case .confetti = content { return } // No history entry and no sound for confetti event transfer
                 self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
                 Task { await playSoundEffect(.send) }
             }
@@ -239,11 +248,13 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     func connectForUpdates() async {
         guard let _ = await UserStore.shared.user else { return } // Only start connections when a user exists because before that it won't work
         DispatchQueue.main.async { self.connecting = true; self.receiveErrorMessage = nil } // Reset last receive error message and mark as connecting
-        var request = URLRequest(url: wsServerUrl)
-        request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
-        socket = WebSocket(request: request)
-        socket.delegate = self
-        socket.connect()
+        if (socket == nil) { // Only init WebSocket if it was not already initialized to avoid crash reported in TestFlight on 2024-09-08 about a WebSocket-deinit-crash
+            var request = URLRequest(url: wsServerUrl)
+            request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
+            socket = WebSocket(request: request)
+        }
+        socket!.delegate = self
+        socket!.connect()
     }
     private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
@@ -389,6 +400,9 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                         print(error)
                         DispatchQueue.main.async { self.receiveErrorMessage = "Saving download failed: " + error.localizedDescription }
                     }
+                } else if contentMeta.type == .confetti {
+                    print("Got confetti")
+                    Task { await self.onReceivedClipboardContent(.confetti) }
                 } else {
                     print("Unexpected server message meta type")
                     DispatchQueue.main.async { self.receiveErrorMessage = "Unexpected server message meta type. Please update the app." }
@@ -403,6 +417,12 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     
     /// Handle received and downloaded clipboard content (sound effect, notification, UI updates, ...)
     private func onReceivedClipboardContent(_ content: ClipboardContent) async {
+        if case .confetti = content { // Handle confetti events to show confetti in the Confetti Magic app separately
+            // Don't actually copy, but instead show confetti in the Confetti Magic app by sending a global notification
+            print("Sending confetti fire event to Confetti Magic app")
+            DistributedNotificationCenter.default().postNotificationName(Notification.Name("de.pschwind.Confetti.fire"), object: nil, userInfo: nil, deliverImmediately: true)
+            return
+        }
         // Play sound effect
         Task { await playSoundEffect(.receive) }
         // Copy to clipboard

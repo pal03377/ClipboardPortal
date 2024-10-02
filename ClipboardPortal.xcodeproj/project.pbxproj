@@ -35,6 +35,7 @@
 		DA99FF782C13471200769146 /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF642C13471200769146 /* UserStore.swift */; };
 		DA99FF7A2C13471200769146 /* ViewIfModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF662C13471200769146 /* ViewIfModifier.swift */; };
 		DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF682C13471200769146 /* ServerRequest.swift */; };
+		DAA248E32C7A24D100368F59 /* DropToSendModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA248E22C7A24D100368F59 /* DropToSendModifier.swift */; };
 		DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA99FF5B2C13471200769146 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +85,7 @@
 		DA99FF662C13471200769146 /* ViewIfModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewIfModifier.swift; sourceTree = "<group>"; };
 		DA99FF682C13471200769146 /* ServerRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ServerRequest.swift; path = ClipboardPortal/ServerRequest.swift; sourceTree = "<group>"; };
 		DA99FF692C13471200769146 /* ClipboardPortal.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = ClipboardPortal.entitlements; path = ClipboardPortal/ClipboardPortal.entitlements; sourceTree = "<group>"; };
+		DAA248E22C7A24D100368F59 /* DropToSendModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropToSendModifier.swift; sourceTree = "<group>"; };
 		DAAB33BB2BCAFDCB00C82DF4 /* Clipboard Portal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Clipboard Portal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -115,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				DA84EF862C572845005A2A26 /* CopyContentModifier.swift */,
+				DAA248E22C7A24D100368F59 /* DropToSendModifier.swift */,
 				DA84EF872C572845005A2A26 /* FocusEffectDisabledModifierMacOS14.swift */,
 				DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */,
 				DA99FF662C13471200769146 /* ViewIfModifier.swift */,
@@ -271,6 +274,7 @@
 				DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */,
 				DA3703762C6070E1004B326F /* FriendRequest.swift in Sources */,
 				DA99FF7C2C13471200769146 /* ServerRequest.swift in Sources */,
+				DAA248E32C7A24D100368F59 /* DropToSendModifier.swift in Sources */,
 				DA99FF712C13471200769146 /* ClipboardPortalApp.swift in Sources */,
 				DA84EF932C572845005A2A26 /* ClipboardHistoryListView.swift in Sources */,
 				DA6F61772C601298007C30FB /* Crypto.swift in Sources */,
@@ -429,7 +433,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
@@ -446,7 +450,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -469,7 +473,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5D4FR5T9QN;
@@ -486,7 +490,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

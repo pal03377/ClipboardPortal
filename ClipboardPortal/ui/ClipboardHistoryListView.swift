@@ -29,6 +29,15 @@ struct ClipboardHistoryListEntryView: View {
                 .lineLimit(4)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
+                .if(entry.content.typeDescription == "text") { view in
+                    guard case let .text(text) = entry.content else { return view.draggable("") }
+                    return view.draggable(text)
+                }
+                .if(entry.content.typeDescription == "file") { view in
+                    var fileURL: URL = .downloadsDirectory
+                    if case let .file(url) = entry.content { fileURL = url }
+                    return view.draggable(fileURL)
+                }
             Group {
                 if case let ClipboardContent.text(textContent) = entry.content, SettingsStore.shared.settingsData.receiverId == textContent, entry.received {
                     Image(systemName: "person.fill.checkmark")

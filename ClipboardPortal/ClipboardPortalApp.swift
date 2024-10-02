@@ -3,6 +3,11 @@ import UserNotifications
 // Third-party
 import KeyboardShortcuts
 
+// Ideas
+// - Clipboard portal clears the file on the server after receiving? (To save me some space)
+// - A history of previously entered IDs that is then accessible from a drop list to pick an ID again in future? Made more useful with a text entry field to add a note, tag or name to the ID?
+// - Support for Windows + Android + iOS + Linux?
+
 // Reasons to use a websocket connection instead of using the Apple Notification Service APNs:
 // - APNs was very hard to debug locally with a sandbox
 // - The notifications were really unreliable, even with highest priority.
@@ -15,6 +20,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Handle global shortcut for pasting
         KeyboardShortcuts.onKeyDown(for: .sendToFriend) {
             Task { await ClipboardManager.shared.sendClipboardContent() } // Paste clipboard contents
+        }
+        // Register global internal app notifications to make Clipboard Portal sync of confetti possible :D
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("de.pschwind.Confetti.wasFired"), object: nil, queue: .main) { notification in // User is throwing confetti?
+            print("Received global confetti notification")
+            Task { await ClipboardManager.shared.sendClipboardContent(.confetti) } // Let the other person participate in the fun by sending the confetti over
         }
     }
     
@@ -73,21 +83,25 @@ class AppGlobals: ObservableObject {
 struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appGlobals = AppGlobals.shared // Observe changes to change behavior in SwiftUI (enable / disable paste dynamically)
+    @StateObject private var userStore = UserStore.shared // Observe user store
     private var updateTimer: Timer?
     
     var body: some Scene {
-        WindowGroup {
+        Window("Clipboard Portal", id: "main") {
             ContentView()
                 .frame(minWidth: 400) // Min window width to now squeeze text
                 .frame(width: 400) // Default width as small as possible
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
+                .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
+                    await ClipboardManager.shared.connectForUpdates()
+                }
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
         .commands {
             SidebarCommands()
-            CommandGroup(replacing: CommandGroupPlacement.newItem) {} // Remove option to open new window
+            CommandGroup(replacing: CommandGroupPlacement.newItem) {}
             if !appGlobals.pasteShortcutDisabledTemporarily {
                 CommandGroup(replacing: .pasteboard) {
                     Button {
