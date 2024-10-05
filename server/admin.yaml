@@ -2,7 +2,7 @@
 info:
   # `admin info --clipboard-portal-user-count` (or `admin --clipboard-portal-user-count`)
   clipboard-portal-user-count:
-    description: Collected example data
+    description: Number of users
     service: $PROJECT_NAME-server
     command: >
       echo "Number of users: $(ls /code/data/*.meta | wc -l)"

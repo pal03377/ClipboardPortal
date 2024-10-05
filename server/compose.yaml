@@ -1,5 +1,5 @@
 services:
-  python-template:
+  clipboard-portal-server:
     container_name: $PROJECT_NAME-server # Needed for admin-alias.yaml to work (service reference). Unique name per project to be able to have multiple projects based on this
     build: .
     environment:
