@@ -5,7 +5,7 @@ info:
     description: Number of users
     service: $PROJECT_NAME-server
     command: >
-      echo "Number of users: $(ls /code/data/*.meta | wc -l)"
+      echo "{\"Number of users\": $(ls /code/data/*.meta | wc -l)}"
 
 # Configuration of the admin backup tool
 backup:
