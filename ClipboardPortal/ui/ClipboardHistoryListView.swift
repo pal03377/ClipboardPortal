@@ -87,7 +87,7 @@ struct ClipboardHistoryListEntryView: View {
 }
 
 
-#Preview {
+struct ClipboardHistoryListEntryViewPreview: View {
     @State var history = [
         ClipboardHistoryEntry(content: .text("Some copied text 1"), received: false),
         ClipboardHistoryEntry(content: .text("Some copied text 2"), received: false),
@@ -96,15 +96,20 @@ struct ClipboardHistoryListEntryView: View {
         ClipboardHistoryEntry(content: .text("12345678"), received: true),
         ClipboardHistoryEntry(content: .text("87654321"), received: true),
     ]
-    return VStack {
-        Button("Add") {
-            history.append(ClipboardHistoryEntry(content: .text("Some copied text \(history.count + 1)"), received: Bool.random()))
-        }.padding()
-        ClipboardHistoryListView(history: history) { _ in }
-            .frame(maxWidth: 300)
-            .padding()
-            .onAppear {
-                SettingsStore.shared.settingsData.receiverId = "87654321"
-            }
+    var body: some View {
+        VStack {
+            Button("Add") {
+                history.append(ClipboardHistoryEntry(content: .text("Some copied text \(history.count + 1)"), received: Bool.random()))
+            }.padding()
+            ClipboardHistoryListView(history: history) { _ in }
+                .frame(maxWidth: 300)
+                .padding()
+                .onAppear {
+                    SettingsStore.shared.settingsData.receiverId = "87654321"
+                }
+        }
     }
+}
+#Preview {
+    ClipboardHistoryListEntryViewPreview()
 }

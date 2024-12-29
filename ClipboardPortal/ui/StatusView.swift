@@ -25,27 +25,38 @@ struct StatusView: View {
         }
     }
 }
-#Preview("Error") {
+
+struct StatusViewErrorPreview: View {
     @State var errorMessage = "There was some very bad error!"
-    return VStack {
-        ZStack {
-            Text("Some content")
+    var body: some View {
+        VStack {
+            ZStack {
+                Text("Some content")
+            }
+            .padding(64)
+            .overlay(alignment: .bottomTrailing) {
+                StatusView(errorMessage: errorMessage)
+            }
         }
-        .padding(64)
-        .overlay(alignment: .bottomTrailing) {
-            StatusView(errorMessage: errorMessage)
+    }
+}
+#Preview("Error") {
+    StatusViewErrorPreview()
+}
+struct StatusViewConnectingPreview: View {
+    @State var connecting = true
+    var body: some View {
+        VStack {
+            ZStack {
+                Text("Some content")
+            }
+            .padding(64)
+            .overlay(alignment: .bottomTrailing) {
+                StatusView(connecting: connecting)
+            }
         }
     }
 }
 #Preview("Connecting") {
-    @State var connecting = true
-    return VStack {
-        ZStack {
-            Text("Some content")
-        }
-        .padding(64)
-        .overlay(alignment: .bottomTrailing) {
-            StatusView(connecting: connecting)
-        }
-    }
+    StatusViewConnectingPreview()
 }

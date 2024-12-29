@@ -94,7 +94,7 @@ struct ClipboardPortalApp: App {
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
-                    await ClipboardManager.shared.connectForUpdates()
+                    ClipboardManager.shared.connectForUpdates()
                 }
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
