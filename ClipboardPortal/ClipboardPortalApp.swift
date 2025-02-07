@@ -96,6 +96,15 @@ struct ClipboardPortalApp: App {
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
                     ClipboardManager.shared.connectForUpdates()
                 }
+            
+            /* For later: Hide window and only show button
+                .background(Color.clear) // Transparentes Fenster
+                .edgesIgnoringSafeArea(.all) // Keine Ränder
+                .onAppear {
+                    configureWindow()
+                }
+                .gesture(WindowDragGesture())
+             */
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
@@ -125,4 +134,22 @@ struct ClipboardPortalApp: App {
             }
         }
     }
+    
+    // For later
+    // /// Konfiguriert das Fenster für fensterlosen Betrieb und "immer on top"
+    // private func configureWindow() {
+    //     DispatchQueue.main.async {
+    //         if let window = NSApplication.shared.windows.first {
+    //             window.titleVisibility = .hidden // Titel ausblenden
+    //             window.titlebarAppearsTransparent = true // Titelbar transparent machen
+    //             window.isOpaque = false // Fensterinhalt transparent
+    //             window.backgroundColor = .clear // Hintergrundfarbe auf transparent setzen
+    //             window.hasShadow = false // Schatten entfernen
+    //             window.styleMask.remove(.resizable) // Größenänderung deaktivieren
+    //             window.styleMask.remove(.titled) // Titelbar entfernen
+    //             window.isMovableByWindowBackground = true // Bewegung per Hintergrund
+    //             window.level = .floating // Fenster immer im Vordergrund
+    //         }
+    //     }
+    // }
 }

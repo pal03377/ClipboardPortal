@@ -171,6 +171,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @Published var clipboardHistory: [ClipboardHistoryEntry] = [] // History of clipboard entries for the UI
     private var socket: WebSocket? // WebSocket connection to the server
     private var pingTimer: Timer? // Periodic timer to ping server to keep connection alive
+    private var pongReceived = false // Whether the last pong (ping answer) was received to check if the connection is still alive and maybe reconnect
 
     // ### Send ###
     /// Send specific clipboard content to the friend. Used with a parameter to enable re-sending clipboard contents from the history.
@@ -263,12 +264,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         self.connecting = true; self.receiveErrorMessage = nil // Reset last receive error message and mark as connecting
         var request = URLRequest(url: wsServerUrl)
         request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
-        if self.socket == nil {
+        if !self.connected {
             socket = WebSocket(request: request)
             socket!.delegate = self
             socket!.connect()
         }
-        /* End of old version*/
     }
     private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
@@ -292,10 +292,19 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to register for events
                 do {
                     try client.write(string: String(data: JSONEncoder().encode(UserInitialMessageDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server with user ID to get updates for that ID
+                    // Automatically reconnect when the connection is lost (broken ping)
+                    self.pongReceived = true // Mark ping as received to only reconnect when the connection is lost
                     self.pingTimer?.invalidate() // Cancel previous ping task to restart it
                     self.pingTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { timer in // Ping every Xs to keep the server connection alive
-                            guard self.connected else { timer.invalidate(); return } // Stop pinging when server is disconnected
-                            client.write(ping: Data()) // Ping server to keep connection alive
+                        // Force reconnect when connection is broken (detected by no pong answer) to fix connection issues after laptop sleep phase
+                        if !self.pongReceived { // Connection is broken (no pong answer received to ping)
+                            print("Reconnect because of broken connection")
+                            client.disconnect(); self.socket?.disconnect(); self.connected = false // Disconnect to force re-connect
+                            DispatchQueue.main.async { self.connectForUpdates() } // Reconnect
+                        } else {
+                            self.pongReceived = false // Mark pong as not received before pinging
+                            client.write(ping: Data()) // Ping the server to check the connection and keep it alive
+                        }
                     }
                 } catch { // Error while sending greeting message?
                     self.receiveErrorMessage = "User does not exist"; self.connected = false // Update connection status. Update in UI thread.
@@ -331,12 +340,12 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             print("Unsupported binary data from server")
             DispatchQueue.main.async { self.receiveErrorMessage = "Server sent unsupported binary data" } // Show error. Update in UI thread.
         case .ping: break // Ignore ping events
-        case .pong: break // Ignore pong events
+        case .pong: self.pongReceived = true; break // Remember pong events for the reconnection mechanism
         case .viabilityChanged(let connected): // Connection status changed?
             DispatchQueue.main.async { self.connected = connected } // Show new connection status in status view on the bottom right
             break
         case .reconnectSuggested: // Connection should be restarted?
-            self.retryConnectForUpdatesAfterDelay() // Restart connection after delay
+            self.socket?.disconnect(); self.connected = false; self.retryConnectForUpdatesAfterDelay() // Restart connection after delay
             break
         case .cancelled: // Connection cancelled
             DispatchQueue.main.async { self.connected = false } // Update connection status
