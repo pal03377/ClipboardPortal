@@ -68,6 +68,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     print("Wrong URL: Missing content GET param")
                 }
             }
+            else if url.host == "recover" { // Recover last received clipboard item by regex
+                guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+                      let queryItems = components.queryItems else {
+                    print("Invalid URL or missing components")
+                    return
+                }
+                let regexString = queryItems.first(where: { $0.name == "regex" })?.value ?? ""
+                Task {
+                    await ClipboardManager.shared.recoverLastReceivedClipboardItem(matching: regexString)
+                }
+            }
         }
     }
 }

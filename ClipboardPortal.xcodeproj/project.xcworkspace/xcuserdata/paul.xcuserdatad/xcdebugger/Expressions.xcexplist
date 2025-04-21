@@ -11,6 +11,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "ClipboardManager.recoverLastReceivedClipboardItem(matching:):ClipboardManager.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.clipboardHistory">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "static ServerRequest.post&lt;&#x3c4;_0_0&gt;(path:body:):ServerRequest.swift">
          <PersistentStrings>
             <PersistentString

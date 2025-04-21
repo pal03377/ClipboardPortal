@@ -473,4 +473,14 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     deinit {
         self.disconnect(closeCode: CloseCode.normal.rawValue) // Disconnect on deinit of the class
     }
+    
+    @MainActor
+    public func recoverLastReceivedClipboardItem(matching regexString: String) async {
+        // Recover last received clipboard item by regex
+        guard let regex = try? NSRegularExpression(pattern: regexString, options: []) else { return } // Create regex
+        let lastReceivedItemMatchingRegex = self.clipboardHistory.filter { $0.received && regex.firstMatch(in: $0.content.description, options: [], range: NSRange(location: 0, length: $0.content.description.count)) != nil }
+        guard let lastReceivedItem = lastReceivedItemMatchingRegex.first else { return } // Get first matching item
+        // Copy to clipboard
+        await self.onReceivedClipboardContent(lastReceivedItem.content) // Copy to clipboard (and maybe open URL)
+    }
 }
