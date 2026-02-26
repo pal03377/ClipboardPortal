@@ -234,6 +234,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             let responseString = String(data: data, encoding: .utf8)!
             print("Response: \(responseString)")
             if case .confetti = content { return } // No history entry and no sound for confetti event transfer
+            SettingsStore.shared.registerSentTransfer(byteCount: data.count)
             self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
             Task { await playSoundEffect(.send) }
         } catch {
@@ -407,6 +408,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 // Check if the file is a text or a file
                 if contentMeta.type == .text, let text = String(data: data, encoding: .utf8) { // Text clipboard contents?
                     print("Got text \(text)")
+                    SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                     await self.onReceivedClipboardContent(.text(text))
                 } else if contentMeta.type == .file { // File clipboard contents?
                     print("Got file \(location)")
@@ -414,6 +416,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                     do {
                         // Move the temporary file into the Downloads folder
                         let downloadFolderFileURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: contentMeta.filename!)
+                        SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                         // Copy the file to the clipboard, update the history and send a notification
                         await self.onReceivedClipboardContent(.file(downloadFolderFileURL))
                     } catch {

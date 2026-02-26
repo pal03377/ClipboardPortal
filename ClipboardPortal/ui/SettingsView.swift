@@ -5,6 +5,10 @@ struct SettingsView: View {
     @StateObject private var userStore = UserStore.shared // Observe changes to user
     @State private var isFriendsCodePopupOpen = false
     @FocusState private var receiverIdInputFocused
+
+    private var formattedTotalTransferred: String {
+        ByteCountFormatter.string(fromByteCount: Int64(settingsStore.settingsData.totalTransferredBytes), countStyle: .file)
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -78,6 +82,9 @@ struct SettingsView: View {
             }.task(id: settingsStore.settingsData.receiveSoundEnabled) {
                 Task { try await settingsStore.save() }
             }
+            Text("Sent: \(settingsStore.settingsData.sentItemsCount) | Received: \(settingsStore.settingsData.receivedItemsCount) | Data: \(formattedTotalTransferred)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .frame(width: 200)
     }
