@@ -1,0 +1,61 @@
+{
+  "fill" : {
+    "solid" : "display-p3:0.07065,0.18087,0.44150,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "clipboardportal-whirl-top.png",
+          "name" : "clipboardportal-whirl-top",
+          "position" : {
+            "scale" : 1.23,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "image-name" : "clipboardportal-clip.png",
+          "name" : "clipboardportal-clip",
+          "position" : {
+            "scale" : 1.05,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "glass" : false,
+          "image-name" : "clipboardportal-whirl-bottom.png",
+          "name" : "clipboardportal-whirl-bottom",
+          "position" : {
+            "scale" : 1.23,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA1CEF752E7C73F400EF4C69 /* ClipboardPortal.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA1CEF742E7C73F400EF4C69 /* ClipboardPortal.icon */; };
 		DA3703742C601AC1004B326F /* MoveFileToDownloads.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */; };
 		DA3703762C6070E1004B326F /* FriendRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703752C6070E1004B326F /* FriendRequest.swift */; };
 		DA3703782C607258004B326F /* FriendRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3703772C607258004B326F /* FriendRequestView.swift */; };
@@ -53,6 +54,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA1CEF742E7C73F400EF4C69 /* ClipboardPortal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ClipboardPortal.icon; sourceTree = "<group>"; };
 		DA3703732C601AC1004B326F /* MoveFileToDownloads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MoveFileToDownloads.swift; path = ClipboardPortal/MoveFileToDownloads.swift; sourceTree = "<group>"; };
 		DA3703752C6070E1004B326F /* FriendRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendRequest.swift; path = ClipboardPortal/FriendRequest.swift; sourceTree = "<group>"; };
 		DA3703772C607258004B326F /* FriendRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendRequestView.swift; path = ClipboardPortal/ui/FriendRequestView.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				DA99FF612C13471200769146 /* ConfigDevelopment.xcconfig */,
 				DA99FF632C13471200769146 /* ConfigProduction.xcconfig */,
 				DA99FF562C13471200769146 /* Info.plist */,
+				DA1CEF742E7C73F400EF4C69 /* ClipboardPortal.icon */,
 				DAAB33BC2BCAFDCB00C82DF4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -219,7 +222,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					DAAB33BA2BCAFDCB00C82DF4 = {
 						CreatedOnToolsVersion = 15.1;
@@ -255,6 +258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA6F617A2C601335007C30FB /* receive.mp3 in Resources */,
+				DA1CEF752E7C73F400EF4C69 /* ClipboardPortal.icon in Resources */,
 				DA6F617B2C601335007C30FB /* send.mp3 in Resources */,
 				DAFE18792C178BEF00360134 /* Assets.xcassets in Resources */,
 			);
@@ -335,6 +339,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -358,6 +363,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -400,6 +406,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 5D4FR5T9QN;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -416,6 +423,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -423,7 +431,7 @@
 		DAAB33CB2BCAFDCD00C82DF4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ClipboardPortal;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -432,12 +440,15 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 20;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 5D4FR5T9QN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ClipboardPortal/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Portal";
@@ -448,8 +459,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.6;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -462,7 +473,7 @@
 		DAAB33CC2BCAFDCD00C82DF4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ClipboardPortal;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -471,12 +482,15 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 20;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 5D4FR5T9QN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ClipboardPortal/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Clipboard Portal";
@@ -487,8 +501,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.6;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
