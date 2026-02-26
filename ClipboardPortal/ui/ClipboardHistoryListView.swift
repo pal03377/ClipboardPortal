@@ -36,6 +36,7 @@ struct ClipboardHistoryListEntryView: View {
                 .if(entry.content.typeDescription == "file") { view in
                     var fileURL: URL = .downloadsDirectory
                     if case let .file(url) = entry.content { fileURL = url }
+                    if case let .fileCollection(url, _) = entry.content { fileURL = url }
                     return view.draggable(fileURL)
                 }
             Group {

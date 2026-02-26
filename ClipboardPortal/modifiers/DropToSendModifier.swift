@@ -22,12 +22,11 @@ struct DropToSendModifier: ViewModifier {
         }
         // Drop files
         .dropDestination(for: URL.self) { items, location in
-            guard let fileURL = items.first else { return false }
+            guard !items.isEmpty else { return false }
             Task {
-                await ClipboardManager.shared.sendClipboardContent(.file(fileURL))
+                await ClipboardManager.shared.sendFileSystemItems(items)
             }
             return true
         } isTargeted: { targeted = $0 }
     }
 }
-

@@ -58,6 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         let clipboardContent: ClipboardContent? = switch type {
                         case "text": .text(content)
                         case "file": if let url = URL(string: content) { .file(url) } else { nil }
+                        case "fileCollection": if let url = URL(string: content) { .fileCollection(url, []) } else { nil }
                         default: .text(content)
                         }
                         guard let clipboardContent else { return }
