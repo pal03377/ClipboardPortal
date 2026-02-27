@@ -16,7 +16,6 @@
 		DA6F617A2C601335007C30FB /* receive.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA4A24882C5F381D0032E3F0 /* receive.mp3 */; };
 		DA6F617B2C601335007C30FB /* send.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA4A24872C5F381D0032E3F0 /* send.mp3 */; };
 		DA82955D2C1CAEDA00ADFA1E /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = DA82955C2C1CAEDA00ADFA1E /* KeyboardShortcuts */; };
-		DA90AA052F00000100AA5501 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = DA90AA042F00000100AA5501 /* ZIPFoundation */; };
 		DA84EF932C572845005A2A26 /* ClipboardHistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8D2C572845005A2A26 /* ClipboardHistoryListView.swift */; };
 		DA84EF942C572845005A2A26 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF902C572845005A2A26 /* SettingsView.swift */; };
 		DA84EF952C572845005A2A26 /* KeyPressModifierMacOS14.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF882C572845005A2A26 /* KeyPressModifierMacOS14.swift */; };
@@ -28,6 +27,7 @@
 		DA84EF9B2C572845005A2A26 /* NotificationsToggleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8F2C572845005A2A26 /* NotificationsToggleView.swift */; };
 		DA84EF9C2C572845005A2A26 /* GlobalKeyboardShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA84EF8A2C572845005A2A26 /* GlobalKeyboardShortcut.swift */; };
 		DA84EF9F2C574204005A2A26 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DA84EF9E2C574204005A2A26 /* Starscream */; };
+		DA90AA052F00000100AA5501 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = DA90AA042F00000100AA5501 /* ZIPFoundation */; };
 		DA99FF6C2C13471200769146 /* LocalNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF572C13471200769146 /* LocalNotification.swift */; };
 		DA99FF6D2C13471200769146 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF582C13471200769146 /* SettingsStore.swift */; };
 		DA99FF6E2C13471200769146 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA99FF592C13471200769146 /* ClipboardManager.swift */; };
@@ -444,7 +444,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
@@ -464,7 +464,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 1.9;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -486,7 +486,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
@@ -506,7 +506,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 1.9;
 				PRODUCT_BUNDLE_IDENTIFIER = de.pschwind.ClipboardPortal;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -547,20 +547,20 @@
 				minimumVersion = 2.0.1;
 			};
 		};
-		DA90AA032F00000100AA5501 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.9.19;
-			};
-		};
 		DA84EF9D2C574204005A2A26 /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 4.0.8;
+			};
+		};
+		DA90AA032F00000100AA5501 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -571,15 +571,15 @@
 			package = DA82955B2C1CAEDA00ADFA1E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		DA90AA042F00000100AA5501 /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DA90AA032F00000100AA5501 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
-		};
 		DA84EF9E2C574204005A2A26 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DA84EF9D2C574204005A2A26 /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
+		};
+		DA90AA042F00000100AA5501 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA90AA032F00000100AA5501 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
