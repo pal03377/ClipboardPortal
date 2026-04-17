@@ -1,13 +1,13 @@
 {
-  "originHash" : "384cfec6dd6b3b2b3cf7db06a05791bbb8c35e86671395cce88cbb04110c691e",
+  "originHash" : "1544be334d8d2a1b98cadf004c451f083127c5cde70dad05a18e1e82005ef1ed",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
-        "revision" : "e6b60117ec266e1e5d059f7f34815144f9762b36",
-        "version" : "2.0.2"
+        "revision" : "045cf174010beb335fa1d2567d18c057b8787165",
+        "version" : "2.3.0"
       }
     },
     {
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
         "version" : "4.0.8"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation",
+      "state" : {
+        "revision" : "22787ffb59de99e5dc1fbfe80b19c97a904ad48d",
+        "version" : "0.9.20"
       }
     }
   ],

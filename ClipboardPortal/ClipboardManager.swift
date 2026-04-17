@@ -2,16 +2,21 @@ import Foundation
 import AppKit
 
 import Starscream // For WebSockets
+import ZIPFoundation
 
 enum ClipboardManagerError {
     case encryptedMetadataEncoding
     case contentsFromStranger
+    case archiveCreationFailed
+    case archiveExtractionFailed
 }
 extension ClipboardManagerError: LocalizedError { // Nice error messages
     public var errorDescription: String? {
         switch self {
         case .encryptedMetadataEncoding: "Clipboard metadata broken. Update the app."
         case .contentsFromStranger: "Received clipboard contents from a stranger. Add them as a friend first."
+        case .archiveCreationFailed: "Could not package files for sending."
+        case .archiveExtractionFailed: "Could not unpack the received files."
         }
     }
 }
@@ -20,6 +25,7 @@ extension ClipboardManagerError: LocalizedError { // Nice error messages
 enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     case text(String)
     case file(URL)
+    case fileCollection(URL, [String]) // ZIP used for transferring multiple files/folders
     case confetti // For showing confetti in the Confetti Magic app
     
     // String representation of content for UI. Use pattern matching for getting the text or URL.
@@ -27,6 +33,9 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text(let text): return text
         case .file(let url):  return url.lastPathComponent // Filename e.g. "myfile.txt"
+        case .fileCollection(let url, let names):
+            if names.isEmpty { return url.lastPathComponent }
+            return names.joined(separator: ", ")
         case .confetti:       return "🎉"
         }
     }
@@ -34,9 +43,10 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     // Data representation for sending to the server
     var data: Data? {
         switch self {
-        case .text(let text): return text.data(using: .utf8)
-        case .file(let url):  return try? Data(contentsOf: url)
-        case .confetti:       return Data()
+        case .text(let text):             return text.data(using: .utf8)
+        case .file(let url):              return try? Data(contentsOf: url)
+        case .fileCollection(let url, _): return try? Data(contentsOf: url)
+        case .confetti:                   return Data()
         }
     }
     
@@ -45,6 +55,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text: "text"
         case .file: "file"
+        case .fileCollection: "files"
         case .confetti: "confetti"
         }
     }
@@ -64,6 +75,8 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
             }
         case .file(let fileURL):
             pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Copy as file URL e.g. for pasting in Finder or an image into an image editing app
+        case .fileCollection(let fileURL, _):
+            pasteboard.setString(fileURL.absoluteString, forType: .fileURL)
         case .confetti: break // Cannot copy confetti event. This will never be executed anyway.
         }
     }
@@ -79,17 +92,39 @@ struct ClipboardContentSendMetadata: Codable {
         enum ClipboardContentType: String, Codable {
             case text = "text"
             case file = "file"
+            case fileCollection = "fileCollection"
             case confetti = "confetti"
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.singleValueContainer()
+                let value = try container.decode(String.self)
+                switch value {
+                case "text": self = .text
+                case "file": self = .file
+                case "fileCollection": self = .fileCollection
+                case "confetti": self = .confetti
+                default:
+                    throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown clipboard content type: \(value)")
+                }
+            }
+
+            func encode(to encoder: Encoder) throws {
+                var container = encoder.singleValueContainer()
+                try container.encode(self.rawValue)
+            }
+
             static func fromClipboardContent(_ content: ClipboardContent) -> Self {
                 switch content {
                 case .text: .text
                 case .file: .file
+                case .fileCollection: .fileCollection
                 case .confetti: .confetti
                 }
             }
         }
         let type: ClipboardContentType // Type of content
         let filename: String? // Filename for files or nil
+        let filenames: [String]? // Multiple names for file collections
         
         @MainActor
         static func fromEncryptedMetadataBase64(_ encryptedBase64: String, senderId: String) throws -> Self {
@@ -122,14 +157,20 @@ struct ClipboardContentSendMetadata: Codable {
     static func fromClipboardContent(_ content: ClipboardContent, receiverId: String) throws -> Self {
         let filename: String? = switch content { // Filename for sending
         case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
+        case .fileCollection(let fileURL, _): fileURL.lastPathComponent
         case .text: nil
         case .confetti: nil
+        }
+        let filenames: [String]? = switch content {
+        case .fileCollection(_, let names): names
+        default: nil
         }
         return try Self(
             senderId: UserStore.shared.user!.id,
             encryptedContentMetadataBase64: ContentMetadata(
                 type: .fromClipboardContent(content),
-                filename: filename
+                filename: filename,
+                filenames: filenames
             ).toEncryptedMetadatabase64(receiverId: receiverId)
         )
     }
@@ -171,6 +212,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @Published var clipboardHistory: [ClipboardHistoryEntry] = [] // History of clipboard entries for the UI
     private var socket: WebSocket? // WebSocket connection to the server
     private var pingTimer: Timer? // Periodic timer to ping server to keep connection alive
+    private var pongReceived = false // Whether the last pong (ping answer) was received to check if the connection is still alive and maybe reconnect
 
     // ### Send ###
     /// Send specific clipboard content to the friend. Used with a parameter to enable re-sending clipboard contents from the history.
@@ -178,6 +220,14 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     @MainActor
     func sendClipboardContent(_ content: ClipboardContent) async { // data -> to send, textForm -> to display in history
         print("Sending \(content)")
+        if case let .file(fileURL) = content, self.isDirectory(fileURL) {
+            await self.sendFileSystemItems([fileURL])
+            return
+        }
+        if case let .fileCollection(fileURL, _) = content, self.isDirectory(fileURL) {
+            await self.sendFileSystemItems([fileURL])
+            return
+        }
         let receiverId = SettingsStore.shared.settingsData.receiverId
         guard receiverId != "" else {
             self.sendErrorMessage = "No receiver configured. Go to settings." // Show error if there is no receiver yet. Update UI in main thread.
@@ -233,6 +283,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             let responseString = String(data: data, encoding: .utf8)!
             print("Response: \(responseString)")
             if case .confetti = content { return } // No history entry and no sound for confetti event transfer
+            SettingsStore.shared.registerSentTransfer(byteCount: data.count)
             self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
             Task { await playSoundEffect(.send) }
         } catch {
@@ -243,15 +294,87 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     /// Send the computer clipboard to the friend.
     @MainActor
     func sendClipboardContent() async {
-        if let fileUrlString = NSPasteboard.general.propertyList(forType: .fileURL) as? String { // File in clipboard?
-            guard let fileUrl = URL(string: fileUrlString) else { await self.sendClipboardContent(.text(fileUrlString)); return } // Fall back to sending the file URL if it cannot be read as a URL
-            await self.sendClipboardContent(.file(fileUrl)) // Send file
+        let fileURLs = (NSPasteboard.general.readObjects(
+            forClasses: [NSURL.self],
+            options: [.urlReadingFileURLsOnly: true]
+        ) as? [URL]) ?? []
+        if !fileURLs.isEmpty {
+            await self.sendFileSystemItems(fileURLs)
         } else if var content = NSPasteboard.general.string(forType: .string) { // Text in clipboard?
             if content == "rick" { content = "https://www.youtube.com/watch?v=xvFZjo5PgG0" } // Easter egg
             await self.sendClipboardContent(.text(content)) // Send text
         } else { // No supported clipboard content?
             self.sendErrorMessage = "No sendable clipboard content." // Show error. Update UI in main thread.
         }
+    }
+
+    @MainActor
+    func sendFileSystemItems(_ fileURLs: [URL]) async {
+        let urls = fileURLs.filter { $0.isFileURL }
+        guard !urls.isEmpty else {
+            self.sendErrorMessage = "No files selected to send."
+            return
+        }
+        if urls.count == 1, let singleURL = urls.first, !self.isDirectory(singleURL) {
+            await self.sendClipboardContent(.file(singleURL))
+            return
+        }
+        do {
+            let archiveURL = try self.createTransferArchive(for: urls)
+            let sentNames = urls.map(\.lastPathComponent)
+            await self.sendClipboardContent(.fileCollection(archiveURL, sentNames))
+        } catch {
+            print("Archive creation error: \(error)")
+            self.sendErrorMessage = (error as? LocalizedError)?.errorDescription ?? ClipboardManagerError.archiveCreationFailed.localizedDescription
+        }
+    }
+
+    private func isDirectory(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+    }
+
+    private func createTransferArchive(for urls: [URL]) throws -> URL {
+        let fileManager = FileManager.default
+        if urls.count == 1, let directoryURL = urls.first {
+            let archiveName = directoryURL.lastPathComponent + ".zip"
+            let archiveURL = self.makeUniqueURL(in: fileManager.temporaryDirectory, preferredFilename: archiveName)
+            try fileManager.zipItem(at: directoryURL, to: archiveURL, shouldKeepParent: true)
+            return archiveURL
+        }
+
+        let stagingDirectory = fileManager.temporaryDirectory.appendingPathComponent("ClipboardPortal-Bundle-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: stagingDirectory, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: stagingDirectory) }
+
+        for sourceURL in urls {
+            var targetURL = stagingDirectory.appendingPathComponent(sourceURL.lastPathComponent)
+            var counter = 2
+            while fileManager.fileExists(atPath: targetURL.path) {
+                let base = sourceURL.deletingPathExtension().lastPathComponent
+                let ext = sourceURL.pathExtension
+                let candidate = ext.isEmpty ? "\(base)-\(counter)" : "\(base)-\(counter).\(ext)"
+                targetURL = stagingDirectory.appendingPathComponent(candidate)
+                counter += 1
+            }
+            try fileManager.copyItem(at: sourceURL, to: targetURL)
+        }
+
+        let archiveURL = self.makeUniqueURL(in: fileManager.temporaryDirectory, preferredFilename: "ClipboardPortal-Bundle.zip")
+        try fileManager.zipItem(at: stagingDirectory, to: archiveURL, shouldKeepParent: false)
+        return archiveURL
+    }
+
+    private func makeUniqueURL(in directory: URL, preferredFilename: String) -> URL {
+        var destinationURL = directory.appendingPathComponent(preferredFilename)
+        let ext = destinationURL.pathExtension
+        let base = destinationURL.deletingPathExtension().lastPathComponent
+        var counter = 2
+        while FileManager.default.fileExists(atPath: destinationURL.path) {
+            let candidateName = ext.isEmpty ? "\(base)-\(counter)" : "\(base)-\(counter).\(ext)"
+            destinationURL = directory.appendingPathComponent(candidateName)
+            counter += 1
+        }
+        return destinationURL
     }
     
     
@@ -263,12 +386,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         self.connecting = true; self.receiveErrorMessage = nil // Reset last receive error message and mark as connecting
         var request = URLRequest(url: wsServerUrl)
         request.timeoutInterval = 10 * 365 * 24 * 60 * 60 // Wait as long as possible until clipboard content arrives
-        if self.socket == nil {
+        if !self.connected {
             socket = WebSocket(request: request)
             socket!.delegate = self
             socket!.connect()
         }
-        /* End of old version*/
     }
     private func retryConnectForUpdatesAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { // Retry connecting after Xs
@@ -292,10 +414,19 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 guard let user = UserStore.shared.user else { print("Cannot connect to WebSocket without user"); return } // Require user to register for events
                 do {
                     try client.write(string: String(data: JSONEncoder().encode(UserInitialMessageDTO(id: user.id)), encoding: .utf8)!) // Send initial greeting message to server with user ID to get updates for that ID
+                    // Automatically reconnect when the connection is lost (broken ping)
+                    self.pongReceived = true // Mark ping as received to only reconnect when the connection is lost
                     self.pingTimer?.invalidate() // Cancel previous ping task to restart it
                     self.pingTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { timer in // Ping every Xs to keep the server connection alive
-                            guard self.connected else { timer.invalidate(); return } // Stop pinging when server is disconnected
-                            client.write(ping: Data()) // Ping server to keep connection alive
+                        // Force reconnect when connection is broken (detected by no pong answer) to fix connection issues after laptop sleep phase
+                        if !self.pongReceived { // Connection is broken (no pong answer received to ping)
+                            print("Reconnect because of broken connection")
+                            client.disconnect(); self.socket?.disconnect(); self.connected = false // Disconnect to force re-connect
+                            DispatchQueue.main.async { self.connectForUpdates() } // Reconnect
+                        } else {
+                            self.pongReceived = false // Mark pong as not received before pinging
+                            client.write(ping: Data()) // Ping the server to check the connection and keep it alive
+                        }
                     }
                 } catch { // Error while sending greeting message?
                     self.receiveErrorMessage = "User does not exist"; self.connected = false // Update connection status. Update in UI thread.
@@ -331,12 +462,12 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             print("Unsupported binary data from server")
             DispatchQueue.main.async { self.receiveErrorMessage = "Server sent unsupported binary data" } // Show error. Update in UI thread.
         case .ping: break // Ignore ping events
-        case .pong: break // Ignore pong events
+        case .pong: self.pongReceived = true; break // Remember pong events for the reconnection mechanism
         case .viabilityChanged(let connected): // Connection status changed?
             DispatchQueue.main.async { self.connected = connected } // Show new connection status in status view on the bottom right
             break
         case .reconnectSuggested: // Connection should be restarted?
-            self.retryConnectForUpdatesAfterDelay() // Restart connection after delay
+            self.socket?.disconnect(); self.connected = false; self.retryConnectForUpdatesAfterDelay() // Restart connection after delay
             break
         case .cancelled: // Connection cancelled
             DispatchQueue.main.async { self.connected = false } // Update connection status
@@ -398,6 +529,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 // Check if the file is a text or a file
                 if contentMeta.type == .text, let text = String(data: data, encoding: .utf8) { // Text clipboard contents?
                     print("Got text \(text)")
+                    SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                     await self.onReceivedClipboardContent(.text(text))
                 } else if contentMeta.type == .file { // File clipboard contents?
                     print("Got file \(location)")
@@ -405,11 +537,25 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                     do {
                         // Move the temporary file into the Downloads folder
                         let downloadFolderFileURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: contentMeta.filename!)
+                        SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                         // Copy the file to the clipboard, update the history and send a notification
                         await self.onReceivedClipboardContent(.file(downloadFolderFileURL))
                     } catch {
                         print(error)
                         DispatchQueue.main.async { self.receiveErrorMessage = "Saving download failed: " + error.localizedDescription }
+                    }
+                } else if contentMeta.type == .fileCollection {
+                    print("Got file collection \(location)")
+                    try data.write(to: location)
+                    do {
+                        let archiveName = contentMeta.filename ?? "ClipboardPortal-Bundle.zip"
+                        let movedArchiveURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: archiveName)
+                        let representativeURL = try self.extractTransferredCollectionToDownloads(at: movedArchiveURL)
+                        SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
+                        await self.onReceivedClipboardContent(.fileCollection(representativeURL, contentMeta.filenames ?? []))
+                    } catch {
+                        print(error)
+                        DispatchQueue.main.async { self.receiveErrorMessage = "Unpacking download failed: " + error.localizedDescription }
                     }
                 } else if contentMeta.type == .confetti {
                     print("Got confetti")
@@ -453,7 +599,30 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             }
         }
     }
-    
+
+    private func extractTransferredCollectionToDownloads(at archiveURL: URL) throws -> URL {
+        let fileManager = FileManager.default
+        let downloadsDirectory = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+        let extractionDirectory = fileManager.temporaryDirectory.appendingPathComponent("ClipboardPortal-Extract-\(UUID().uuidString)", isDirectory: true)
+        try fileManager.createDirectory(at: extractionDirectory, withIntermediateDirectories: true)
+        defer { try? fileManager.removeItem(at: extractionDirectory) }
+
+        try fileManager.unzipItem(at: archiveURL, to: extractionDirectory)
+        let extractedEntries = try fileManager.contentsOfDirectory(at: extractionDirectory, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+        guard !extractedEntries.isEmpty else { throw ClipboardManagerError.archiveExtractionFailed }
+
+        var movedEntries: [URL] = []
+        for entry in extractedEntries {
+            let destination = self.makeUniqueURL(in: downloadsDirectory, preferredFilename: entry.lastPathComponent)
+            try fileManager.moveItem(at: entry, to: destination)
+            movedEntries.append(destination)
+        }
+        try? fileManager.removeItem(at: archiveURL)
+        guard let representativeURL = movedEntries.first else { throw ClipboardManagerError.archiveExtractionFailed }
+        return representativeURL
+    }
+
+
     // Attempt to fix ClipboardPortal crashing on Johannes's M2 Ultra MacBook Pro
     func disconnect(closeCode: UInt16 = CloseCode.normal.rawValue) {
         guard self.socket != nil else { return }
@@ -463,5 +632,15 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
     }
     deinit {
         self.disconnect(closeCode: CloseCode.normal.rawValue) // Disconnect on deinit of the class
+    }
+    
+    @MainActor
+    public func recoverLastReceivedClipboardItem(matching regexString: String) async {
+        // Recover last received clipboard item by regex
+        guard let regex = try? NSRegularExpression(pattern: regexString, options: []) else { return } // Create regex
+        let lastReceivedItemMatchingRegex = self.clipboardHistory.filter { $0.received && regex.firstMatch(in: $0.content.description, options: [], range: NSRange(location: 0, length: $0.content.description.count)) != nil }
+        guard let lastReceivedItem = lastReceivedItemMatchingRegex.first else { return } // Get first matching item
+        // Copy to clipboard
+        await self.onReceivedClipboardContent(lastReceivedItem.content) // Copy to clipboard (and maybe open URL)
     }
 }

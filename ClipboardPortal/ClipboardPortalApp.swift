@@ -58,6 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         let clipboardContent: ClipboardContent? = switch type {
                         case "text": .text(content)
                         case "file": if let url = URL(string: content) { .file(url) } else { nil }
+                        case "fileCollection": if let url = URL(string: content) { .fileCollection(url, []) } else { nil }
                         default: .text(content)
                         }
                         guard let clipboardContent else { return }
@@ -66,6 +67,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     }
                 } else {
                     print("Wrong URL: Missing content GET param")
+                }
+            }
+            else if url.host == "recover" { // Recover last received clipboard item by regex
+                guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+                      let queryItems = components.queryItems else {
+                    print("Invalid URL or missing components")
+                    return
+                }
+                let regexString = queryItems.first(where: { $0.name == "regex" })?.value ?? ""
+                Task {
+                    await ClipboardManager.shared.recoverLastReceivedClipboardItem(matching: regexString)
                 }
             }
         }
@@ -96,6 +108,15 @@ struct ClipboardPortalApp: App {
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
                     ClipboardManager.shared.connectForUpdates()
                 }
+            
+            /* For later: Hide window and only show button
+                .background(Color.clear) // Transparentes Fenster
+                .edgesIgnoringSafeArea(.all) // Keine Ränder
+                .onAppear {
+                    configureWindow()
+                }
+                .gesture(WindowDragGesture())
+             */
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
         .windowResizability(.contentSize)
@@ -125,4 +146,22 @@ struct ClipboardPortalApp: App {
             }
         }
     }
+    
+    // For later
+    // /// Konfiguriert das Fenster für fensterlosen Betrieb und "immer on top"
+    // private func configureWindow() {
+    //     DispatchQueue.main.async {
+    //         if let window = NSApplication.shared.windows.first {
+    //             window.titleVisibility = .hidden // Titel ausblenden
+    //             window.titlebarAppearsTransparent = true // Titelbar transparent machen
+    //             window.isOpaque = false // Fensterinhalt transparent
+    //             window.backgroundColor = .clear // Hintergrundfarbe auf transparent setzen
+    //             window.hasShadow = false // Schatten entfernen
+    //             window.styleMask.remove(.resizable) // Größenänderung deaktivieren
+    //             window.styleMask.remove(.titled) // Titelbar entfernen
+    //             window.isMovableByWindowBackground = true // Bewegung per Hintergrund
+    //             window.level = .floating // Fenster immer im Vordergrund
+    //         }
+    //     }
+    // }
 }
