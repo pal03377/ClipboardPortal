@@ -1,9 +1,11 @@
 import SwiftUI
+import KeyboardShortcuts
 
 struct SettingsView: View {
     @StateObject private var settingsStore = SettingsStore.shared // Observe changes to settings
     @StateObject private var userStore = UserStore.shared // Observe changes to user
     @State private var isFriendsCodePopupOpen = false
+    @Environment(\.openWindow) private var openWindow
     @FocusState private var receiverIdInputFocused
 
     private var formattedTotalTransferred: String {
@@ -71,22 +73,71 @@ struct SettingsView: View {
             Divider()
             Spacer().frame(height: 8)
             GlobalKeyboardShortcutView()
-            NotificationsToggleView()
-            Toggle(isOn: $settingsStore.settingsData.sendSoundEnabled) {
-                Text("Sound when sending")
-            }.task(id: settingsStore.settingsData.sendSoundEnabled) {
-                Task { try await settingsStore.save() }
-            }
-            Toggle(isOn: $settingsStore.settingsData.receiveSoundEnabled) {
-                Text("Sound when receiving")
-            }.task(id: settingsStore.settingsData.receiveSoundEnabled) {
-                Task { try await settingsStore.save() }
+            Button {
+                openWindow(id: "more-settings")
+            } label: {
+                Text("More Settings")
+                    .frame(maxWidth: .infinity)
             }
             Text("Sent: \(settingsStore.settingsData.sentItemsCount) | Received: \(settingsStore.settingsData.receivedItemsCount) | Data: \(formattedTotalTransferred)")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
         .frame(width: 200)
+    }
+}
+
+struct MoreSettingsView: View {
+    @StateObject private var settingsStore = SettingsStore.shared
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            NotificationsToggleView()
+            Toggle(isOn: $settingsStore.settingsData.sendSoundEnabled) {
+                Text("Sound when sending")
+            }
+            Toggle(isOn: $settingsStore.settingsData.receiveSoundEnabled) {
+                Text("Sound when receiving")
+            }
+
+            Divider()
+
+            Text("Media Controls")
+                .font(.headline)
+            Toggle(isOn: $settingsStore.settingsData.mediaControlsEnabled) {
+                Text("Enable Media Controls")
+            }
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
+                mediaShortcutRow("Volume Down", name: .mediaVolumeDown)
+                mediaShortcutRow("Previous Track", name: .mediaPreviousTrack)
+                mediaShortcutRow("Play/Pause", name: .mediaPlayPause)
+                mediaShortcutRow("Next Track", name: .mediaNextTrack)
+                mediaShortcutRow("Volume Up", name: .mediaVolumeUp)
+            }
+            .disabled(!settingsStore.settingsData.mediaControlsEnabled)
+        }
+        .frame(width: 300, alignment: .leading)
+        .task(id: settingsStore.settingsData.notificationsEnabled) {
+            Task { try await settingsStore.save() }
+        }
+        .task(id: settingsStore.settingsData.sendSoundEnabled) {
+            Task { try await settingsStore.save() }
+        }
+        .task(id: settingsStore.settingsData.receiveSoundEnabled) {
+            Task { try await settingsStore.save() }
+        }
+        .task(id: settingsStore.settingsData.mediaControlsEnabled) {
+            Task { try await settingsStore.save() }
+        }
+    }
+
+    private func mediaShortcutRow(_ title: String, name: KeyboardShortcuts.Name) -> some View {
+        GridRow {
+            Text(title)
+                .foregroundStyle(settingsStore.settingsData.mediaControlsEnabled ? .primary : .secondary)
+            KeyboardShortcuts.Recorder("", name: name)
+                .gridColumnAlignment(.trailing)
+        }
     }
 }
 

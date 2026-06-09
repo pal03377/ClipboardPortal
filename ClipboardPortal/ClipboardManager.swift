@@ -10,6 +10,68 @@ enum ClipboardManagerError {
     case archiveCreationFailed
     case archiveExtractionFailed
 }
+
+enum MediaCommand: String, Codable, CaseIterable, Equatable, Hashable, CustomStringConvertible {
+    case volumeDown = "volumeDown"
+    case previousTrack = "previousTrack"
+    case playPause = "playPause"
+    case nextTrack = "nextTrack"
+    case volumeUp = "volumeUp"
+
+    var description: String {
+        switch self {
+        case .volumeDown: return "Volume Down"
+        case .previousTrack: return "Previous Track"
+        case .playPause: return "Play/Pause"
+        case .nextTrack: return "Next Track"
+        case .volumeUp: return "Volume Up"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .volumeDown: return "speaker.minus.fill"
+        case .previousTrack: return "backward.end.fill"
+        case .playPause: return "playpause.fill"
+        case .nextTrack: return "forward.end.fill"
+        case .volumeUp: return "speaker.plus.fill"
+        }
+    }
+
+    private var mediaKeyCode: Int {
+        switch self {
+        case .volumeDown: return 1
+        case .previousTrack: return 20
+        case .playPause: return 16
+        case .nextTrack: return 19
+        case .volumeUp: return 0
+        }
+    }
+
+    func sendToOperatingSystem() -> Bool {
+        guard CGPreflightPostEventAccess() || CGRequestPostEventAccess() else { return false }
+        postMediaKey(isKeyDown: true)
+        postMediaKey(isKeyDown: false)
+        return true
+    }
+
+    private func postMediaKey(isKeyDown: Bool) {
+        let keyState = isKeyDown ? 0xA : 0xB
+        let data1 = (mediaKeyCode << 16) | (keyState << 8)
+        guard let event = NSEvent.otherEvent(
+            with: .systemDefined,
+            location: .zero,
+            modifierFlags: NSEvent.ModifierFlags(rawValue: UInt(isKeyDown ? 0xA00 : 0xB00)),
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            subtype: 8,
+            data1: data1,
+            data2: -1
+        ) else { return }
+        event.cgEvent?.post(tap: .cghidEventTap)
+    }
+}
 extension ClipboardManagerError: LocalizedError { // Nice error messages
     public var errorDescription: String? {
         switch self {
@@ -27,6 +89,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     case file(URL)
     case fileCollection(URL, [String]) // ZIP used for transferring multiple files/folders
     case confetti // For showing confetti in the Confetti Magic app
+    case mediaCommand(MediaCommand)
     
     // String representation of content for UI. Use pattern matching for getting the text or URL.
     var description: String {
@@ -37,6 +100,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
             if names.isEmpty { return url.lastPathComponent }
             return names.joined(separator: ", ")
         case .confetti:       return "🎉"
+        case .mediaCommand(let command): return command.description
         }
     }
     
@@ -47,6 +111,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         case .file(let url):              return try? Data(contentsOf: url)
         case .fileCollection(let url, _): return try? Data(contentsOf: url)
         case .confetti:                   return Data()
+        case .mediaCommand:               return Data()
         }
     }
     
@@ -57,6 +122,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         case .file: "file"
         case .fileCollection: "files"
         case .confetti: "confetti"
+        case .mediaCommand: "command"
         }
     }
     
@@ -78,6 +144,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         case .fileCollection(let fileURL, _):
             pasteboard.setString(fileURL.absoluteString, forType: .fileURL)
         case .confetti: break // Cannot copy confetti event. This will never be executed anyway.
+        case .mediaCommand: break // Commands are executed directly on receive and never copied.
         }
     }
 }
@@ -94,6 +161,7 @@ struct ClipboardContentSendMetadata: Codable {
             case file = "file"
             case fileCollection = "fileCollection"
             case confetti = "confetti"
+            case mediaCommand = "mediaCommand"
 
             init(from decoder: Decoder) throws {
                 let container = try decoder.singleValueContainer()
@@ -103,6 +171,7 @@ struct ClipboardContentSendMetadata: Codable {
                 case "file": self = .file
                 case "fileCollection": self = .fileCollection
                 case "confetti": self = .confetti
+                case "mediaCommand": self = .mediaCommand
                 default:
                     throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown clipboard content type: \(value)")
                 }
@@ -119,12 +188,14 @@ struct ClipboardContentSendMetadata: Codable {
                 case .file: .file
                 case .fileCollection: .fileCollection
                 case .confetti: .confetti
+                case .mediaCommand: .mediaCommand
                 }
             }
         }
         let type: ClipboardContentType // Type of content
         let filename: String? // Filename for files or nil
         let filenames: [String]? // Multiple names for file collections
+        let mediaCommand: MediaCommand? // Media-key command for compatible receivers
         
         @MainActor
         static func fromEncryptedMetadataBase64(_ encryptedBase64: String, senderId: String) throws -> Self {
@@ -160,9 +231,14 @@ struct ClipboardContentSendMetadata: Codable {
         case .fileCollection(let fileURL, _): fileURL.lastPathComponent
         case .text: nil
         case .confetti: nil
+        case .mediaCommand: nil
         }
         let filenames: [String]? = switch content {
         case .fileCollection(_, let names): names
+        default: nil
+        }
+        let mediaCommand: MediaCommand? = switch content {
+        case .mediaCommand(let command): command
         default: nil
         }
         return try Self(
@@ -170,7 +246,8 @@ struct ClipboardContentSendMetadata: Codable {
             encryptedContentMetadataBase64: ContentMetadata(
                 type: .fromClipboardContent(content),
                 filename: filename,
-                filenames: filenames
+                filenames: filenames,
+                mediaCommand: mediaCommand
             ).toEncryptedMetadatabase64(receiverId: receiverId)
         )
     }
@@ -233,10 +310,11 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             self.sendErrorMessage = "No receiver configured. Go to settings." // Show error if there is no receiver yet. Update UI in main thread.
             return
         }
-        guard let data = content.data else {
+        guard let contentData = content.data else {
             self.sendErrorMessage = "Could not read data from clipboard." // Show error if reading data from clipboard failed, e.g. because of missing file. Update UI in main thread.
             return
         }
+        let payloadByteCount = contentData.count
         guard let friend = try? await UserStore.shared.getOrAddFriend(userId: receiverId) else { // Automatically add people that we send our clipboard to as friends
             self.sendErrorMessage = "Could not find friend. Is the user ID in the settings correct?" // Show error if friend does not exist, e.g. if the user ID is wrong and therefore the public key was not found
             return
@@ -252,7 +330,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         self.sending = true; self.sendErrorMessage = nil // Show loading spinner in UI. Update UI in main thread.
         defer { self.sending = false } // Hide loading spinner when done. Update UI in main thread.
         // Encrypt data
-        guard let encryptedData = try? encrypt(data: data, friendPublicKey: friend.publicKey) else {
+        guard let encryptedData = try? encrypt(data: contentData, friendPublicKey: friend.publicKey) else {
             self.sendErrorMessage = "Clipboard contents could not be encrypted." // Show error if encrypting fails
             return
         }
@@ -274,16 +352,16 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body // Set request body to file upload
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (responseData, response) = try await URLSession.shared.data(for: request)
             let httpResponse = response as! HTTPURLResponse
             print("Status Code: \(httpResponse.statusCode)")
             if httpResponse.statusCode != 200 {
                 self.sendErrorMessage = (ServerRequestError.fromStatusCode(httpResponse.statusCode)).localizedDescription
             }
-            let responseString = String(data: data, encoding: .utf8)!
+            let responseString = String(data: responseData, encoding: .utf8)!
             print("Response: \(responseString)")
             if case .confetti = content { return } // No history entry and no sound for confetti event transfer
-            SettingsStore.shared.registerSentTransfer(byteCount: data.count)
+            SettingsStore.shared.registerSentTransfer(byteCount: payloadByteCount)
             self.clipboardHistory.append(ClipboardHistoryEntry(content: content, received: false))
             Task { await playSoundEffect(.send) }
         } catch {
@@ -560,6 +638,13 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 } else if contentMeta.type == .confetti {
                     print("Got confetti")
                     await self.onReceivedClipboardContent(.confetti)
+                } else if contentMeta.type == .mediaCommand, let mediaCommand = contentMeta.mediaCommand {
+                    print("Got media command \(mediaCommand)")
+                    guard mediaCommand.sendToOperatingSystem() else {
+                        self.receiveErrorMessage = "Allow Clipboard Portal in System Settings > Privacy & Security > Accessibility to use Media Controls."
+                        return
+                    }
+                    self.clipboardHistory.append(ClipboardHistoryEntry(content: .mediaCommand(mediaCommand), received: true))
                 } else {
                     print("Unexpected server message meta type")
                     DispatchQueue.main.async { self.receiveErrorMessage = "Unexpected server message meta type. Please update the app." }

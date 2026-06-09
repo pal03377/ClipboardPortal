@@ -26,6 +26,28 @@ struct CommandVView: View {
     }
 }
 
+struct MediaControlsView: View {
+    var onPress: (MediaCommand) -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(MediaCommand.allCases, id: \.self) { command in
+                Button {
+                    onPress(command)
+                } label: {
+                    Image(systemName: command.systemImageName)
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 28, height: 22)
+                }
+                .help(command.description)
+                .buttonStyle(.bordered)
+                .controlSize(.mini)
+                .focusable(false)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
 
 struct KeyView: View {
     var symbol: String?

@@ -7,6 +7,7 @@ struct SettingsData: Codable {
     var notificationsEnabled: Bool
     var sendSoundEnabled: Bool
     var receiveSoundEnabled: Bool
+    var mediaControlsEnabled: Bool
     var sentItemsCount: Int
     var receivedItemsCount: Int
     var totalTransferredBytes: Int
@@ -16,6 +17,7 @@ struct SettingsData: Codable {
         case notificationsEnabled
         case sendSoundEnabled
         case receiveSoundEnabled
+        case mediaControlsEnabled
         case sentItemsCount
         case receivedItemsCount
         case totalTransferredBytes
@@ -26,6 +28,7 @@ struct SettingsData: Codable {
         notificationsEnabled: Bool,
         sendSoundEnabled: Bool,
         receiveSoundEnabled: Bool,
+        mediaControlsEnabled: Bool = false,
         sentItemsCount: Int = 0,
         receivedItemsCount: Int = 0,
         totalTransferredBytes: Int = 0
@@ -34,6 +37,7 @@ struct SettingsData: Codable {
         self.notificationsEnabled = notificationsEnabled
         self.sendSoundEnabled = sendSoundEnabled
         self.receiveSoundEnabled = receiveSoundEnabled
+        self.mediaControlsEnabled = mediaControlsEnabled
         self.sentItemsCount = sentItemsCount
         self.receivedItemsCount = receivedItemsCount
         self.totalTransferredBytes = totalTransferredBytes
@@ -45,6 +49,7 @@ struct SettingsData: Codable {
         self.notificationsEnabled = try container.decode(Bool.self, forKey: .notificationsEnabled)
         self.sendSoundEnabled = try container.decode(Bool.self, forKey: .sendSoundEnabled)
         self.receiveSoundEnabled = try container.decode(Bool.self, forKey: .receiveSoundEnabled)
+        self.mediaControlsEnabled = try container.decodeIfPresent(Bool.self, forKey: .mediaControlsEnabled) ?? false
         self.sentItemsCount = try container.decodeIfPresent(Int.self, forKey: .sentItemsCount) ?? 0
         self.receivedItemsCount = try container.decodeIfPresent(Int.self, forKey: .receivedItemsCount) ?? 0
         self.totalTransferredBytes = try container.decodeIfPresent(Int.self, forKey: .totalTransferredBytes) ?? 0

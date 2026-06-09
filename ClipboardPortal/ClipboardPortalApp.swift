@@ -21,6 +21,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .sendToFriend) {
             Task { await ClipboardManager.shared.sendClipboardContent() } // Paste clipboard contents
         }
+        KeyboardShortcuts.onKeyDown(for: .mediaVolumeDown) {
+            Task { await Self.sendMediaCommandIfEnabled(.volumeDown) }
+        }
+        KeyboardShortcuts.onKeyDown(for: .mediaPreviousTrack) {
+            Task { await Self.sendMediaCommandIfEnabled(.previousTrack) }
+        }
+        KeyboardShortcuts.onKeyDown(for: .mediaPlayPause) {
+            Task { await Self.sendMediaCommandIfEnabled(.playPause) }
+        }
+        KeyboardShortcuts.onKeyDown(for: .mediaNextTrack) {
+            Task { await Self.sendMediaCommandIfEnabled(.nextTrack) }
+        }
+        KeyboardShortcuts.onKeyDown(for: .mediaVolumeUp) {
+            Task { await Self.sendMediaCommandIfEnabled(.volumeUp) }
+        }
         // Register global internal app notifications to make Clipboard Portal sync of confetti possible :D
         DistributedNotificationCenter.default().addObserver(forName: Notification.Name("de.pschwind.Confetti.wasFired"), object: nil, queue: .main) { notification in // User is throwing confetti?
             print("Received global confetti notification")
@@ -30,6 +45,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     public func applicationWillFinishLaunching(_ notification: Notification) {
         NSWindow.allowsAutomaticWindowTabbing = false // Disable tabs window tabs
+    }
+
+    @MainActor
+    private static func sendMediaCommandIfEnabled(_ command: MediaCommand) async {
+        guard SettingsStore.shared.settingsData.mediaControlsEnabled else { return }
+        await ClipboardManager.shared.sendClipboardContent(.mediaCommand(command))
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
@@ -119,6 +140,11 @@ struct ClipboardPortalApp: App {
              */
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
+        .windowResizability(.contentSize)
+        Window("More Settings", id: "more-settings") {
+            MoreSettingsView()
+                .padding()
+        }
         .windowResizability(.contentSize)
         .commands {
             SidebarCommands()

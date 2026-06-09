@@ -25,20 +25,7 @@ struct ClipboardHistoryListEntryView: View {
         HStack {
             Image(systemName: entry.received ? "arrow.down" : "arrow.up")
                 .help(entry.received ? "Your friend sent you this" : "You sent this")
-            Text("\(entry.content)")
-                .lineLimit(4)
-                .truncationMode(.tail)
-                .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
-                .if(entry.content.typeDescription == "text") { view in
-                    guard case let .text(text) = entry.content else { return view.draggable("") }
-                    return view.draggable(text)
-                }
-                .if(entry.content.typeDescription == "file") { view in
-                    var fileURL: URL = .downloadsDirectory
-                    if case let .file(url) = entry.content { fileURL = url }
-                    if case let .fileCollection(url, _) = entry.content { fileURL = url }
-                    return view.draggable(fileURL)
-                }
+            historyContentView
             Group {
                 if case let ClipboardContent.text(textContent) = entry.content, SettingsStore.shared.settingsData.receiverId == textContent, entry.received {
                     Image(systemName: "person.fill.checkmark")
@@ -84,6 +71,32 @@ struct ClipboardHistoryListEntryView: View {
     
     func looksLikeUserId(_ contentString: String) -> Bool {
         return contentString.count == 8 && contentString.allSatisfy({ $0.isNumber }) // 8-digit number?
+    }
+
+    @ViewBuilder
+    private var historyContentView: some View {
+        switch entry.content {
+        case .mediaCommand(let command):
+            Label(command.description, systemImage: command.systemImageName)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        default:
+            Text(verbatim: entry.content.description)
+                .lineLimit(4)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading) // Move action buttons to the right while not wrapping the text too early
+                .if(entry.content.typeDescription == "text") { view in
+                    guard case let .text(text) = entry.content else { return view.draggable("") }
+                    return view.draggable(text)
+                }
+                .if(entry.content.typeDescription == "file") { view in
+                    var fileURL: URL = .downloadsDirectory
+                    if case let .file(url) = entry.content { fileURL = url }
+                    if case let .fileCollection(url, _) = entry.content { fileURL = url }
+                    return view.draggable(fileURL)
+                }
+        }
     }
 }
 

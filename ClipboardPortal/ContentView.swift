@@ -18,6 +18,11 @@ struct ContentView: View {
                 .overlay {
                     if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
                 }
+                if settingsStore.settingsData.mediaControlsEnabled {
+                    MediaControlsView { command in
+                        Task { await clipboardManager.sendClipboardContent(.mediaCommand(command)) }
+                    }
+                }
                 FriendRequestView()
                 ClipboardHistoryListView(history: clipboardManager.clipboardHistory) { clipboardContent in
                     // (Re-)Send entry content
