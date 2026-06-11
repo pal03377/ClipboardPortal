@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ContentView: View {
     @StateObject private var userStore = UserStore.shared // Observe user store
@@ -7,7 +8,9 @@ struct ContentView: View {
     @State var isSettingsOpen = false
     @State private var isDropTargeted = false
     @State private var isHoveringWindow = false
+    @State private var contentWindow: NSWindow?
     let updateTimer = Timer.publish(every: 4, tolerance: 2, on: .main, in: .common).autoconnect() // Timer to fetch new clipboard contents every Xs
+    let hoverFallbackTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var showHoverControls: Bool {
         isHoveringWindow || isSettingsOpen
@@ -18,8 +21,14 @@ struct ContentView: View {
             content(size: proxy.size)
         }
         .frame(minWidth: 200)
-        .frame(minHeight: 125) // Cmd+V view plus room for bottom media controls
+        .frame(minHeight: 95) // Cmd+V view plus room for bottom media controls
         .modifier(DropToSendModifier())
+        .background(WindowReader { window in
+            contentWindow = window
+        })
+        .onReceive(hoverFallbackTimer) { _ in
+            updateHoverStateFromMouseLocation()
+        }
     }
 
     private func content(size: CGSize) -> some View {
@@ -93,7 +102,7 @@ struct ContentView: View {
         VStack {
             CommandVView(onPress: {
                 Task { await clipboardManager.sendClipboardContent() }
-            }, minHeight: size.height < 200 ? 92 : 120)
+            }, minHeight: size.height < 200 ? 62 : 120)
             .opacity(clipboardManager.sending ? 0.8 : 1)
             .overlay {
                 if clipboardManager.sending { ProgressView() } // Show loading spinner while sending clipboard contents
@@ -107,6 +116,35 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func updateHoverStateFromMouseLocation() {
+        guard let contentWindow else { return }
+
+        let mouseIsInsideWindow = contentWindow.frame.contains(NSEvent.mouseLocation)
+        guard isHoveringWindow != mouseIsInsideWindow else { return }
+
+        withAnimation(.easeInOut(duration: 0.12)) {
+            isHoveringWindow = mouseIsInsideWindow
+        }
+    }
+}
+
+private struct WindowReader: NSViewRepresentable {
+    var onWindowChange: (NSWindow?) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            onWindowChange(view.window)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            onWindowChange(nsView.window)
         }
     }
 }

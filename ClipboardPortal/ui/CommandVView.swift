@@ -7,24 +7,84 @@ struct CommandVView: View {
 
     var body: some View {
         ZStack {
-            Button { onPress() } label: {
-                HStack(spacing: 10) {
-                    KeyView(symbol: "command", isFlat: isFlat)
-                    KeyView(text: "V", isFlat: isFlat)
-                }
-                .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
+            HStack(spacing: 10) {
+                KeyView(symbol: "command", isFlat: isFlat)
+                KeyView(text: "V", isFlat: isFlat)
             }
-            .focusable(false) // Hide ugly focus border that is not needed because keyboard users can press Cmd+V directly
-            .buttonStyle(PlainButtonStyle())
-            .simultaneousGesture(DragGesture(minimumDistance: 0)
-                .onChanged { _ in isFlat = true } // Flat while pressed
-                .onEnded { _ in
-                    isFlat = false // Lift when released
-                }
-            )
+            .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
+            .overlay {
+                WindowDraggableClickView(
+                    onClick: onPress,
+                    onPressChanged: { isFlat = $0 }
+                )
+                .accessibilityLabel("Send clipboard")
+            }
         }
         .frame(maxWidth: .infinity)
         .frame(minHeight: minHeight) // Prevent squeezing the button too much
+    }
+}
+
+private struct WindowDraggableClickView: NSViewRepresentable {
+    var onClick: () -> Void
+    var onPressChanged: (Bool) -> Void
+
+    func makeNSView(context: Context) -> DraggableClickNSView {
+        DraggableClickNSView(onClick: onClick, onPressChanged: onPressChanged)
+    }
+
+    func updateNSView(_ nsView: DraggableClickNSView, context: Context) {
+        nsView.onClick = onClick
+        nsView.onPressChanged = onPressChanged
+    }
+
+    final class DraggableClickNSView: NSView {
+        var onClick: () -> Void
+        var onPressChanged: (Bool) -> Void
+        private var mouseDownLocation: NSPoint?
+        private var didDrag = false
+
+        init(onClick: @escaping () -> Void, onPressChanged: @escaping (Bool) -> Void) {
+            self.onClick = onClick
+            self.onPressChanged = onPressChanged
+            super.init(frame: .zero)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override var acceptsFirstResponder: Bool { true }
+
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+            true
+        }
+
+        override func mouseDown(with event: NSEvent) {
+            didDrag = false
+            mouseDownLocation = event.locationInWindow
+            onPressChanged(true)
+        }
+
+        override func mouseDragged(with event: NSEvent) {
+            guard let window else { return }
+            if !didDrag, let mouseDownLocation {
+                let distance = hypot(event.locationInWindow.x - mouseDownLocation.x, event.locationInWindow.y - mouseDownLocation.y)
+                guard distance >= 3 else { return }
+            }
+
+            didDrag = true
+            onPressChanged(false)
+            window.performDrag(with: event)
+        }
+
+        override func mouseUp(with event: NSEvent) {
+            onPressChanged(false)
+            mouseDownLocation = nil
+
+            guard !didDrag else { return }
+            onClick()
+        }
     }
 }
 

@@ -123,6 +123,7 @@ struct ClipboardPortalApp: App {
         Window("Clipboard Portal", id: "main") {
             ContentView()
                 .frame(minWidth: 200)
+                .background(MainWindowConfigurationView(titleVisibilityThreshold: 300))
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
@@ -190,4 +191,73 @@ struct ClipboardPortalApp: App {
     //         }
     //     }
     // }
+}
+
+private struct MainWindowConfigurationView: NSViewRepresentable {
+    var titleVisibilityThreshold: CGFloat
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(titleVisibilityThreshold: titleVisibilityThreshold)
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            context.coordinator.configureWindow(for: view)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        context.coordinator.titleVisibilityThreshold = titleVisibilityThreshold
+        DispatchQueue.main.async {
+            context.coordinator.configureWindow(for: nsView)
+        }
+    }
+
+    final class Coordinator {
+        var titleVisibilityThreshold: CGFloat
+        private weak var configuredWindow: NSWindow?
+        private var resizeObserver: NSObjectProtocol?
+
+        init(titleVisibilityThreshold: CGFloat) {
+            self.titleVisibilityThreshold = titleVisibilityThreshold
+        }
+
+        deinit {
+            if let resizeObserver {
+                NotificationCenter.default.removeObserver(resizeObserver)
+            }
+        }
+
+        func configureWindow(for view: NSView) {
+            guard let window = view.window else { return }
+
+            if configuredWindow !== window {
+                configuredWindow = window
+                window.standardWindowButton(.zoomButton)?.isEnabled = false
+                window.standardWindowButton(.zoomButton)?.isHidden = true
+                window.collectionBehavior.remove(.fullScreenPrimary)
+
+                if let resizeObserver {
+                    NotificationCenter.default.removeObserver(resizeObserver)
+                }
+                resizeObserver = NotificationCenter.default.addObserver(
+                    forName: NSWindow.didResizeNotification,
+                    object: window,
+                    queue: .main
+                ) { [weak self] _ in
+                    self?.updateTitleVisibility(for: window)
+                }
+            }
+
+            updateTitleVisibility(for: window)
+        }
+
+        private func updateTitleVisibility(for window: NSWindow) {
+            let isCompact = window.frame.width < titleVisibilityThreshold
+            window.titleVisibility = isCompact ? .hidden : .visible
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = isCompact
+        }
+    }
 }
