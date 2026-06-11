@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CommandVView: View {
     var onPress: () -> Void
+    var minHeight: CGFloat = 120
     @State var isFlat = false
 
     var body: some View {
@@ -23,16 +24,30 @@ struct CommandVView: View {
             )
         }
         .frame(maxWidth: .infinity)
-        .frame(minHeight: 120) // Prevent squeezing the button too much
+        .frame(minHeight: minHeight) // Prevent squeezing the button too much
     }
 }
 
 struct MediaControlsView: View {
+    var width: CGFloat = 400
     var onPress: (MediaCommand) -> Void
+
+    private var visibleCommands: [MediaCommand] {
+        MediaCommand.allCases.filter { command in
+            switch command {
+            case .volumeDown, .volumeUp:
+                return width >= 400
+            case .previousTrack:
+                return width >= 300
+            case .playPause, .nextTrack:
+                return true
+            }
+        }
+    }
 
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(MediaCommand.allCases, id: \.self) { command in
+            ForEach(visibleCommands, id: \.self) { command in
                 Button {
                     onPress(command)
                 } label: {
@@ -46,7 +61,8 @@ struct MediaControlsView: View {
                 .focusable(false)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: width < 300 ? .leading : .center)
+        .padding(.leading, width < 300 ? 8 : 0)
     }
 }
 

@@ -3,14 +3,16 @@ import SwiftUI
 struct StatusView: View {
     var connecting: Bool = false
     var errorMessage: String?
+
+    private var statusText: String {
+        errorMessage ?? (connecting ? "Connecting..." : "Connected")
+    }
     
     var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "circlebadge.fill")
-            Text(errorMessage ?? (connecting ? "Connecting..." : "Connected"))
-        }
+        Image(systemName: "circlebadge.fill")
         .foregroundColor(errorMessage == nil ? (connecting ? .blue : .green) : .red)
         .padding(8)
+        .help(statusText)
     }
 }
 

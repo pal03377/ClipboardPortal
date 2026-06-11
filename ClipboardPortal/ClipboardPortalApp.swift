@@ -122,8 +122,7 @@ struct ClipboardPortalApp: App {
     var body: some Scene {
         Window("Clipboard Portal", id: "main") {
             ContentView()
-                .frame(minWidth: 400) // Min window width to now squeeze text
-                .frame(width: 400) // Default width as small as possible
+                .frame(minWidth: 200)
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
@@ -140,6 +139,7 @@ struct ClipboardPortalApp: App {
              */
         }
         .handlesExternalEvents(matching: []) // No new window when opening custom URL scheme clipboardportal://something
+        .defaultSize(width: 400, height: 260)
         .windowResizability(.contentSize)
         Window("More Settings", id: "more-settings") {
             MoreSettingsView()
