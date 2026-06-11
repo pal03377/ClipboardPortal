@@ -8,6 +8,7 @@ struct SettingsData: Codable {
     var sendSoundEnabled: Bool
     var receiveSoundEnabled: Bool
     var mediaControlsEnabled: Bool
+    var alwaysOnTopEnabled: Bool
     var sentItemsCount: Int
     var receivedItemsCount: Int
     var totalTransferredBytes: Int
@@ -18,6 +19,7 @@ struct SettingsData: Codable {
         case sendSoundEnabled
         case receiveSoundEnabled
         case mediaControlsEnabled
+        case alwaysOnTopEnabled
         case sentItemsCount
         case receivedItemsCount
         case totalTransferredBytes
@@ -29,6 +31,7 @@ struct SettingsData: Codable {
         sendSoundEnabled: Bool,
         receiveSoundEnabled: Bool,
         mediaControlsEnabled: Bool = false,
+        alwaysOnTopEnabled: Bool = false,
         sentItemsCount: Int = 0,
         receivedItemsCount: Int = 0,
         totalTransferredBytes: Int = 0
@@ -38,6 +41,7 @@ struct SettingsData: Codable {
         self.sendSoundEnabled = sendSoundEnabled
         self.receiveSoundEnabled = receiveSoundEnabled
         self.mediaControlsEnabled = mediaControlsEnabled
+        self.alwaysOnTopEnabled = alwaysOnTopEnabled
         self.sentItemsCount = sentItemsCount
         self.receivedItemsCount = receivedItemsCount
         self.totalTransferredBytes = totalTransferredBytes
@@ -50,6 +54,7 @@ struct SettingsData: Codable {
         self.sendSoundEnabled = try container.decode(Bool.self, forKey: .sendSoundEnabled)
         self.receiveSoundEnabled = try container.decode(Bool.self, forKey: .receiveSoundEnabled)
         self.mediaControlsEnabled = try container.decodeIfPresent(Bool.self, forKey: .mediaControlsEnabled) ?? false
+        self.alwaysOnTopEnabled = try container.decodeIfPresent(Bool.self, forKey: .alwaysOnTopEnabled) ?? false
         self.sentItemsCount = try container.decodeIfPresent(Int.self, forKey: .sentItemsCount) ?? 0
         self.receivedItemsCount = try container.decodeIfPresent(Int.self, forKey: .receivedItemsCount) ?? 0
         self.totalTransferredBytes = try container.decodeIfPresent(Int.self, forKey: .totalTransferredBytes) ?? 0

@@ -117,13 +117,17 @@ struct ClipboardPortalApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var appGlobals = AppGlobals.shared // Observe changes to change behavior in SwiftUI (enable / disable paste dynamically)
     @StateObject private var userStore = UserStore.shared // Observe user store
+    @StateObject private var settingsStore = SettingsStore.shared
     private var updateTimer: Timer?
     
     var body: some Scene {
         Window("Clipboard Portal", id: "main") {
             ContentView()
                 .frame(minWidth: 200)
-                .background(MainWindowConfigurationView(titleVisibilityThreshold: 300))
+                .background(MainWindowConfigurationView(
+                    titleVisibilityThreshold: 300,
+                    alwaysOnTopEnabled: settingsStore.settingsData.alwaysOnTopEnabled
+                ))
                 .task { await UserStore.shared.load() } // Load user data
                 .task { await SettingsStore.shared.load() } // Load settings
                 .task(id: userStore.user?.id) { // Start new clipboard update check connection for new user
@@ -195,9 +199,13 @@ struct ClipboardPortalApp: App {
 
 private struct MainWindowConfigurationView: NSViewRepresentable {
     var titleVisibilityThreshold: CGFloat
+    var alwaysOnTopEnabled: Bool
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(titleVisibilityThreshold: titleVisibilityThreshold)
+        Coordinator(
+            titleVisibilityThreshold: titleVisibilityThreshold,
+            alwaysOnTopEnabled: alwaysOnTopEnabled
+        )
     }
 
     func makeNSView(context: Context) -> NSView {
@@ -210,6 +218,7 @@ private struct MainWindowConfigurationView: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSView, context: Context) {
         context.coordinator.titleVisibilityThreshold = titleVisibilityThreshold
+        context.coordinator.alwaysOnTopEnabled = alwaysOnTopEnabled
         DispatchQueue.main.async {
             context.coordinator.configureWindow(for: nsView)
         }
@@ -217,11 +226,13 @@ private struct MainWindowConfigurationView: NSViewRepresentable {
 
     final class Coordinator {
         var titleVisibilityThreshold: CGFloat
+        var alwaysOnTopEnabled: Bool
         private weak var configuredWindow: NSWindow?
         private var resizeObserver: NSObjectProtocol?
 
-        init(titleVisibilityThreshold: CGFloat) {
+        init(titleVisibilityThreshold: CGFloat, alwaysOnTopEnabled: Bool) {
             self.titleVisibilityThreshold = titleVisibilityThreshold
+            self.alwaysOnTopEnabled = alwaysOnTopEnabled
         }
 
         deinit {
@@ -252,12 +263,17 @@ private struct MainWindowConfigurationView: NSViewRepresentable {
             }
 
             updateTitleVisibility(for: window)
+            updateAlwaysOnTop(for: window)
         }
 
         private func updateTitleVisibility(for window: NSWindow) {
             let isCompact = window.frame.width < titleVisibilityThreshold
             window.titleVisibility = isCompact ? .hidden : .visible
             window.standardWindowButton(.miniaturizeButton)?.isHidden = isCompact
+        }
+
+        private func updateAlwaysOnTop(for window: NSWindow) {
+            window.level = alwaysOnTopEnabled ? .floating : .normal
         }
     }
 }

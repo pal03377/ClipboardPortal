@@ -99,6 +99,9 @@ struct MoreSettingsView: View {
             Toggle(isOn: $settingsStore.settingsData.receiveSoundEnabled) {
                 Text("Sound when receiving")
             }
+            Toggle(isOn: $settingsStore.settingsData.alwaysOnTopEnabled) {
+                Text("Always on top")
+            }
 
             Divider()
 
@@ -124,6 +127,9 @@ struct MoreSettingsView: View {
             Task { try await settingsStore.save() }
         }
         .task(id: settingsStore.settingsData.receiveSoundEnabled) {
+            Task { try await settingsStore.save() }
+        }
+        .task(id: settingsStore.settingsData.alwaysOnTopEnabled) {
             Task { try await settingsStore.save() }
         }
         .task(id: settingsStore.settingsData.mediaControlsEnabled) {
