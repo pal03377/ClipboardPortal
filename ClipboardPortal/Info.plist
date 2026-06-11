@@ -19,6 +19,8 @@
 	<array>
 		<string>SendClipboardIntent</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>ServerURL</key>
 	<string>$(SERVER_URL)</string>
 	<key>UIApplicationSceneManifest</key>

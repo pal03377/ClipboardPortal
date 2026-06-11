@@ -5,24 +5,25 @@ struct CommandVView: View {
     @State var isFlat = false
 
     var body: some View {
-        Button { onPress() } label: {
-            HStack(spacing: 10) {
-                KeyView(symbol: "command", isFlat: isFlat)
-                KeyView(text: "V", isFlat: isFlat)
+        ZStack {
+            Button { onPress() } label: {
+                HStack(spacing: 10) {
+                    KeyView(symbol: "command", isFlat: isFlat)
+                    KeyView(text: "V", isFlat: isFlat)
+                }
+                .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .frame(minHeight: 120) // Prevent squeezing the button too much
-            .background(Color(white: 0, opacity: 0.01)) // Somehow required to make the frame work. Opacity 0 does not work
-            .scaleEffect(isFlat ? CGSize(width: 0.98, height: 0.98) : CGSize(width: 1, height: 1))
+            .focusable(false) // Hide ugly focus border that is not needed because keyboard users can press Cmd+V directly
+            .buttonStyle(PlainButtonStyle())
+            .simultaneousGesture(DragGesture(minimumDistance: 0)
+                .onChanged { _ in isFlat = true } // Flat while pressed
+                .onEnded { _ in
+                    isFlat = false // Lift when released
+                }
+            )
         }
-        .focusable(false) // Hide ugly focus border that is not needed because keyboard users can press Cmd+V directly
-        .buttonStyle(PlainButtonStyle())
-        .simultaneousGesture(DragGesture(minimumDistance: 0)
-            .onChanged { _ in isFlat = true } // Flat while pressed
-            .onEnded { _ in
-                isFlat = false // Lift when released
-            }
-        )
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 120) // Prevent squeezing the button too much
     }
 }
 
