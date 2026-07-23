@@ -1,6 +1,8 @@
 $DOMAIN {
 	log $PROJECT_NAME # Enable Caddy access logs (for goaccess)
 	route {
+		import /root/wordpress-docker-staticsites-for-neowp/caddy-routes/clipboardportal.pschwind.de/*.caddy
+
 		# Homepage
 		file_server / {
 			root /root/$PROJECT_NAME/server
