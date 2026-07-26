@@ -7,7 +7,7 @@
             "request": "attach",
             "connect": {
                 "host": "localhost",
-                "port": 5017
+                "port": 
             },
             "pathMappings": [
                 {
