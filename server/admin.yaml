@@ -4,8 +4,7 @@ info:
   clipboard-portal-user-count:
     description: Number of users
     service: clipboard-portal-server
-    command: >
-      echo "{\"Number of users\": $(ls /code/data/*.meta | wc -l)}"
+    command: python -m app.user_stats
 
 # Configuration of the admin backup tool
 backup:
