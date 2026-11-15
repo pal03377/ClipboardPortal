@@ -14,13 +14,13 @@ class UserStatsTests(unittest.TestCase):
                 "Active 3d": 0,
                 "Active 7d": 0,
                 "Active 30d": 0,
-                "Active 265d": 0,
+                "Active 365d": 0,
             })
 
     def test_activity_windows_include_exact_boundary(self):
         now = 1800000000
         with tempfile.TemporaryDirectory() as data_dir:
-            for index, days in enumerate((0, 3, 7, 30, 265, 266)):
+            for index, days in enumerate((0, 3, 7, 30, 365, 366)):
                 metadata = Path(data_dir) / f"{index:08d}.meta"
                 metadata.touch()
                 modified = now - days * 86400
@@ -33,5 +33,5 @@ class UserStatsTests(unittest.TestCase):
                 "Active 3d": 2,
                 "Active 7d": 3,
                 "Active 30d": 4,
-                "Active 265d": 5,
+                "Active 365d": 5,
             })

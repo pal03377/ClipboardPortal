@@ -9,7 +9,7 @@ import time
 def collect_user_stats(data_dir, now=None):
     if now is None:
         now = time.time()
-    periods = (3, 7, 30, 265)
+    periods = (3, 7, 30, 365)
     stats = {"Users": 0}
     stats.update({f"Active {days}d": 0 for days in periods})
     for metadata in Path(data_dir).glob("*.meta"):
