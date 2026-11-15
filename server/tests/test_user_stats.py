@@ -10,11 +10,11 @@ class UserStatsTests(unittest.TestCase):
     def test_empty_directory(self):
         with tempfile.TemporaryDirectory() as data_dir:
             self.assertEqual(collect_user_stats(data_dir), {
-                "Number of users": 0,
-                "Number of active users last 3d": 0,
-                "Number of active users last 7d": 0,
-                "Number of active users last 30d": 0,
-                "Number of active users last 265d": 0,
+                "Users": 0,
+                "Active 3d": 0,
+                "Active 7d": 0,
+                "Active 30d": 0,
+                "Active 265d": 0,
             })
 
     def test_activity_windows_include_exact_boundary(self):
@@ -29,9 +29,9 @@ class UserStatsTests(unittest.TestCase):
             (Path(data_dir) / "00000000").touch()
             (Path(data_dir) / "00000000.publickey").touch()
             self.assertEqual(collect_user_stats(data_dir, now=now), {
-                "Number of users": 6,
-                "Number of active users last 3d": 2,
-                "Number of active users last 7d": 3,
-                "Number of active users last 30d": 4,
-                "Number of active users last 265d": 5,
+                "Users": 6,
+                "Active 3d": 2,
+                "Active 7d": 3,
+                "Active 30d": 4,
+                "Active 265d": 5,
             })
