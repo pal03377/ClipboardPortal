@@ -87,7 +87,7 @@ extension ClipboardManagerError: LocalizedError { // Nice error messages
 enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
     case text(String)
     case file(URL)
-    case fileCollection(URL, [String]) // ZIP used for transferring multiple files/folders
+    case fileCollection(URL, [String], modificationDates: [String: Date] = [:]) // ZIP used for transferring multiple files/folders
     case confetti // For showing confetti in the Confetti Magic app
     case mediaCommand(MediaCommand)
     
@@ -96,7 +96,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text(let text): return text
         case .file(let url):  return url.lastPathComponent // Filename e.g. "myfile.txt"
-        case .fileCollection(let url, let names):
+        case .fileCollection(let url, let names, _):
             if names.isEmpty { return url.lastPathComponent }
             return names.joined(separator: ", ")
         case .confetti:       return "🎉"
@@ -109,7 +109,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
         switch self {
         case .text(let text):             return text.data(using: .utf8)
         case .file(let url):              return try? Data(contentsOf: url)
-        case .fileCollection(let url, _): return try? Data(contentsOf: url)
+        case .fileCollection(let url, _, _): return try? Data(contentsOf: url)
         case .confetti:                   return Data()
         case .mediaCommand:               return Data()
         }
@@ -141,7 +141,7 @@ enum ClipboardContent: Equatable, Hashable, CustomStringConvertible {
             }
         case .file(let fileURL):
             pasteboard.setString(fileURL.absoluteString, forType: .fileURL) // Copy as file URL e.g. for pasting in Finder or an image into an image editing app
-        case .fileCollection(let fileURL, _):
+        case .fileCollection(let fileURL, _, _):
             pasteboard.setString(fileURL.absoluteString, forType: .fileURL)
         case .confetti: break // Cannot copy confetti event. This will never be executed anyway.
         case .mediaCommand: break // Commands are executed directly on receive and never copied.
@@ -195,6 +195,8 @@ struct ClipboardContentSendMetadata: Codable {
         let type: ClipboardContentType // Type of content
         let filename: String? // Filename for files or nil
         let filenames: [String]? // Multiple names for file collections
+        let modificationDate: Date? // Original timestamp for a single file
+        let modificationDates: [String: Date]? // Archive-relative paths, including directories
         let mediaCommand: MediaCommand? // Media-key command for compatible receivers
         
         @MainActor
@@ -228,18 +230,30 @@ struct ClipboardContentSendMetadata: Codable {
     static func fromClipboardContent(_ content: ClipboardContent, receiverId: String) throws -> Self {
         let filename: String? = switch content { // Filename for sending
         case .file(let fileURL): fileURL.lastPathComponent // Filename e.g. "myfile.txt"
-        case .fileCollection(let fileURL, _): fileURL.lastPathComponent
+        case .fileCollection(let fileURL, _, _): fileURL.lastPathComponent
         case .text: nil
         case .confetti: nil
         case .mediaCommand: nil
         }
         let filenames: [String]? = switch content {
-        case .fileCollection(_, let names): names
+        case .fileCollection(_, let names, _): names
         default: nil
         }
         let mediaCommand: MediaCommand? = switch content {
         case .mediaCommand(let command): command
         default: nil
+        }
+        let modificationDate: Date?
+        if case .file(let url) = content {
+            modificationDate = try url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+        } else {
+            modificationDate = nil
+        }
+        let modificationDates: [String: Date]?
+        if case .fileCollection(_, _, let dates) = content {
+            modificationDates = dates
+        } else {
+            modificationDates = nil
         }
         return try Self(
             senderId: UserStore.shared.user!.id,
@@ -247,6 +261,8 @@ struct ClipboardContentSendMetadata: Codable {
                 type: .fromClipboardContent(content),
                 filename: filename,
                 filenames: filenames,
+                modificationDate: modificationDate,
+                modificationDates: modificationDates,
                 mediaCommand: mediaCommand
             ).toEncryptedMetadatabase64(receiverId: receiverId)
         )
@@ -301,7 +317,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             await self.sendFileSystemItems([fileURL])
             return
         }
-        if case let .fileCollection(fileURL, _) = content, self.isDirectory(fileURL) {
+        if case let .fileCollection(fileURL, _, _) = content, self.isDirectory(fileURL) {
             await self.sendFileSystemItems([fileURL])
             return
         }
@@ -398,9 +414,9 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
             return
         }
         do {
-            let archiveURL = try self.createTransferArchive(for: urls)
+            let (archiveURL, modificationDates) = try self.createTransferArchive(for: urls)
             let sentNames = urls.map(\.lastPathComponent)
-            await self.sendClipboardContent(.fileCollection(archiveURL, sentNames))
+            await self.sendClipboardContent(.fileCollection(archiveURL, sentNames, modificationDates: modificationDates))
         } catch {
             print("Archive creation error: \(error)")
             self.sendErrorMessage = (error as? LocalizedError)?.errorDescription ?? ClipboardManagerError.archiveCreationFailed.localizedDescription
@@ -411,19 +427,21 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
     }
 
-    private func createTransferArchive(for urls: [URL]) throws -> URL {
+    private func createTransferArchive(for urls: [URL]) throws -> (URL, [String: Date]) {
         let fileManager = FileManager.default
         if urls.count == 1, let directoryURL = urls.first {
             let archiveName = directoryURL.lastPathComponent + ".zip"
             let archiveURL = self.makeUniqueURL(in: fileManager.temporaryDirectory, preferredFilename: archiveName)
+            let dates = try TransferModificationDates.capture(at: directoryURL)
             try fileManager.zipItem(at: directoryURL, to: archiveURL, shouldKeepParent: true)
-            return archiveURL
+            return (archiveURL, dates)
         }
 
         let stagingDirectory = fileManager.temporaryDirectory.appendingPathComponent("ClipboardPortal-Bundle-\(UUID().uuidString)", isDirectory: true)
         try fileManager.createDirectory(at: stagingDirectory, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: stagingDirectory) }
 
+        var dates: [String: Date] = [:]
         for sourceURL in urls {
             var targetURL = stagingDirectory.appendingPathComponent(sourceURL.lastPathComponent)
             var counter = 2
@@ -434,12 +452,14 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                 targetURL = stagingDirectory.appendingPathComponent(candidate)
                 counter += 1
             }
+            // Capture before copying: creating children can change staged directory dates.
+            dates.merge(try TransferModificationDates.capture(at: sourceURL, rootName: targetURL.lastPathComponent)) { _, new in new }
             try fileManager.copyItem(at: sourceURL, to: targetURL)
         }
 
         let archiveURL = self.makeUniqueURL(in: fileManager.temporaryDirectory, preferredFilename: "ClipboardPortal-Bundle.zip")
         try fileManager.zipItem(at: stagingDirectory, to: archiveURL, shouldKeepParent: false)
-        return archiveURL
+        return (archiveURL, dates)
     }
 
     private func makeUniqueURL(in directory: URL, preferredFilename: String) -> URL {
@@ -615,6 +635,9 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                     do {
                         // Move the temporary file into the Downloads folder
                         let downloadFolderFileURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: contentMeta.filename!)
+                        if let date = contentMeta.modificationDate {
+                            try FileManager.default.setAttributes([.modificationDate: date], ofItemAtPath: downloadFolderFileURL.path)
+                        }
                         SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                         // Copy the file to the clipboard, update the history and send a notification
                         await self.onReceivedClipboardContent(.file(downloadFolderFileURL))
@@ -628,7 +651,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
                     do {
                         let archiveName = contentMeta.filename ?? "ClipboardPortal-Bundle.zip"
                         let movedArchiveURL = try moveFileToDownloadsFolder(fileURL: location, preferredFilename: archiveName)
-                        let representativeURL = try self.extractTransferredCollectionToDownloads(at: movedArchiveURL)
+                        let representativeURL = try self.extractTransferredCollectionToDownloads(at: movedArchiveURL, modificationDates: contentMeta.modificationDates ?? [:])
                         SettingsStore.shared.registerReceivedTransfer(byteCount: data.count)
                         await self.onReceivedClipboardContent(.fileCollection(representativeURL, contentMeta.filenames ?? []))
                     } catch {
@@ -685,7 +708,7 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         }
     }
 
-    private func extractTransferredCollectionToDownloads(at archiveURL: URL) throws -> URL {
+    private func extractTransferredCollectionToDownloads(at archiveURL: URL, modificationDates: [String: Date]) throws -> URL {
         let fileManager = FileManager.default
         let downloadsDirectory = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first!
         let extractionDirectory = fileManager.temporaryDirectory.appendingPathComponent("ClipboardPortal-Extract-\(UUID().uuidString)", isDirectory: true)
@@ -700,6 +723,8 @@ class ClipboardManager: ObservableObject, WebSocketDelegate { // WebSocketDelega
         for entry in extractedEntries {
             let destination = self.makeUniqueURL(in: downloadsDirectory, preferredFilename: entry.lastPathComponent)
             try fileManager.moveItem(at: entry, to: destination)
+            // Restore after moving, using the archive name even if Downloads renamed the item.
+            try TransferModificationDates.restore(modificationDates, at: destination, rootName: entry.lastPathComponent)
             movedEntries.append(destination)
         }
         try? fileManager.removeItem(at: archiveURL)
