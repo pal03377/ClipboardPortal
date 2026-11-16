@@ -1,2 +1,9 @@
 *.cer
 *.p8
+
+.bundle/
+build/
+fastlane/report.xml
+fastlane/README.md
+vendor/bundle/
+fastlane/api_key.json

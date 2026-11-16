@@ -74,23 +74,5 @@
    <ArchiveAction
       buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
-      <PostActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Run Script"
-               scriptText = "# Increase build number when running Archive&#10;# Source: https://www.theswift.dev/posts/auto-increment-your-build-numbers&#10;cd &quot;${PROJECT_DIR}&quot; ; agvtool bump&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "DAAB33BA2BCAFDCB00C82DF4"
-                     BuildableName = "Clipboard Portal.app"
-                     BlueprintName = "Clipboard Portal"
-                     ReferencedContainer = "container:ClipboardPortal.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
-            </ActionContent>
-         </ExecutionAction>
-      </PostActions>
    </ArchiveAction>
 </Scheme>

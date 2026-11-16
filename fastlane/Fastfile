@@ -1,0 +1,123 @@
+require "json"
+require "shellwords"
+require "securerandom"
+require "fileutils"
+require "fastlane_core/build_watcher"
+
+opt_out_usage
+
+def connect_key_path
+  File.expand_path(ENV.fetch("ASC_API_KEY_PATH", "api_key.json"), __dir__)
+end
+
+def signing_keychain
+  File.expand_path("../build/signing/ClipboardPortal-release.keychain-db", __dir__)
+end
+
+def signing_password
+  path = File.expand_path("../build/signing/keychain-password", __dir__)
+  FileUtils.mkdir_p(File.dirname(path))
+  File.write(path, SecureRandom.urlsafe_base64(32), perm: 0600) unless File.exist?(path)
+  File.read(path)
+end
+
+def connect_key
+  app_store_connect_api_key(**JSON.parse(File.read(connect_key_path), symbolize_names: true).slice(:key_id, :issuer_id, :key, :in_house).transform_keys { |k| k == :key ? :key_content : k })
+end
+
+default_platform(:mac)
+
+platform :mac do
+  desc "Build a signed Release archive for App Store distribution"
+  lane :archive do
+    build_mac_app(
+      project: "ClipboardPortal.xcodeproj",
+      scheme: "Clipboard Portal",
+      configuration: "Release",
+      archive_path: "build/ClipboardPortal.xcarchive",
+      buildlog_path: "build/logs",
+      output_directory: "build",
+      skip_package_pkg: true,
+      xcargs: "-allowProvisioningUpdates"
+    )
+  end
+
+  desc "Install local Mac App Store distribution signing certificates"
+  lane :setup_signing do
+    key = connect_key
+    if File.exist?(signing_keychain)
+      unlock_keychain(path: signing_keychain, password: signing_password)
+    else
+      create_keychain(path: signing_keychain, password: signing_password, unlock: true, timeout: 21600, lock_when_sleeps: true)
+    end
+    get_certificates(api_key: key, platform: "macos", development: false, generate_apple_certs: false, output_path: "build/signing", keychain_path: signing_keychain, keychain_password: signing_password)
+    app_certificate_id = lane_context[SharedValues::CERT_CERTIFICATE_ID]
+    get_certificates(api_key: key, platform: "macos", type: "mac_installer_distribution", output_path: "build/signing", keychain_path: signing_keychain, keychain_password: signing_password)
+    get_provisioning_profile(api_key: key, cert_id: app_certificate_id, platform: "macos", app_identifier: "de.pschwind.ClipboardPortal", provisioning_name: "ClipboardPortal App Store Fastlane", output_path: "build/signing")
+  end
+
+  desc "Sign and upload the existing archive to App Store Connect"
+  lane :upload do
+    unlock_keychain(path: signing_keychain, password: signing_password) if File.exist?(signing_keychain)
+    key = JSON.parse(File.read(connect_key_path))
+    key_file = File.expand_path("../build/AuthKey_#{key.fetch('key_id')}.p8", __dir__)
+    File.write(key_file, key.fetch("key"), perm: 0600)
+    args = ["-allowProvisioningUpdates", "-authenticationKeyPath", key_file, "-authenticationKeyID", key.fetch("key_id"), "-authenticationKeyIssuerID", key.fetch("issuer_id")].shelljoin
+    begin
+      build_mac_app(
+        project: "ClipboardPortal.xcodeproj",
+        scheme: "Clipboard Portal",
+        archive_path: "build/ClipboardPortal.xcarchive",
+        skip_build_archive: true,
+        output_directory: "build",
+        buildlog_path: "build/logs",
+        export_method: "app-store",
+        export_options: {
+          destination: "upload",
+          signingStyle: "manual",
+          signingCertificate: "3rd Party Mac Developer Application: Paul Schwind (5D4FR5T9QN)",
+          installerSigningCertificate: "3rd Party Mac Developer Installer: Paul Schwind (5D4FR5T9QN)",
+          provisioningProfiles: { "de.pschwind.ClipboardPortal" => "ClipboardPortal App Store Fastlane" },
+          manageAppVersionAndBuildNumber: false
+        },
+        export_xcargs: args
+      )
+    ensure
+      File.delete(key_file) if File.exist?(key_file)
+    end
+  end
+
+  desc "Update release notes and submit build 30 for automatic release after review"
+  lane :submit do
+    key = connect_key
+    app = Spaceship::ConnectAPI::App.find("de.pschwind.ClipboardPortal")
+    FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+      app_id: app.id, platform: "MAC_OS", app_version: "1.13", build_version: "30",
+      poll_interval: 15, timeout_duration: 1200, return_spaceship_testflight_build: false
+    )
+    upload_to_app_store(
+      api_key: key,
+      app_identifier: "de.pschwind.ClipboardPortal",
+      platform: "osx",
+      app_version: "1.13",
+      build_number: "30",
+      metadata_path: "fastlane/metadata",
+      app_rating_config_path: "fastlane/age-rating.json",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      submit_for_review: true,
+      automatic_release: true,
+      run_precheck_before_submit: false,
+      submission_information: { export_compliance_uses_encryption: false },
+      force: true
+    )
+  end
+
+  desc "Archive, upload, and submit the release"
+  lane :release do
+    archive
+    upload
+    submit
+  end
+
+end
